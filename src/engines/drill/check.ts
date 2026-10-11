@@ -41,3 +41,44 @@ export function explainAny<Q extends DrillQ>(g: DrillGame<Q>, tag: string, q: Q,
 }
 
 export const errLabel = (g: DrillGame<DrillQ>, tag: string) => g.errLabels[tag] ?? ENGINE_ERR[tag];
+
+/* ---------- uppläsning ---------- */
+
+const SAY_OP: Record<string, string> = {
+  '+': 'plus', '−': 'minus', '-': 'minus', '·': 'gånger', '/': 'delat med', '=': 'är lika med', '<': 'är mindre än', '>': 'är större än',
+  ':': 'till', '≈': 'är ungefär',
+};
+const SAY_UNIT: Record<string, string> = {
+  kr: 'kronor', mm: 'millimeter', cm: 'centimeter', dm: 'decimeter', m: 'meter', km: 'kilometer', l: 'liter', dl: 'deciliter', cl: 'centiliter', ml: 'milliliter',
+  'cm²': 'kvadratcentimeter', 'm²': 'kvadratmeter', 'dm²': 'kvadratdecimeter', 'cm³': 'kubikcentimeter', 'dm³': 'kubikdecimeter', 'm³': 'kubikmeter', '°': 'grader', g: 'gram', kg: 'kilo',
+};
+const DELAR: Record<number, string> = { 3: 'tredjedel', 4: 'fjärdedel', 5: 'femtedel', 6: 'sjättedel', 7: 'sjundedel', 8: 'åttondel', 9: 'niondel', 10: 'tiondel', 12: 'tolftedel' };
+
+/** Ett bråk i ord: "tre fjärdedelar", "en halv", "hur många femtedelar". */
+function sayFrac(n: number | null, d: number | null): string {
+  if (d === null) return `${n} delat med vad`;
+  const one = d === 2 ? 'halv' : DELAR[d] ?? `${d}-del`;
+  const many = d === 2 ? 'halvor' : `${one}ar`;
+  if (n === null) return `hur många ${many}`;
+  return n === 1 ? `en ${one}` : `${fmtNum(n)} ${many}`;
+}
+
+/** Tecken i löptext i ord: "−6" → "minus 6", "x = 3" → "x är lika med 3". */
+const sayText = (t: string) => t
+  .replace(/[−-](?=\d)/g, 'minus ').replace(/−/g, ' minus ').replace(/\s*=\s*/g, ' är lika med ').replace(/·/g, ' gånger ')
+  .replace(/≈/g, ' ungefär ').replace(/</g, ' mindre än ').replace(/>/g, ' större än ').replace(/π/g, 'pi')
+  .replace(/\s+/g, ' ').replace(/ ([,.?!])/g, '$1').trim();
+
+/** Frågan som text att läsa upp: instruktionen, uppställningen ("sju plus vad är lika med tolv") och alternativen. */
+export function spoken(q: DrillQ): string {
+  const eq = q.parts.map((p) => {
+    if (p === null) return q.choices ? '…' : 'vad';
+    if (typeof p === 'number') return fmtNum(p).replace('−', 'minus ');
+    if (typeof p === 'object') return sayFrac(p.n, p.d);
+    return SAY_OP[p] ?? SAY_UNIT[p] ?? sayText(p);
+  }).join(' ');
+  const choices = q.choices && !q.prompt?.includes('Välj') ? ` Välj: ${q.choices.map((c) => SAY_OP[c.label] ?? sayText(c.label)).join(', ')}.` : '';
+  const head = q.prompt ? sayText(q.prompt) : '';
+  // En ensam ruta ("vad") säger inget mer än frågan.
+  return [head, eq === 'vad' || eq === '…' ? '' : `${eq}.`, choices.trim()].filter(Boolean).join(' ');
+}

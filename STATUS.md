@@ -4,6 +4,9 @@
 
 ## Done
 
+- **Read-aloud of drill questions** (2026-10-12): every drill question (all of Talbergen and Betongbukten) has a 🔊 button when the device has a Swedish voice. `spoken(q)` in `src/engines/drill/check.ts` turns the question into Swedish: operators ("plus", "delat med", "är lika med"), units ("kronor", "kvadratcentimeter"), fractions ("tre fjärdedelar", "hur många femtedelar"), negative numbers, symbols inside the prompt text, and the choices. Numbers drawn only in the picture (`Visual`, e.g. prices on goods) are not read. Test: `tests/uppläsning.test.ts` (every question of every drill area reads without symbols or leftovers).
+- The m-rule texts in Stavningsträsket now say "nästan inga ord slutar på två m" (lamm, damm).
+
 - **More content in all word areas** (2026-10-12): Stavningsträsket 267 → 413 words (every rule grew, both bands; new småord like mig/dig/sig, något/någon, hade/blev/gav/tog, dem), Rimbäcken 216 → 349 items (13 new rhyme groups, 12 verses, 22 word pairs, 16 compounds, 14 word meanings, 20 idioms), Meningssmedjan 154 → 260 (sentences for every topic, incl. new questions to build and new sambandsord like *ifall*, *tills*, *medan*). Fixed: two wrong rhyme options could be the same word. The new content also needs the parent's proofread.
 
 - **Ordskogen S3 – Rimbäcken** (2026-10-12, `src/games/rim/`, word lists in `ord.ts`): rim (which word rhymes + finish-the-verse), motsatser, synonymer, sammansatta ord (what is a bokhylla? / which word means …), ord med flera betydelser, uttryck. 5 eras, 13 stages. Monsters Tvärtomtrollet (`tvartom`: picks a synonym when asked for an opposite, or the reverse) and Bokstavliga Bengt (`bokstavligt`: takes an idiom literally); Mästare Rimmästaren (generic persona Skalden Strofa, slot `rimbacken.mastare`). Every wrong option carries its error tag (rhymes with the start instead of the end, near-rhyme, fits but doesn't rhyme, related word, first part decides, another meaning …). Skill ids `sv.ord.<topic>`. Tests: `tests/rimbacken.test.ts`, `e2e/ordskogen.spec.ts`.
@@ -123,7 +126,7 @@ Older options:
 
 Talbergen, Betongbukten, the village, Vuxenläge and the three mini-games are done, and games are lazy-loaded (see below). Options, to pick with the user:
 1. Svenska/engelska (wordpack engine) – the user put this on hold.
-2. Read-aloud of drill questions (PLAN §12: read-aloud on every instruction; only mentor text has 🔊 today).
+2. Read-aloud of what the drill pictures show (prices, ruler readings); the drill text itself is read since 2026-10-12.
 
 Smaller things:
 - Mini-games: all three planned ones are done (Dimstormen, Grottdyket, Bossduellen in Arenan). They need a playtest with the kids for balance: Dimstormen `stormNumbers()`, `WAVES`/`stegScale()`; Grottdyket `caveNumbers()`, `MONS`/`depthScale()`, what `genFloor()` places; Bossduellen `duelNumbers()`, `OPPONENTS` (hp, atk, wind, open), `HOP_SECS`. Ideas for later: sound effects, more opponents/monsters.
@@ -148,8 +151,7 @@ Tiokompisbron, Tabellgruvan, Myntmarknaden, Tallinjebron and Bråkbageriet are t
 
 - The main chunk is about 85 KB gzipped JS + 11 KB CSS; each game is a 3–6 KB chunk, the mini-games 4–10 KB each, plus the shared drill engine (~4 KB) and klocka's question view (~7 KB). CSS is still one file for all games.
 - On a phone the calculator sits below the answer box, so the child scrolls between them. Fine for now; a floating panel could come later.
-- Read-aloud of drill questions isn't there yet (the 🔊 button exists only on mentor text).
-- `e2e/loot.spec.ts` failed once (2 "Ta av" buttons after one "Använd"), then passed 3/3 reruns. Possibly a double render in Azaleagården; worth a look if it recurs.
+- `e2e/loot.spec.ts` fails about 1 run in 30 (2 "Ta av" buttons after one "Använd"; reproduce with `--repeat-each=30`). Checked 2026-10-12: nothing equips items except the button in `Gard.tsx`, and the chest modal closes on click (no tap falling through). With a 300 ms wait after the click it passed 40/40, which hints at timing but isn't proof. Not found yet.
 
 - The map art is drawn in SVG by hand; Ordskogen's trees slightly overlap Azaleabyn.
 - Emoji look different on different platforms (Windows is flatter).

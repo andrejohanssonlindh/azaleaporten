@@ -228,7 +228,7 @@ export function explain(tag: string, q: SQ): Explained {
       };
     case 'm-regeln': {
       const [k, l] = PAIRS_M.find(([x, y]) => !w.includes(x) && !y.includes(w))!;
-      return { title: 'M-regeln', text: `Inget ord slutar på två m. Man skriver "${k}" – men "${l}", där ordet fortsätter.` };
+      return { title: 'M-regeln', text: `Nästan inga ord slutar på två m. Man skriver "${k}" – men "${l}", där ordet fortsätter.` };
     }
     case 'ck':
       return { title: 'Två k skrivs ck', text: `Man skriver aldrig kk. Man skriver ck i stället. Exempel: ${ex(q, ['tack', 'vecka', 'docka', 'flicka'], 2)}.` };
@@ -261,7 +261,7 @@ const HINT: Record<Rule, string> = {
   smaord: 'Småord säger vi ofta slarvigt. Hur ser ordet ut i skrift?',
   dubbel: 'Lyssna på vokalen. Kort vokal – två konsonanter efter.',
   lang: 'Lyssna på vokalen. Lång vokal – bara en konsonant efter.',
-  m: 'M-regeln: inget ord slutar på två m. Men mitt i ett ord kan m bli dubbelt.',
+  m: 'M-regeln: nästan inga ord slutar på två m. Men mitt i ett ord kan m bli dubbelt.',
   ck: 'Två k skrivs alltid ck.',
   ng: 'ng-ljudet kan skrivas ng, n före k, eller g före n.',
   j: 'j-ljudet kan skrivas j, g, gj, hj, dj eller lj.',
@@ -286,7 +286,7 @@ function tip(q: SQ): string {
     case 'smaord': return 'Småord skrivs inte alltid som de låter.';
     case 'dubbel': return 'Kort vokal – och då dubbel konsonant.';
     case 'lang': return 'Lång vokal – och då en konsonant.';
-    case 'm': return w.endsWith('mm') || !w.endsWith('m') ? 'Mitt i ordet kan m bli dubbelt.' : 'M-regeln: inget ord slutar med mm.';
+    case 'm': return w.endsWith('mm') || !w.endsWith('m') ? 'Mitt i ordet kan m bli dubbelt.' : 'M-regeln: nästan inga ord slutar med mm.';
     case 'ck': return 'Två k skrivs ck.';
     case 'ng': return /nk/.test(w) ? 'n före k låter som ng.' : /gn/.test(w) ? 'g före n låter som ng.' : 'Här skrivs ng-ljudet ng.';
     case 'j': return `Här skrivs j-ljudet "${/^(hj|dj|lj|gj|g|j)/.exec(w)?.[0]}".`;

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { GameModule, QuestionViewProps } from '../../platform/rpg/types';
-import { diagnoseAny, errLabel, explainAny, fmtNum, isRight, parseAnswer, sameNumber } from './check';
+import { canSpeak, hasVoice, speak, voices } from '../../platform/speech';
+import { diagnoseAny, errLabel, explainAny, fmtNum, isRight, parseAnswer, sameNumber, spoken } from './check';
 import { Tools } from './Tools';
 import type { DrillGame, DrillQ, Explained, Frac, Part } from './types';
 
@@ -44,6 +45,7 @@ function Equation(slot: SlotProps) {
 export function makeDrillView<Q extends DrillQ>(g: DrillGame<Q>) {
   return function DrillView({ q: raw, hint, onAnswer, onDone, nextLabel = 'Nästa' }: QuestionViewProps) {
     const q = raw as Q;
+    voices.value; // rita om när enhetens röster har laddats
     const [phase, setPhase] = useState<Phase>('open');
     const [tries, setTries] = useState(0);
     const [err, setErr] = useState<Explained | null>(null);
@@ -88,7 +90,12 @@ export function makeDrillView<Q extends DrillQ>(g: DrillGame<Q>) {
     return (
       <div class="kq drill">
         {hint && <p class="hint-tag">💡 {g.hint(q)}</p>}
-        {q.prompt && <p class="drill-prompt">{q.prompt}</p>}
+        {(q.prompt || (canSpeak() && hasVoice('sv-SE'))) && (
+          <div class={`ord-head${q.prompt ? '' : ' only-speak'}`}>
+            {q.prompt && <p class="drill-prompt">{q.prompt}</p>}
+            {canSpeak() && hasVoice('sv-SE') && <button type="button" class="speak" onClick={() => speak(spoken(q))} aria-label="Läs upp">🔊</button>}
+          </div>
+        )}
         {Visual && <Visual q={q} hint={hint} done={phase === 'done'} />}
         <form class="eq-form" onSubmit={(e) => { e.preventDefault(); if (!q.choices) submit(); }}>
           <Equation {...slot} />

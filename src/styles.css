@@ -876,6 +876,7 @@ button.stat.on { border-color: var(--accent); }
 /* ---------- Ordmotorn (svenska) ---------- */
 .ord-head { position: relative; padding: 0 42px; }
 .ord-head .speak { top: -8px; right: 0; }
+.ord-head.only-speak { min-height: 34px; }
 .ord-sentence { font-size: 22px; line-height: 1.7; margin: 6px 0 12px; white-space: pre-line; }
 .ord-gap { display: inline-block; min-width: 3.2em; border-bottom: 3px solid var(--accent); margin: 0 4px; font-weight: 800; line-height: 1.2; }
 .ord-gap.filled { color: var(--ok); border-color: var(--ok); }
