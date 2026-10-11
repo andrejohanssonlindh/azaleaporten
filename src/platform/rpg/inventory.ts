@@ -191,7 +191,10 @@ export function useLifePotion(hid: string): boolean {
 
 /* ---------- unika föremål från bossar ---------- */
 
-const PET_STAT: Record<string, Stat> = { halv: 'kraft', rel: 'skydd', period: 'tur', hm: 'snabbhet' };
+const PET_STAT: Record<string, Stat> = {
+  halv: 'kraft', rel: 'skydd', period: 'tur', hm: 'snabbhet',
+  'glomd-tia': 'kraft', 'lanade-inte': 'skydd', plus: 'tur', 'noll-ett': 'klurighet', granntabell: 'snabbhet',
+};
 
 /** Ger husdjursföremålet för en tämjd boss (om det inte redan finns). */
 export function givePetItem(hid: string, key: string, pet: { name: string; icon: string }, trap?: string): Item | null {

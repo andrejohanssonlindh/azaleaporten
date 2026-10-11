@@ -27,12 +27,12 @@ export interface Region {
 export const REGIONS: Region[] = [
   {
     id: 'talbergen', name: 'Talbergen', subject: 'Matematik', icon: '⛰️',
-    tagline: 'Höga toppar av tal och tid. Högst upp står Tidstornet.',
+    tagline: 'Höga toppar av tal och tid. Över forsen går Tiokompisbron, djupt i berget ligger Tabellgruvan och högst upp står Tidstornet.',
     sky: ['#4f9fe0', '#cde9f8', '#6a7f5a'],
     areas: [
       { id: 'tidstornet', name: 'Tidstornet', icon: '🕰️', desc: 'Res genom tiden och läs klockor.', grades: [1, 5], status: 'open' },
-      { id: 'tiokompisbron', name: 'Tiokompisbron', icon: '🌉', desc: 'Plus och minus med tiotalsövergång.', grades: [1, 3], status: 'soon' },
-      { id: 'tabellgruvan', name: 'Tabellgruvan', icon: '⛏️', desc: 'Gångertabeller och division.', grades: [2, 6], status: 'soon' },
+      { id: 'tiokompisbron', name: 'Tiokompisbron', icon: '🌉', desc: 'Plus och minus med tiotalsövergång.', grades: [1, 3], status: 'open' },
+      { id: 'tabellgruvan', name: 'Tabellgruvan', icon: '⛏️', desc: 'Gångertabeller och division.', grades: [2, 6], status: 'open' },
       { id: 'myntmarknaden', name: 'Myntmarknaden', icon: '🪙', desc: 'Pengar och växel.', grades: [1, 4], status: 'soon' },
       { id: 'brakbageriet', name: 'Bråkbageriet', icon: '🥧', desc: 'Bråk du kan se och smaka på.', grades: [3, 6], status: 'soon' },
       { id: 'tallinjebron', name: 'Tallinjebron', icon: '📏', desc: 'Tallinjen, decimaler och negativa tal.', grades: [2, 6], status: 'soon' },

@@ -60,6 +60,7 @@ export const TIDSTORNET: AreaDef = {
   gameId: 'klocka',
   title: 'Tidstornet',
   kunskap: { name: 'Tidsmagi', icon: '⏳' },
+  texts: { cleared: 'Tidsmaskinen är laddad!', notYet: 'Tidsmaskinen behöver minst 9 rätt – försök igen!', back: 'Till tornet' },
   story: 'Tidsmaskinen högst upp i Tidstornet har gått sönder, och nu visar klockorna fel i alla tidsåldrar! Res genom tiden, läs klockorna rätt och ladda tidsmaskinen – nio rätt av tio tar dig vidare.',
   eras: [
     { id: 'dinosaurier', name: 'Dinosauriernas tid', icon: '🦕', fact: 'För 66 miljoner år sedan fanns inga klockor alls – men nu har du med dig en!',

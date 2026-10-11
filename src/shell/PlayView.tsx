@@ -9,7 +9,6 @@ import { levelTitle } from '../platform/rpg/balance';
 import type { BossDef, PathNode } from '../platform/rpg/types';
 import { playable } from '../content/areas';
 import { personaFor } from '../content/bosses';
-import { ERR } from '../games/klocka/logic/diagnose';
 import { leaveToPicker } from '../session';
 import { Portrait, Screen, Stars } from './ui';
 import { ItemCard } from './Loot';
@@ -79,7 +78,7 @@ export function PlayView({ areaId, nodeId, practice = false }: { areaId: string;
           <blockquote class="boss-speech">"{face.entrance}"</blockquote>
           <p class="boss-rules">
             Du har {'❤️'.repeat(hearts)}. Svara rätt {boss.hp} gånger för att vinna – ett fel kostar ett hjärta.
-            {boss.trap && <> Akta dig: varannan fråga är en fälla ({ERR[boss.trap]?.toLowerCase()}).</>}
+            {boss.trap && <> Akta dig: varannan fråga är en fälla ({pl.game.errLabel(boss.trap)?.toLowerCase()}).</>}
           </p>
           <div class="row center-row">
             <button class="btn" onClick={() => go(back)}>Inte än</button>
@@ -188,13 +187,13 @@ function Result({ o, areaId, node, face, practice, onAgain }: { o: Outcome; area
     head = (
       <>
         <div class="big-emoji">⚡</div>
-        <h1>Tidsmaskinen är laddad!</h1>
+        <h1>{pl.def.texts.cleared}</h1>
         <div class="result-stars"><Stars n={o.stars} /></div>
         <p>{o.correct} av {o.total} rätt{o.stars === 2 && !o.usedHint ? ` – svara snabbare för tredje stjärnan (snitt ${(o.avgMs / 1000).toFixed(1)} s)` : ''}{o.usedHint && o.stars === 2 ? ' – utan ledtråd kan du få tre stjärnor' : ''}.</p>
       </>
     );
   } else {
-    head = <><div class="big-emoji">🔋</div><h1>Nästan!</h1><p>{o.correct} av {o.total} rätt. Tidsmaskinen behöver minst 9 rätt – försök igen!</p></>;
+    head = <><div class="big-emoji">🔋</div><h1>Nästan!</h1><p>{o.correct} av {o.total} rätt. {pl.def.texts.notYet}</p></>;
   }
 
   return (
@@ -218,7 +217,7 @@ function Result({ o, areaId, node, face, practice, onAgain }: { o: Outcome; area
         )}
         {o.tired && <p class="note">Hjälten är trött för idag – inga fler kastanjer, men allt du lär dig räknas!</p>}
         <div class="row center-row">
-          <button class="btn" onClick={() => go(back)}>{practice ? 'Tillbaka' : 'Till tornet'}</button>
+          <button class="btn" onClick={() => go(back)}>{practice ? 'Tillbaka' : pl.def.texts.back}</button>
           <button class="btn" onClick={onAgain}>{o.kind === 'boss' && !o.bossWon ? 'Försök igen' : 'Spela igen'}</button>
           {!practice && next && next.id !== node.id && (o.cleared || o.bossWon) && (
             <button class="btn primary" onClick={() => go(`spela/${areaId}/${next.id}`)}>Vidare: {next.type === 'boss' ? 'Bossen!' : next.name}</button>

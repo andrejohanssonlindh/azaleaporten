@@ -61,6 +61,8 @@ export interface AreaDef {
   /** Kunskapen på hjältebladet som området tränar. */
   kunskap: { name: string; icon: string };
   story: string;
+  /** Ord på resultatskärmen, i områdets tema. */
+  texts: { cleared: string; notYet: string; back: string };
   eras: EraDef[];
 }
 
@@ -80,6 +82,8 @@ export interface GameModule {
   id: string;
   makeQuestion(spec: QuestionSpec, rng: Rng): unknown;
   skillOf(q: unknown): string;
+  /** Kort beskrivning av en felkod (bossintro, statistik). */
+  errLabel(tag: string): string | undefined;
   View: ComponentType<QuestionViewProps>;
 }
 

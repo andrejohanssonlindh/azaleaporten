@@ -1,6 +1,6 @@
 # Status – Azaleaporten
 
-*Updated 2026-10-11 after Phase 3. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
+*Updated 2026-10-11 after Phase 5a (Talbergen: Tiokompisbron + Tabellgruvan). Live: https://andrejohanssonlindh.github.io/azaleaporten/*
 
 ## Done
 
@@ -21,55 +21,49 @@
   - tamed bosses → pet items, the Pionjärkista
   - gear affects only boss fights, luck, XP and hints (see the "learning integrity" rule in CLAUDE.md)
 
-Tests: `npm test` (Vitest, ~72 tests) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
+- **Phase 5a, Talbergen (matematik):**
+  - the **drill engine** (`src/engines/drill/`): a game supplies `make / diagnose / explain / solution / hint` (+ an optional `Visual`), and `drillModule()` turns it into a `GameModule` with a shared View (an equation with an answer box, open → fixing → done). Shared error tags: `omvanda-siffror`, `annat`.
+  - **Tiokompisbron** (`src/games/tiokompis/`): ten pairs, hundred pairs, +/− within 20 and to 100, with and without tiotalsövergång, missing terms. 14 stages, monsters Tiotapparen (`glomd-tia`) and Baklängesbävern (`lanade-inte`), Mästare Brovaktaren. Ten-frames as visual support.
+  - **Tabellgruvan** (`src/games/tabeller/`): tables 2/5/10 → 3/4 → 6–9 → all, division, the hidden factor, 0/1 rules, and a mixed race against the clock. 12 stages, monsters Plusråttan (`plus`), Nollfladdermusen (`noll-ett`) and Gångerspindeln (`granntabell`), Mästare Gruvmästarinnan. A dot array as hint.
+  - Explanations after a mistake explain the method but never state the answer (tested), so the child really fixes it.
+  - Platform: `GameModule.errLabel`, `AreaDef.texts` (result-screen words per area), a generic "Öva fritt" for every non-klocka area (`#/labb/<area>`), and the map's "Fortsätt" button follows the last area played (else the first one fitting the hero's årskurs).
 
-## Next mission: fill Talbergen (matematik)
+Tests: `npm test` (Vitest, 86 tests) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
 
-Make the math areas in `src/content/world.ts` playable. The heroes are in **åk 2** and **åk 4**, so each area needs good difficulty levels for both.
+## Next mission: Phase 4, the learning loop
 
-How to add an area (Tidstornet is the template):
-1. **The game:** create `src/games/<game>/`.
-   - `logic/` holds the pure generation, checking and **diagnosis of mistakes** (an error tag + an explanation in Swedish for the child), with tests.
-   - `index.ts` exports a `GameModule` (`makeQuestion(spec, rng)`, `skillOf(q)`, `View`).
-   - The View follows the same flow as `games/klocka/ui/QuestionView.tsx`: open → fixing (the child must fix a mistake; after 3 tries the answer is shown) → done. `onAnswer` is called only for the first answer.
-2. **Content:** `content.ts` with an `AreaDef` holding eras/sections, stages (`spec: {mode, level}`, `thrMs`) and bosses.
-   - Monster bosses are named after a typical misconception, with a `trap` matching an error tag and a `pet`.
-   - The area's final boss is a `kind: 'mastare'`, with a persona in `src/content/bosses.ts` under the id `<area>.mastare`.
-3. **Register** the area in `src/content/areas.ts` (`PLAYABLE`) and set `status: 'open'` in `world.ts`.
-4. **Ids are permanent:** stage, boss and skill ids (`ma.<area>.<skill>`) and error tags.
-5. **Tests:** logic (all generation is seeded), plus at least one full run in `tests/progress.test.ts` style.
+Now there are three areas and real skill ids in the event log (`k` in `h:<id>:events`), so the scheduler has something to work with.
+- A Leitner schedule (boxes 0, 1, 2, 4, 8, 16 days) built from the event log per skill id; a new `h:<id>:skills` record (versioned, with a fixture test).
+- **Glömskans dimma** on the map and on area pages where skills are due.
+- **Övningsängen** picks the due skills: a 5-question review run with `spec` per skill. Needs a way to make a question *for a skill*: add an optional `GameModule.specForSkill(skill)` (drill games can map `ma.mult.7` → tables spec with that table; klocka maps `ma.tid.i-halv` → a words/choice spec).
+- **Uppdragstavlan** (3 daily quests), streak with one freeze day a week.
+- Mästare Kastanj's greeting names what needs repeating.
 
-Suggested order and content:
-- **Tiokompisbron** (åk 1–3, the åk 2 hero's focus):
-  - number pairs to 10/100
-  - +/− without and then with tiotalsövergång
-  - missing addend (3 + _ = 10)
-  - typical mistakes: forgets the carry, subtracts the wrong way round (smaller from larger in every column)
-- **Tabellgruvan** (åk 2–6, the åk 4 hero's focus):
-  - tables 2/5/10 → 3/4 → 6–9
-  - division as reversed multiplication
-  - mixed and against the clock
-  - typical mistakes: neighbouring table (7·8 → 54/63), adding instead of multiplying, 0/1 rules
-- **Myntmarknaden:** Swedish coins and notes, adding up a price, giving change.
-- **Bråkbageriet** (åk 3–6): fractions as pizza pieces, comparing, equivalent fractions, adding with the same denominator.
+## Then: more of Talbergen
+
+How to add a drill area (Tiokompisbron/Tabellgruvan are the templates):
+1. `src/games/<game>/logic.ts`: seeded `makeQ(spec, rng)` returning a `DrillQ` (`parts` with `null` for the answer box, `answer`, `skill`), plus `diagnose`, `explain` (never state the answer), `solution`, `hint` and `ERR` labels. Boss traps: `makeQ` must produce a question that can trigger `spec.trap`.
+2. `index.tsx`: `drillModule({ id, make, diagnose, explain, solution, hint, Visual?, errLabels })`.
+3. `content.ts`: an `AreaDef` with `texts`, eras, stages, monster bosses (trap + pet) and a final `mastare`; a generic persona in `src/content/bosses.ts` under `<area>.mastare`; the trap's pet stat in `PET_STAT` (`inventory.ts`).
+4. Register in `src/content/areas.ts`, set `status: 'open'` in `world.ts`. `tests/talbergen.test.ts` already plays every registered area through.
+
+Remaining Talbergen areas:
+- **Myntmarknaden:** Swedish coins and notes, adding up a price, giving change. Needs a coin Visual; answers are still integers (kronor).
+- **Bråkbageriet** (åk 3–6): fractions as pizza pieces, comparing, equivalent fractions, adding with the same denominator. Answers aren't single integers – extend the drill engine with a choice mode or a fraction input.
 - **Tallinjebron:** placing numbers on a number line, rounding, decimals, negative numbers.
-
-A shared "drill engine" (generate / check / diagnose / explain + an input-number View) is worth extracting from the first new game, so the following ones go quickly.
 
 ## Next after that (in PLAN.md order)
 
-- Phase 4, the learning loop:
-  - a Leitner schedule over `h:<id>:events`
-  - Glömskans dimma on the map
-  - Övningsängen choosing from what's due
-  - Uppdragstavlan (daily quests)
-  - Mästare Kastanj's greeting saying what needs repeating
 - Betongbukten (geometri, the Malmö skateparks): Fluffy → … → Stapelbäddsparken.
 - Ordskogen (svenska) and Västerön (engelska), via a wordpack engine with JSON content.
 - Biblioteket: the child's own statistics (common mistakes per skill).
 - Teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`).
 
 ## Known minor things
+
+- Games are bundled into the main chunk (60 KB gzipped in total). Lazy-load them per area when the bundle nears the 150 KB budget.
+- Read-aloud of drill questions isn't there yet (the 🔊 button exists only on mentor text).
+- Mästare Kastanj's first greeting still points every new hero to Tidstornet; the åk 2 hero might be better sent to Tiokompisbron.
 
 - The map art is drawn in SVG by hand; Ordskogen's trees slightly overlap Azaleabyn.
 - Emoji look different on different platforms (Windows is flatter).

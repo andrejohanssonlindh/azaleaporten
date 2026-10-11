@@ -435,3 +435,18 @@ button.slot { background: transparent; color: inherit; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .gate.opening::after { display: none; }
 }
+
+/* ---------- drillfrågor (Tiokompisbron, Tabellgruvan) ---------- */
+.eq-form { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 6px 0 8px; }
+.eq { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; background: var(--card); border-radius: 18px; padding: 18px 14px; box-shadow: var(--shadow); font-size: 40px; font-weight: 900; line-height: 1; min-width: 260px; }
+.eq-op { color: var(--muted); font-weight: 800; }
+.eq-input { width: 2.9em; font: inherit; font-size: 36px; text-align: center; padding: 6px 4px; border-radius: 14px; border: 3px solid var(--line); background: var(--bg); color: var(--ink); min-height: 56px; }
+.eq-input:focus { border-color: var(--accent); outline: none; }
+.eq-ans { color: var(--ok); border-bottom: 4px solid var(--ok); padding: 0 6px; }
+.tenframe, .dot-array { display: block; margin: 0 auto 10px; max-width: 100%; height: auto; }
+.tf-cell { fill: var(--card); stroke: var(--rim); stroke-width: 2; }
+.tf-dot.tf-a { fill: var(--minhand); }
+.tf-dot.tf-b { fill: var(--accent); }
+.tf-dot.tf-x { fill: var(--line); }
+.tf-cross { stroke: var(--bad); stroke-width: 3; stroke-linecap: round; }
+@media (max-width: 380px) { .eq { font-size: 32px; min-width: 0; } .eq-input { font-size: 30px; } }

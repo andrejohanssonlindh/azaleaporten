@@ -58,6 +58,26 @@ export const GENERIC_PERSONAS: Persona[] = [
     defeat: 'Du behärskar tiden. Ta mitt timglas – det är ditt nu.',
     signatureItem: { name: 'Väktarens timglas', slot: 'amulett', flavor: 'Sanden rinner uppåt när du tänker.' },
   },
+  {
+    boss: 'tiokompisbron.mastare', name: 'Brovaktaren Balans', title: 'Tiokompisbrons Mästare', portrait: '🧝', color: '#0ca678',
+    entrance: 'Halt! Ingen kliver över min bro utan att kunna sina tiokompisar. Visa vad du går för!',
+    phase2: 'Huvudräkning över forsen – nu går det fort!',
+    phase3: 'Sista spannet: allt på en gång!',
+    onHeroMiss: ['Plankan knakar! Tänk efter.', 'Räkna ental och tiotal för sig.'],
+    onBossHit: ['Stadigt!', 'Den plankan håller.'],
+    defeat: 'Bron är din, brobyggare! Ta mitt vattenpass – bubblan ligger alltid i mitten när det stämmer.',
+    signatureItem: { name: 'Brovaktarens vattenpass', slot: 'skold', flavor: 'Bubblan ligger mitt i när svaret stämmer.' },
+  },
+  {
+    boss: 'tabellgruvan.mastare', name: 'Gruvmästarinnan Kvarts', title: 'Tabellgruvans Mästare', portrait: '👷‍♀️', color: '#f08c00',
+    entrance: 'Välkommen till djupet, hjälte. Jag har räknat varenda kristall i den här gruvan. Klarar du mitt tabellprov?',
+    phase2: 'Gruvvagnen rullar – svara innan den är förbi!',
+    phase3: 'Nu blandar jag ALLA tabeller!',
+    onHeroMiss: ['Den kristallen var falsk!', 'Tänk på grannen i tabellen.'],
+    onBossHit: ['Äkta diamant!', 'Klockrent – som en kristall.'],
+    defeat: 'Du kan tabellerna som en riktig gruvarbetare! Ta min hjälm med lykta – den lyser upp varenda tabell.',
+    signatureItem: { name: 'Gruvhjälmen med lykta', slot: 'huvud', flavor: 'Lyser starkare ju fler tabeller du kan.' },
+  },
 ];
 
 /** Väljer persona för en boss-plats: familjepaketets (matchande årskurs först), annars den allmänna. */

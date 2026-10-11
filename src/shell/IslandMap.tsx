@@ -4,7 +4,7 @@ import { getProfile } from '../platform/profiles';
 import { greeting } from '../platform/greeting';
 import { getArea, getPlay, nextOpenNode, findNode } from '../platform/rpg/progress';
 import { playable } from '../content/areas';
-import { areaById } from '../content/world';
+import { fitsGrade, REGIONS } from '../content/world';
 import { animal } from '../content/heroes';
 import { leaveToPicker } from '../session';
 import { Mentor, Screen, TopBar, UpdateBanner } from './ui';
@@ -137,20 +137,17 @@ export function IslandMap() {
   const lastNode = lastArea && findNode(lastArea.def, last!.nodeId);
   const lastPlace = lastNode ? `${lastNode.name} i ${lastArea!.def.title}` : null;
 
-  // Snabbknapp: fortsätt där äventyret pågår.
-  const tower = playable('tidstornet')!;
-  const next = nextOpenNode(tower.def, getArea(p.id, 'tidstornet'));
-  const towerInfo = areaById('tidstornet')!;
-
+  // Snabbknapp: fortsätt där äventyret pågår – senaste området, annars det första som passar årskursen.
+  const cont = continueTarget(p.id, p.grade, last?.areaId);
   return (
     <Screen class="map">
       <TopBar p={p} />
       <UpdateBanner />
       <Mentor text={greeting(p.name, previousVisit.value, lastPlace)} compact />
       <Island heroEmoji={animal(p.animal).emoji} />
-      {next && (
-        <button class="btn primary big continue" onClick={() => go(`spela/tidstornet/${next.id}`)}>
-          {towerInfo.area.icon} Fortsätt: {next.name}
+      {cont && (
+        <button class="btn primary big continue" onClick={() => go(`spela/${cont.areaId}/${cont.node.id}`)}>
+          {cont.icon} Fortsätt: {cont.node.name}
         </button>
       )}
       <footer class="map-foot">
@@ -158,4 +155,14 @@ export function IslandMap() {
       </footer>
     </Screen>
   );
+}
+
+function continueTarget(hid: string, grade: number, lastAreaId: string | undefined) {
+  const open = REGIONS.flatMap((r) => r.areas).filter((a) => a.status === 'open' && playable(a.id));
+  const order = [...open.filter((a) => a.id === lastAreaId), ...open.filter((a) => fitsGrade(a, grade)), ...open];
+  for (const a of order) {
+    const node = nextOpenNode(playable(a.id)!.def, getArea(hid, a.id));
+    if (node) return { areaId: a.id, node, icon: a.icon };
+  }
+  return null;
 }

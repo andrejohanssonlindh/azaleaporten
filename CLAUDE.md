@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Azaleaporten: a free, adventure/RPG-themed practice app (matematik, svenska, engelska) for school kids, hosted on GitHub Pages at `https://andrejohanssonlindh.github.io/azaleaporten/`. No backend: all progress lives in the browser's `localStorage` on each device. UI text, comments and many identifiers are **Swedish**; keep new user-facing text Swedish and child-friendly.
 
-The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phases 1–3 are done (platform, Tidstornet, loot/gear). **Current status and the next mission are in `STATUS.md`. Read it first.**
+The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phases 1–3 are done (platform, Tidstornet, loot/gear), plus Tiokompisbron and Tabellgruvan from Phase 5. **Current status and the next mission are in `STATUS.md`. Read it first.**
 
 ## Commands
 
@@ -62,7 +62,8 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
   Regions and areas are defined in `src/content/world.ts`, with recommended grades only (never locks). Betongbukten (geometry) uses Malmö skateparks as levels. `src/content/heroes.ts` has animals, colours and classes.
 - **Adventure model** (`src/platform/rpg/`):
   - an area (`AreaDef`) is a list of eras with a path of stage and boss nodes (`types.ts`); each node unlocks when the previous one is done
-  - a game is just a question factory, `GameModule` = `makeQuestion(spec, rng)` + `skillOf(q)` + a Preact `View` that runs open → fixing → done and reports only the first answer
+  - a game is just a question factory, `GameModule` = `makeQuestion(spec, rng)` + `skillOf(q)` + `errLabel(tag)` + a Preact `View` that runs open → fixing → done and reports only the first answer
+  - `AreaDef.texts` holds the area's result-screen words; non-klocka areas get a generic "Öva fritt" (`src/shell/LabbView.tsx`)
   - the platform owns everything else in `progress.ts`:
     - stage runs are exactly 10 questions; 9 right = ★, 10 = ★★, 10 under `thrMs` with no hint = ★★★
     - practice runs are 5 questions
@@ -82,6 +83,7 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
   - `logic/` holds the pure Swedish time-language model, the diagnosis of mistakes and the parser, ported from v0.1 and tested over all 720 times
   - `content.ts` holds the eras, stages, monster bosses (tamed → pets) and the final Mästare (persona via `personaFor`)
   - `V01_STAGE_MAP` maps the old v0.1 stage indexes
+- **Drill engine** (`src/engines/drill/`): for questions whose answer is an integer typed into a box in an equation. A game supplies `make / diagnose / explain / solution / hint` (+ optional `Visual`); `drillModule()` makes the `GameModule`. Explanations after a mistake explain the method and **never state the answer** (`tests/talbergen.test.ts` checks this), so the child fixes it themselves. Used by Tiokompisbron (`src/games/tiokompis/`) and Tabellgruvan (`src/games/tabeller/`). Skill ids are by topic, not area: `ma.add.*`, `ma.sub.*`, `ma.mult.<n>`, `ma.div.<n>`.
 - **Importing old progress:** `src/platform/legacy/klockaV01.ts` imports the old file's `localStorage` (via a console snippet pasted into Vuxenläge). The fixture is `tests/fixtures/storage/legacy-klocka-v01.json`.
 - **PWA:** `vite-plugin-pwa` with `registerType: 'prompt'`. `UpdateBanner` is shown only on calm screens (map, picker), never mid-exercise.
 - **Tests:**

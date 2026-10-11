@@ -79,12 +79,22 @@ export function AreaView({ id }: { id: string }) {
       ))}
 
       <section class="card lab-links">
-        <h2>🧪 Tidslabbet</h2>
-        <p class="muted">Öva fritt utan stjärnor, eller låt tidsmaskinen tolka en tid du skriver.</p>
-        <div class="row">
-          <button class="btn" onClick={() => go(`labb/${id}`)}>Öva fritt</button>
-          <button class="btn" onClick={() => go(`labb/${id}/tolka`)}>Tolka en tid</button>
-        </div>
+        {area.gameId === 'klocka' ? (
+          <>
+            <h2>🧪 Tidslabbet</h2>
+            <p class="muted">Öva fritt utan stjärnor, eller låt tidsmaskinen tolka en tid du skriver.</p>
+            <div class="row">
+              <button class="btn" onClick={() => go(`labb/${id}`)}>Öva fritt</button>
+              <button class="btn" onClick={() => go(`labb/${id}/tolka`)}>Tolka en tid</button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2>🧪 Öva fritt</h2>
+            <p class="muted">Välj själv vad du vill träna på. Inga stjärnor – bara träning.</p>
+            <div class="row"><button class="btn" onClick={() => go(`labb/${id}`)}>Öva fritt</button></div>
+          </>
+        )}
       </section>
     </Screen>
   );
