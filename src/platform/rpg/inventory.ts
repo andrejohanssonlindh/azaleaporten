@@ -194,6 +194,8 @@ export function useLifePotion(hid: string): boolean {
 const PET_STAT: Record<string, Stat> = {
   halv: 'kraft', rel: 'skydd', period: 'tur', hm: 'snabbhet',
   'glomd-tia': 'kraft', 'lanade-inte': 'skydd', plus: 'tur', 'noll-ett': 'klurighet', granntabell: 'snabbhet',
+  'raknade-antal': 'tur', 'fem-regeln': 'klurighet', teckenfel: 'skydd',
+  'storre-namnare': 'kraft', 'adderade-namnare': 'snabbhet',
 };
 
 /** Ger husdjursföremålet för en tämjd boss (om det inte redan finns). */

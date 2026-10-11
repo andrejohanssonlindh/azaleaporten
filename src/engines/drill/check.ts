@@ -9,17 +9,23 @@ export const ENGINE_ERR: Record<string, string> = {
 
 const reversed = (n: number) => Number(String(n).split('').reverse().join(''));
 
-/** Tolkar barnets svar. null = inte ett heltal (barnet får en vänlig uppmaning, och det räknas inte som svar). */
+/** Tolkar barnets svar: heltal, decimaltal med komma eller punkt, och minus. null = inte ett tal (räknas inte som svar). */
 export function parseAnswer(s: string): number | null {
-  const t = s.replace(/\s+/g, '');
-  if (!/^-?\d{1,6}$/.test(t)) return null;
+  const t = s.replace(/\s+/g, '').replace(/[−–]/g, '-').replace(',', '.');
+  if (!/^-?(\d{1,6}(\.\d{1,3})?|\.\d{1,3})$/.test(t)) return null;
   return Number(t);
 }
+
+/** Samma tal (decimaltal jämförs utan avrundningsfel). */
+export const sameNumber = (a: number, b: number) => Math.abs(a - b) < 1e-9;
+
+/** Tal som svenska barn skriver dem: decimalkomma och riktigt minustecken. */
+export const fmtNum = (n: number) => String(Math.round(n * 1000) / 1000).replace('.', ',').replace('-', '−');
 
 export function diagnoseAny<Q extends DrillQ>(g: DrillGame<Q>, q: Q, given: number): string {
   const tag = g.diagnose(q, given);
   if (tag) return tag;
-  if (q.answer >= 10 && given !== q.answer && reversed(given) === q.answer) return 'omvanda-siffror';
+  if (Number.isInteger(q.answer) && q.answer >= 10 && given !== q.answer && reversed(given) === q.answer) return 'omvanda-siffror';
   return 'annat';
 }
 

@@ -6,8 +6,13 @@ import type { QuestionSpec } from '../../platform/rpg/types';
 // t.ex. "8 + 5 = ?" eller "7 · ? = 56". Spelet levererar generering, diagnos och förklaringar;
 // motorn står för vyn (öppen → rätta → klar) och för fel som gäller alla spel.
 
-/** En del av uppställningen: ett tal, ett tecken, eller null = rutan där barnet skriver svaret. */
-export type Part = number | string | null;
+/** Ett bråk i uppställningen; null = rutan (täljare eller nämnare som ska fyllas i). */
+export interface Frac { n: number | null; d: number | null }
+
+/** En del av uppställningen: ett tal, ett tecken/en enhet, ett bråk, eller null = rutan där barnet svarar. */
+export type Part = number | string | null | Frac;
+
+export interface Choice { label: string; value: number }
 
 export interface DrillQ {
   mode: string;
@@ -16,6 +21,12 @@ export interface DrillQ {
   skill: string;
   parts: Part[];
   answer: number;
+  /** Text ovanför uppställningen, t.ex. en räknehändelse. */
+  prompt?: string;
+  /** Flerval i stället för att skriva: barnet trycker på ett alternativ (värdet jämförs med answer). */
+  choices?: Choice[];
+  /** Svaret kan vara negativt (ger en ±-knapp) eller ha decimaler (decimaltangentbord). */
+  keypad?: 'int' | 'signed' | 'decimal';
 }
 
 export interface Explained { title: string; text: string }

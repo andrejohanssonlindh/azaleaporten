@@ -51,7 +51,7 @@ export function App() {
   else if (page === 'repetera' && a) view = <PlayView key={path} areaId={a} nodeId="dimma" review />;
   else if (page === 'ovning') view = <Ovning />;
   else if (page === 'uppdrag') view = <Uppdrag />;
-  else if (page === 'labb' && a) view = <LabbView areaId={a} tab={b ?? ''} />;
+  else if (page === 'labb' && a) view = <LabbView key={a} areaId={a} tab={b ?? ''} />;
   else view = <IslandMap />;
 
   return (

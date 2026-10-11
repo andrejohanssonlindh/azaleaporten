@@ -150,7 +150,10 @@ describe('drillmotorn', () => {
   it('tolkar svar', () => {
     expect(parseAnswer(' 42 ')).toBe(42);
     expect(parseAnswer('1 000')).toBe(1000);
-    expect(parseAnswer('4,2')).toBeNull();
+    expect(parseAnswer('4,2')).toBe(4.2);
+    expect(parseAnswer('0.5')).toBe(0.5);
+    expect(parseAnswer('−3')).toBe(-3);
+    expect(parseAnswer('4,2,1')).toBeNull();
     expect(parseAnswer('')).toBeNull();
     expect(parseAnswer('tolv')).toBeNull();
   });

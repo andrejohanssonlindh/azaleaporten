@@ -478,3 +478,48 @@ button.slot { background: transparent; color: inherit; }
 .streak-card h2 { margin-bottom: 4px; }
 .quest-news { background: color-mix(in srgb, var(--gold) 12%, var(--card)); border-radius: 14px; padding: 4px 12px; margin: 10px 0; text-align: left; }
 .quest-news p { margin: 6px 0; }
+.drill-prompt { font-size: 19px; font-weight: 700; margin: 0 0 10px; }
+.eq-unit { color: var(--muted); font-size: .6em; font-weight: 800; }
+.eq-blank { display: inline-grid; place-items: center; min-width: 1.4em; min-height: 1.3em; border: 3px dashed var(--accent); border-radius: 12px; color: var(--accent); padding: 0 6px; }
+.eq-blank.small, .eq-ans.small { font-size: .8em; }
+.eq-ans.chosen { border-bottom: none; }
+.eq-frac { display: inline-flex; flex-direction: column; align-items: center; font-size: .85em; line-height: 1.05; }
+.eq-frac-n { padding: 0 6px 4px; border-bottom: 4px solid var(--ink); }
+.eq-frac-d { padding: 4px 6px 0; }
+.eq-input.small { width: 1.9em; font-size: 28px; min-height: 46px; padding: 2px; }
+.sign-btn { min-width: 54px; font-size: 22px; font-weight: 900; }
+.drill-choices { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 4px 0 8px; }
+.drill-choice { min-width: 76px; min-height: 60px; font-size: 26px; font-weight: 900; }
+.drill-choice.wrong { border-color: var(--bad); color: var(--bad); text-decoration: line-through; opacity: .7; }
+/* Myntmarknaden */
+.money, .market { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; margin: 0 auto 12px; max-width: 420px; }
+.coin-v { font: 900 15px var(--font); fill: #3d2c00; }
+.note-v { font: 900 20px var(--font); fill: #fff; paint-order: stroke; stroke: rgba(0,0,0,.25); stroke-width: 2px; }
+.ware { display: flex; flex-direction: column; align-items: center; background: var(--card); border-radius: 14px; padding: 8px 10px; box-shadow: var(--shadow); }
+.ware-icon { font-size: 34px; line-height: 1.1; }
+.price-tag { font-weight: 900; background: #fff3bf; color: #5c3d00; border-radius: 6px; padding: 1px 8px; font-size: 15px; }
+.ware-count { font-size: 26px; font-weight: 900; }
+.paid { display: flex; flex-direction: column; align-items: center; margin-left: 8px; }
+.paid small { color: var(--muted); font-weight: 700; }
+/* Tallinjebron */
+.numline-wrap { display: flex; justify-content: center; margin: 0 auto 10px; }
+.numline { max-width: 100%; height: auto; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); }
+.nl-axis { stroke: var(--ink); stroke-width: 3; }
+.nl-head { fill: var(--ink); }
+.nl-tick { stroke: var(--muted); stroke-width: 2; }
+.nl-tick.big { stroke: var(--ink); stroke-width: 3; }
+.nl-tick.zero { stroke: var(--accent); stroke-width: 4; }
+.nl-label { font: 800 13px var(--font); fill: var(--ink); }
+.nl-mark { fill: var(--accent); }
+.nl-mark-label { font: 900 14px var(--font); fill: var(--accent); }
+/* Bråkbageriet */
+.bakery { display: flex; gap: 14px; justify-content: center; align-items: center; margin: 0 auto 12px; flex-wrap: wrap; }
+.bakery.col { flex-direction: column; gap: 8px; }
+.pie-empty { fill: #fff8e7; stroke: #c08a3e; stroke-width: 3; }
+.pie-slice { fill: #fff8e7; stroke: #c08a3e; stroke-width: 2; }
+.pie-full { fill: #e8590c; stroke: #c08a3e; stroke-width: 2; }
+.bar-empty { fill: #f3e3d3; stroke: #5c3d2e; stroke-width: 2; }
+.bar-full { fill: #7b4a2d; stroke: #5c3d2e; stroke-width: 2; }
+.groups { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 0 auto 12px; max-width: 420px; }
+.group { border: 2px dashed var(--line); border-radius: 12px; padding: 4px 6px; font-size: 18px; letter-spacing: -2px; opacity: .55; }
+.group.take { border-color: var(--accent); opacity: 1; }
