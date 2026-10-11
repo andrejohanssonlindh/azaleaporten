@@ -96,3 +96,41 @@ Tests: `npm test` (Vitest, 226 tests; `tests/betongbukten.test.ts` covers the ge
   - **Gear:** svärd quick, yxa/hammare heavy (hammer keeps them dizzy longer), stav charges the superslag faster, båge chips through; sköld = full parry that opens the opponent, trollbok = faster superslag, lykta = see moves 20 % longer; the pet bites while the opponent is dizzy. Skydd = life/armour, Kraft = damage, Snabbhet = faster hits, Tur = crits, Klurighet = longer wind-ups, Visdom = superslag charge.
   - **One token = an evening:** start at the next opponent or any beaten one, then keep going (25 % life back between fights) until a loss or "Gå hem nöjd". Each win is saved immediately: a first win moves the ladder and pays 1 + rung/2 🌸, a rematch 1 🌸, +1 for no damage taken.
   - Controls: buttons, swipes (left/right/down, tap = hit) or keys (←/→, ↓ block, ↑/space hit, E superslag).
+
+## Next mission
+
+Talbergen, Betongbukten, the village, Vuxenläge and the three mini-games are done, and games are lazy-loaded (see below). Options, to pick with the user:
+1. Svenska/engelska (wordpack engine) – the user put this on hold.
+2. Read-aloud of drill questions (PLAN §12: read-aloud on every instruction; only mentor text has 🔊 today).
+3. The mastery component of kunskap levels (PLAN §9.4).
+
+Smaller things:
+- Mini-games: all three planned ones are done (Dimstormen, Grottdyket, Bossduellen in Arenan). They need a playtest with the kids for balance: Dimstormen `stormNumbers()`, `WAVES`/`stegScale()`; Grottdyket `caveNumbers()`, `MONS`/`depthScale()`, what `genFloor()` places; Bossduellen `duelNumbers()`, `OPPONENTS` (hp, atk, wind, open), `HOP_SECS`. Ideas for later: sound effects, more opponents/monsters.
+- The hero figure is not in the top bar or the hero picker yet (they still use the round avatar).
+- The kunskap level has no mastery component yet (Biblioteket shows "Sitter som berget" per skill instead).
+- The teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`), now including `talbergen.region` and the six area Mästare.
+
+## How to add a drill area
+
+Tiokompisbron, Tabellgruvan, Myntmarknaden, Tallinjebron and Bråkbageriet are the templates; the Betongbukten parks (`src/games/geometri/<game>/`) show drawn SVG visuals (shared helpers in `geometri/draw.tsx`), the toolbox and answer tolerance.
+1. `src/games/<game>/logic.ts`: seeded `makeQ(spec, rng)` returning a `DrillQ` (`parts` with exactly one `null` box – possibly inside a `Frac` –, `answer`, `skill`, optional `prompt`, `choices`, `keypad`, `tol` for rounded answers, `tools: 'kladd' | 'raknare'` for the toolbox on harder stages only), plus `specsForSkill`, `diagnose`, `explain` (never state the answer), `solution`, `hint` and `ERR` labels. Boss traps: `makeQ` must produce a question that can trigger `spec.trap`.
+2. `index.tsx`: `drillModule({ id, make, specsForSkill, diagnose, explain, solution, hint, Visual?, notes?, errLabels })` (`notes(q)` = the formula card).
+3. `content.ts`: an `AreaDef` with `texts`, eras, stages, monster bosses (trap + pet) and a final `mastare`; a generic persona in `src/content/bosses.ts` under `<area>.mastare`; the trap's pet stat in `PET_STAT` (`inventory.ts`); skill names in `src/content/skills.ts`.
+4. Register in `src/content/areas.ts`, set `status: 'open'` in `world.ts`, and add the game to `GAMES` in `tests/drill-games.test.ts`. The generic tests then cover it (that file, and the playthrough in `tests/talbergen.test.ts`); put game-specific trap/misconception tests in their own file (like `tests/betongbukten.test.ts`).
+5. A new region boss: an `AreaDef` with `region` (see `src/games/talbergen.ts`, `src/games/geometri/betongbukten.ts`), registered in `PLAYABLE` with `regionGame(id, gamesOf(id))`, plus a persona under `<region>.region`.
+
+## Next after that (in PLAN.md order)
+
+- Ordskogen (svenska) and Västerön (engelska), via a wordpack engine with JSON content.
+- Teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`), now also the seven park Mästare and `betongbukten.region`.
+
+## Known minor things
+
+- The main chunk is about 85 KB gzipped JS + 11 KB CSS; each game is a 3–6 KB chunk, the mini-games 4–10 KB each, plus the shared drill engine (~4 KB) and klocka's question view (~7 KB). CSS is still one file for all games.
+- On a phone the calculator sits below the answer box, so the child scrolls between them. Fine for now; a floating panel could come later.
+- Read-aloud of drill questions isn't there yet (the 🔊 button exists only on mentor text).
+- `e2e/loot.spec.ts` failed once (2 "Ta av" buttons after one "Använd"), then passed 3/3 reruns. Possibly a double render in Azaleagården; worth a look if it recurs.
+
+- The map art is drawn in SVG by hand; Ordskogen's trees slightly overlap Azaleabyn.
+- Emoji look different on different platforms (Windows is flatter).
+- The Malmö skatepark names are in the public code (see the privacy section in PLAN.md if they should move into the family pack).
