@@ -1,13 +1,14 @@
 import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, heroKey, saveHeroState } from '../profiles';
 import { bestStreak } from '../learning/quests';
+import { solidCount } from '../learning/skills';
 
 // Garderoben: utseende för hjältefiguren. Köps i Skräddaren för kastanjer, eller låses upp som belöning.
 // Rent utseende – påverkar inga egenskaper. Id:n är permanenta: byt aldrig namn, lägg till nya.
 
 export type LookSlot = 'hatt' | 'mantel' | 'skor' | 'bakgrund' | 'aura';
 
-export interface Unlock { kind: 'mastare' | 'niva' | 'svit' | 'arena' | 'storm' | 'grotta'; n: number }
+export interface Unlock { kind: 'mastare' | 'niva' | 'svit' | 'arena' | 'storm' | 'grotta' | 'sitter'; n: number }
 
 export interface Cosmetic {
   id: string;
@@ -63,6 +64,8 @@ export const COSMETICS: Cosmetic[] = [
   { id: 'aura.hjartan', slot: 'aura', name: 'Hjärtan', icon: '💖', cost: 80, color: '#f06595' },
   { id: 'aura.eld', slot: 'aura', name: 'Eldaura', icon: '🔥', unlock: { kind: 'niva', n: 10 }, color: '#ff6b00' },
   { id: 'aura.storm', slot: 'aura', name: 'Stormvirvel', icon: '🌪️', unlock: { kind: 'storm', n: 3 }, color: '#74c0fc' },
+  { id: 'aura.visdom', slot: 'aura', name: 'Visdomsljus', icon: '💡', unlock: { kind: 'sitter', n: 15 }, color: '#ffe066' },
+  { id: 'mantel.uggla', slot: 'mantel', name: 'Ugglemanteln', icon: '🦉', unlock: { kind: 'sitter', n: 40 }, color: '#8d5524', color2: '#ffe8cc' },
 ];
 
 export const cosmetic = (id: string | undefined) => COSMETICS.find((c) => c.id === id);
@@ -86,10 +89,11 @@ export function unlockText(u: Unlock): string {
     case 'arena': return `Vinn över ${u.n} motståndare i Arenan`;
     case 'storm': return `Klara steg ${u.n} i Dimstormen`;
     case 'grotta': return `Nå våning ${u.n} i Grottdyket`;
+    case 'sitter': return `Få ${u.n} saker att sitta som berget (repetera dem flera dagar)`;
   }
 }
 
-/** Belöningar låses upp av saker som aldrig minskar (nivå, mentorer, längsta svit, arenasteg, stormsteg, grottdjup). */
+/** Belöningar låses upp av saker som aldrig minskar (nivå, mentorer, längsta svit, arenasteg, stormsteg, grottdjup, saker som suttit som berget). */
 export function unlocked(hid: string, u: Unlock): boolean {
   const s = getHeroState(hid);
   switch (u.kind) {
@@ -99,6 +103,7 @@ export function unlocked(hid: string, u: Unlock): boolean {
     case 'arena': return s.arena.rank >= u.n;
     case 'storm': return s.storm.best >= u.n;
     case 'grotta': return s.grotta.best >= u.n;
+    case 'sitter': return solidCount(hid) >= u.n;
   }
 }
 

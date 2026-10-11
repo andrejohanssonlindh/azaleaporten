@@ -57,7 +57,7 @@ export const TABELLGRUVAN: AreaDef = {
   areaId: 'tabellgruvan',
   gameId: 'tabeller',
   title: 'Tabellgruvan',
-  kunskap: { name: 'Tabellkraft', icon: '⛏️' },
+  kunskap: { name: 'Tabellkraft', icon: '⛏️', titles: ['Tabellgrävare', 'Gångergeni'] },
   texts: { cleared: 'Kristallerna glittrar!', notYet: 'Gruvvagnen behöver minst 9 kristaller – försök igen!', back: 'Till gruvan' },
   story: 'Djupt inne i Talbergen ligger Tabellgruvan, full av glittrande tabellkristaller. Gräv dig nedåt gång för gång – nio rätt av tio lyser upp nästa gruvgång.',
   eras: [

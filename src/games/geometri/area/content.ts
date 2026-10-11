@@ -44,7 +44,7 @@ export const BRYGGERIET: AreaDef = {
   areaId: 'bryggeriet',
   gameId: 'area',
   title: 'Bryggeriet',
-  kunskap: { name: 'Ytkraft', icon: '🟩' },
+  kunskap: { name: 'Ytkraft', icon: '🟩', titles: ['Rutfyllare', 'Ytexpert'] },
   texts: { cleared: 'Golvet är lagt!', notYet: 'Minst 9 rätt för att lägga golvet – försök igen!', back: 'Till Bryggeriet' },
   story: 'I det gamla bryggeriet finns en skejtpark inomhus. Nu ska det läggas nya golv och ramper – men ingen vet hur stora ytorna är! Kantkrypet har bara mätt kanterna. Hjälp till att räkna ut arean. Nio rätt av tio, så är golvet lagt.',
   eras: [

@@ -44,7 +44,7 @@ export const TIOKOMPISBRON: AreaDef = {
   areaId: 'tiokompisbron',
   gameId: 'tiokompis',
   title: 'Tiokompisbron',
-  kunskap: { name: 'Räknekraft', icon: '➕' },
+  kunskap: { name: 'Räknekraft', icon: '➕', titles: ['Snabbräknare', 'Huvudräkningshjälte'] },
   texts: { cleared: 'Bron håller!', notYet: 'Bron behöver minst 9 hela plankor – försök igen!', back: 'Till bron' },
   story: 'Tiokompisbron går över den vilda Talforsen. Men brotrollen har knyckt plankor, och nu fattas det tal överallt! Laga bron bit för bit – nio rätt av tio lägger en ny planka på plats.',
   eras: [

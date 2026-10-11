@@ -44,7 +44,7 @@ export const MYNTMARKNADEN: AreaDef = {
   areaId: 'myntmarknaden',
   gameId: 'pengar',
   title: 'Myntmarknaden',
-  kunskap: { name: 'Handelskraft', icon: '🪙' },
+  kunskap: { name: 'Handelskraft', icon: '🪙', titles: ['Marknadsräknare', 'Växelvirtuos'] },
   texts: { cleared: 'Kassan stämmer!', notYet: 'Kassan behöver minst 9 rätt för att stämma – försök igen!', back: 'Till marknaden' },
   story: 'Vid foten av Talbergen ligger Myntmarknaden, där alla handlar med kronor. Men handlarna har blandat ihop kassorna! Hjälp dem räkna pengar och ge rätt växel – nio rätt av tio får en kassa att stämma.',
   eras: [

@@ -44,7 +44,7 @@ export const SVAMPEN: AreaDef = {
   areaId: 'svampen',
   gameId: 'symmetri',
   title: 'Svampen',
-  kunskap: { name: 'Spegelkraft', icon: '🪞' },
+  kunskap: { name: 'Spegelkraft', icon: '🪞', titles: ['Spegelspanare', 'Spegelmagiker'] },
   texts: { cleared: 'Spegelblankt!', notYet: 'Minst 9 rätt för att klara rampen – försök igen!', back: 'Till Svampen' },
   story: 'Under den stora svampen ligger en skejtpark där allt är symmetriskt – ramperna, räckena, till och med graffitin. Men Kopiekatten har bytt ut speglarna mot kopior! Hjälp till att få ordning på speglar och mönster. Nio rätt av tio klarar en ramp.',
   eras: [

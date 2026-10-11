@@ -60,7 +60,7 @@ export const STAVNINGSTRASKET: AreaDef = {
   areaId: 'stavningstrasket',
   gameId: 'stavning',
   title: 'Stavningsträsket',
-  kunskap: { name: 'Bokstavsmagi', icon: '🔤' },
+  kunskap: { name: 'Bokstavsmagi', icon: '🔤', titles: ['Ordsnickare', 'Stavningsstjärna'] },
   texts: { cleared: 'Du hittade stenarna över träsket!', notYet: 'Nio rätt av tio behövs för att kliva torrskodd – försök igen!', back: 'Till träsket' },
   story: 'Stavningsträsket är en dimmig mosse där orden flyter omkring som näckrosblad. Stavar du rätt hittar du stenarna att kliva på – stavar du fel blir det plask! Hoppa från sten till sten hela vägen in till Träskets hjärta.',
   eras: [

@@ -23,7 +23,15 @@ export interface SkillItem {
   lastSeen: string;
   lastErr?: string;
   lastErrDay?: string;
+  /** Högsta lådan färdigheten någonsin nått (sjunker aldrig). Saknas i äldre data: då gäller box. */
+  best?: number;
 }
+
+/** Högsta lådan färdigheten nått. */
+export const bestBox = (it: SkillItem) => Math.max(it.best ?? 0, it.box);
+
+/** Från den här lådan "sitter det som berget". */
+export const SOLID_BOX = 4;
 
 export interface SkillsRecord { v: number; items: Record<string, SkillItem>; seeded: boolean }
 export const SKILLS: RecordSpec<SkillsRecord> = { version: 1, defaults: () => ({ v: 1, items: {}, seeded: false }) };
@@ -51,12 +59,14 @@ export function getSkills(hid: string): SkillsRecord {
 /** Uppdaterar en färdighet efter ett första svar. Ren funktion (för tester och omspelning). */
 export function step(item: SkillItem | undefined, area: string, correct: boolean, hint: boolean, day: string, errTag?: string): SkillItem {
   const it: SkillItem = item ? { ...item } : { box: 0, due: day, seen: 0, correct: 0, area, lastSeen: day };
+  it.best = item ? bestBox(item) : 0; // innan lådan kanske sjunker
   it.seen++;
   it.area = area;
   it.lastSeen = day;
   if (correct) {
     it.correct++;
     if (!hint && it.due <= day) { it.box = Math.min(TOP_BOX, it.box + 1); it.due = addDays(day, INTERVALS[it.box]); }
+    it.best = Math.max(it.best ?? 0, it.box);
   } else {
     it.box = Math.max(0, it.box - 2);
     it.due = addDays(day, INTERVALS[it.box]);
@@ -66,9 +76,13 @@ export function step(item: SkillItem | undefined, area: string, correct: boolean
   return it;
 }
 
-export function noteAnswer(hid: string, area: string, skill: string, correct: boolean, hint: boolean, errTag?: string, day = dayOf()) {
+/** Uppdaterar schemat. Returnerar färdigheten efteråt och hur högt den nått innan (för behärskning). */
+export function noteAnswer(hid: string, area: string, skill: string, correct: boolean, hint: boolean, errTag?: string, day = dayOf()): { item: SkillItem; prevBest: number } {
   const r = getSkills(hid);
-  saveRecord(key(hid), SKILLS, { ...r, items: { ...r.items, [skill]: step(r.items[skill], area, correct, hint, day, errTag) } });
+  const before = r.items[skill];
+  const item = step(before, area, correct, hint, day, errTag);
+  saveRecord(key(hid), SKILLS, { ...r, items: { ...r.items, [skill]: item } });
+  return { item, prevBest: before ? bestBox(before) : 0 };
 }
 
 /**
@@ -86,7 +100,7 @@ export function seedSkills(hid: string, events: LogEvent[], day = dayOf()) {
     const errs = evs.filter((e) => !e.c);
     const lastErr = errs[errs.length - 1];
     items[k] = {
-      box: errs.length ? 0 : 2, due: errs.length ? day : addDays(day, INTERVALS[2]),
+      box: errs.length ? 0 : 2, best: errs.length ? 0 : 2, due: errs.length ? day : addDays(day, INTERVALS[2]),
       seen: evs.length, correct: evs.length - errs.length, area: last.a, lastSeen: day,
       ...(lastErr ? { lastErr: lastErr.e, lastErrDay: day } : {}),
     };
@@ -115,4 +129,9 @@ export function mistByArea(hid: string, day = dayOf()): Record<string, number> {
 export function reviewPlan(hid: string, area: string, length: number, day = dayOf()): string[] {
   const due = dueSkills(hid, area, day).slice(0, length).map((d) => d.skill);
   return due.length ? Array.from({ length }, (_, i) => due[i % due.length]) : [];
+}
+
+/** Färdigheter som någon gång suttit som berget (räknas aldrig ner), totalt eller i ett område. */
+export function solidCount(hid: string, area?: string): number {
+  return Object.values(getSkills(hid).items).filter((it) => bestBox(it) >= SOLID_BOX && (!area || it.area === area)).length;
 }

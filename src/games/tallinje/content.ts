@@ -44,7 +44,7 @@ export const TALLINJEBRON: AreaDef = {
   areaId: 'tallinjebron',
   gameId: 'tallinje',
   title: 'Tallinjebron',
-  kunskap: { name: 'Linjekraft', icon: '📏' },
+  kunskap: { name: 'Linjekraft', icon: '📏', titles: ['Linjegångare', 'Tallinjens lots'] },
   texts: { cleared: 'Plankorna sitter!', notYet: 'Bron behöver minst 9 plankor på rätt plats – försök igen!', back: 'Till bron' },
   story: 'Tallinjebron är en lång hängbro där varje planka har ett tal. En storm har blandat ihop plankorna! Hitta rätt plats för talen – nio rätt av tio spikar fast nästa spann.',
   eras: [

@@ -44,7 +44,7 @@ export const BRAKBAGERIET: AreaDef = {
   areaId: 'brakbageriet',
   gameId: 'brak',
   title: 'Bråkbageriet',
-  kunskap: { name: 'Bråkkraft', icon: '🥧' },
+  kunskap: { name: 'Bråkkraft', icon: '🥧', titles: ['Bråkbagare', 'Bråkgeni'] },
   texts: { cleared: 'Nybakat!', notYet: 'Degen behöver minst 9 rätt för att jäsa – försök igen!', back: 'Till bageriet' },
   story: 'I Bråkbageriet delas allt i bitar: pajer, tårtor och chokladkakor. Men bagarlärlingarna har blandat ihop beställningarna! Hjälp dem dela rätt – nio rätt av tio, så är plåten klar.',
   eras: [

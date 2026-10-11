@@ -1,7 +1,7 @@
 import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey, saveHeroState } from '../profiles';
 import { randomSeed, rngFrom, type Rng } from '../rng';
-import { BOSS, BOSS_HP_SCALE, CLEAR_MIN, FAST_MS, HINTS_PER_DAY, LOOT, minHits, MOB, needXP, PRACTICE_LENGTH, REWARD, RUN_LENGTH, TIRED_AFTER_MS, XP } from './balance';
+import { BOSS, BOSS_HP_SCALE, CLEAR_MIN, FAST_MS, HINTS_PER_DAY, KUNSKAP_TITLE_LEVELS, kunskapLevel, LOOT, MASTERY, minHits, MOB, needXP, PRACTICE_LENGTH, REWARD, RUN_LENGTH, TIRED_AFTER_MS, XP } from './balance';
 import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, heroStats, useLifePotion, type Chest } from './inventory';
 import type { Item } from './items';
 import { getEvents, logEvents, type LogEvent } from '../learning/events';
@@ -43,6 +43,10 @@ export interface RunState {
   mob?: MobState;
   /** Repetitionsrunda: färdigheten för varje fråga (bestäms när rundan startar). */
   review?: string[];
+  /** Områdets kunskaps-XP när rundan startade (för "ny kunskapsnivå" på resultatskärmen). */
+  kxp0?: number;
+  /** Färdigheter som nådde en ny högsta låda under rundan, och kunskaps-XP de gav. */
+  mastery?: { skills: string[]; xp: number };
 }
 
 export interface Hit { dmg: number; crit: boolean; fast?: boolean }
@@ -116,11 +120,16 @@ export const isTired = (hid: string) => getPlay(hid).activeMs >= TIRED_AFTER_MS;
 
 /* ---------- XP och kastanjer ---------- */
 
-/** Ger XP till hjälten och områdets kunskap. Returnerar faktisk XP och antal nya nivåer. */
+/** Ger XP till hjälten och områdets kunskap (med trollkarlens och utrustningens bonus). Returnerar faktisk XP och antal nya nivåer. */
 export function giveXP(hid: string, areaId: string, base: number): { xp: number; levelUps: number } {
   if (base <= 0) return { xp: 0, levelUps: 0 };
   const cls = getProfile(hid)?.heroClass;
-  const xp = Math.round(base * (1 + (cls === 'trollkarl' ? XP.trollkarlBonus : 0) + effects.xpBonus(heroStats(hid))));
+  return addXP(hid, areaId, Math.round(base * (1 + (cls === 'trollkarl' ? XP.trollkarlBonus : 0) + effects.xpBonus(heroStats(hid)))));
+}
+
+/** Lägger till XP exakt som den är (ingen bonus) till hjälten och områdets kunskap. */
+function addXP(hid: string, areaId: string, xp: number): { xp: number; levelUps: number } {
+  if (xp <= 0) return { xp: 0, levelUps: 0 };
   const s = getHeroState(hid);
   s.xp += xp;
   let levelUps = 0;
@@ -129,6 +138,28 @@ export function giveXP(hid: string, areaId: string, base: number): { xp: number;
   const a = getArea(hid, areaId);
   saveArea(hid, areaId, { ...a, xp: a.xp + xp });
   return { xp, levelUps };
+}
+
+/**
+ * Ett första svar in i repetitionsschemat. Når färdigheten en högre låda än någonsin förut ger det
+ * behärsknings-XP till färdighetens område – utan bonusar, så att utrustning aldrig påverkar behärskning.
+ */
+export function learn(hid: string, areaId: string, skill: string, correct: boolean, hint: boolean, errTag?: string): { xp: number; levelUps: number } {
+  const { item, prevBest } = noteAnswer(hid, areaId, skill, correct, hint, errTag);
+  let xp = 0;
+  for (let b = prevBest + 1; b <= (item.best ?? item.box); b++) xp += MASTERY.xp[b] ?? 0;
+  return addXP(hid, areaId, xp);
+}
+
+/** Ger områdets kunskapstitlar som hjälten nått men inte fått än. Returnerar de nya. */
+export function grantKunskapTitles(hid: string, area: AreaDef): string[] {
+  const titles = area.kunskap.titles;
+  if (!titles) return [];
+  const level = kunskapLevel(getArea(hid, area.areaId).xp).level;
+  const s = getHeroState(hid);
+  const fresh = titles.filter((t, i) => level >= KUNSKAP_TITLE_LEVELS[i] && !s.titles.includes(t));
+  if (fresh.length) saveHeroState(hid, { ...s, titles: [...s.titles, ...fresh], title: fresh.at(-1)! });
+  return fresh;
 }
 
 /** Ger kastanjer, om hjälten inte är trött för dagen. Returnerar faktiskt antal. */
@@ -162,7 +193,7 @@ export function bossPreview(hid: string, boss: BossDef) {
 }
 
 export function startRun(hid: string, area: AreaDef, node: PathNode, kind: RunState['kind'] = node.type === 'boss' ? 'boss' : 'stage'): RunState {
-  const run: RunState = { kind, areaId: area.areaId, nodeId: node.id, seed: randomSeed(), index: 0, results: [], startedAt: new Date().toISOString(), xp: 0, levelUps: 0 };
+  const run: RunState = { kind, areaId: area.areaId, nodeId: node.id, seed: randomSeed(), index: 0, results: [], startedAt: new Date().toISOString(), xp: 0, levelUps: 0, kxp0: getArea(hid, area.areaId).xp };
   if (kind === 'stage') run.mob = { k: 0, hp: MOB.hp, maxHp: MOB.hp, beaten: 0, blad: 0 };
   if (kind === 'boss' && node.type === 'boss') {
     const hearts = bossHearts(hid, useLifePotion(hid)).total;
@@ -179,7 +210,7 @@ export function startRun(hid: string, area: AreaDef, node: PathNode, kind: RunSt
 
 /** Startar en repetitionsrunda på givna färdigheter (en per fråga). */
 export function startReview(hid: string, area: AreaDef, skills: string[]): RunState {
-  const run: RunState = { kind: 'review', areaId: area.areaId, nodeId: REVIEW_NODE.id, seed: randomSeed(), index: 0, results: [], startedAt: new Date().toISOString(), xp: 0, levelUps: 0, review: skills };
+  const run: RunState = { kind: 'review', areaId: area.areaId, nodeId: REVIEW_NODE.id, seed: randomSeed(), index: 0, results: [], startedAt: new Date().toISOString(), xp: 0, levelUps: 0, review: skills, kxp0: getArea(hid, area.areaId).xp };
   const p = getPlay(hid);
   savePlay(hid, { ...p, run });
   return run;
@@ -234,7 +265,12 @@ export function recordAnswer(hid: string, run: RunState, node: PathNode, a: Answ
       next.lastHit = undefined;
     }
   }
-  noteAnswer(hid, skillArea, skill, a.correct, a.hint, errTag);
+  const m = learn(hid, skillArea, skill, a.correct, a.hint, errTag);
+  if (m.xp) {
+    next.xp += m.xp;
+    next.levelUps += m.levelUps;
+    next.mastery = { skills: [...(run.mastery?.skills ?? []), skill], xp: (run.mastery?.xp ?? 0) + m.xp };
+  }
   logEvents(hid, [{ t: new Date().toISOString(), a: run.areaId, n: node.id, k: skill, c: a.correct, ms: a.ms, ...(errTag ? { e: errTag } : {}), ...(a.hint ? { h: true } : {}) }]);
   const p = getPlay(hid);
   savePlay(hid, { ...p, run: next, activeMs: p.activeMs + Math.min(a.ms, 60_000) });
@@ -326,6 +362,10 @@ export interface Outcome {
   chests: Chest[];
   /** Stigmonster besegrade under rundan och azaleablad de gav. */
   mobs?: { beaten: number; blad: number };
+  /** Färdigheter som sitter bättre än någonsin (behärskning) och kunskaps-XP de gav. */
+  mastery?: { skills: string[]; xp: number };
+  /** Områdets kunskap gick upp en eller flera nivåer; titles = nya kunskapstitlar. */
+  kunskap?: { level: number; titles: string[] };
 }
 
 export function starsFor(correct: number, total: number, avgMs: number, usedHint: boolean, thrMs: number): number {
@@ -416,6 +456,11 @@ export function finishRun(hid: string, area: AreaDef, run: RunState, extras: { s
       o.chests.push(c);
     } else bumpPity(hid);
   }
+  if (run.mastery) o.mastery = run.mastery;
+  const titles = grantKunskapTitles(hid, area);
+  const level = kunskapLevel(getArea(hid, area.areaId).xp).level;
+  if (titles.length || (run.kxp0 !== undefined && level > kunskapLevel(run.kxp0).level)) o.kunskap = { level, titles };
+
   const p = getPlay(hid);
   const showResult = (run.kind === 'stage' || run.kind === 'practice') && p.last;
   savePlay(hid, { ...p, run: null, last: showResult ? { ...p.last!, result: { correct, total } } : p.last });

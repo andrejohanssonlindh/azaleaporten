@@ -23,7 +23,7 @@ export const TALBERGEN_TOPPEN: AreaDef = {
   gameId: 'talbergen',
   title: 'Talbergens topp',
   region: { id: 'talbergen', mastareNeeded: 3 },
-  kunskap: { name: 'Bergskraft', icon: '👑' },
+  kunskap: { name: 'Bergskraft', icon: '👑', titles: ['Bergsklättrare', 'Talbergens hjälte'] },
   texts: { cleared: 'Toppen är din!', notYet: 'Försök igen!', back: 'Till Talbergen' },
   story: 'Högst upp på Talbergen, ovanför molnen, väntar Mästaren över hela berget. Här blandas allt: klockor, tabeller, pengar, tallinjer och bråk.',
   eras: [{ id: 'toppen', name: 'Toppen', icon: '🏔️', fact: 'Bara den som besegrat tre av bergets Mästare hittar stigen hit upp.', nodes: [REGIONSBOSS] }],

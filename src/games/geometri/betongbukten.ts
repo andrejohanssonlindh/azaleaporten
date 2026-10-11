@@ -24,7 +24,7 @@ export const BETONGBUKTENS_TOPP: AreaDef = {
   gameId: 'betongbukten',
   title: 'Den stora tävlingen',
   region: { id: 'betongbukten', mastareNeeded: 3 },
-  kunskap: { name: 'Betongkraft', icon: '👑' },
+  kunskap: { name: 'Betongkraft', icon: '👑', titles: ['Betongskejtare', 'Betongbuktens hjälte'] },
   texts: { cleared: 'Tävlingen är vunnen!', notYet: 'Försök igen!', back: 'Till Betongbukten' },
   story: 'En gång om året hålls den stora tävlingen i Betongbukten. Mästaren över alla parker blandar allt: former, speglar, mått, vinklar, ytor, kroppar och cirklar.',
   eras: [{ id: 'tavlingen', name: 'Tävlingen', icon: '🏆', fact: 'Bara den som besegrat tre av parkernas Mästare får vara med i den stora tävlingen.', nodes: [REGIONSBOSS] }],

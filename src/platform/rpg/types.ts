@@ -61,8 +61,8 @@ export interface AreaDef {
   areaId: string;
   gameId: string;
   title: string;
-  /** Kunskapen på hjältebladet som området tränar. */
-  kunskap: { name: string; icon: string };
+  /** Kunskapen på hjältebladet som området tränar. titles = titlarna på kunskapsnivå 5 och 10 (permanenta). */
+  kunskap: { name: string; icon: string; titles?: [string, string] };
   story: string;
   /** En regions slutboss: inget eget område på kartan, utan en kort stig på regionsidan. */
   region?: { id: string; mastareNeeded: number };

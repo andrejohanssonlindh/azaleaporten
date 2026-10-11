@@ -1,7 +1,8 @@
 import type { ComponentChildren } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
-import { go, heroId } from '../state';
-import { noteAnswer } from '../platform/learning/skills';
+import { go, heroId, toast, touch } from '../state';
+import { grantKunskapTitles, learn } from '../platform/rpg/progress';
+import { skillLabel, cap } from '../content/skills';
 import { playable } from '../content/areas';
 import { randomSeed, rngFrom } from '../platform/rng';
 import type { AreaDef, GameModule, StageDef } from '../platform/rpg/types';
@@ -12,6 +13,18 @@ const loadKlockLabb = () => import('../games/klocka/ui/Labb');
 
 // Fri övning utanför äventyret: inga stjärnor eller belöningar.
 // Tidstornet har sitt eget Tidslabb (fri övning + tolkaren); andra områden övar fritt på sina banor.
+
+/** Fri övning ger inga belöningar, men lärandet räknas – också behärskningen och kunskapstitlarna. */
+function learnFree(def: AreaDef, game: GameModule, q: unknown, r: { correct: boolean; hint: boolean; errTag?: string }) {
+  const hid = heroId.value;
+  if (!hid) return;
+  const skill = game.skillOf(q);
+  const m = learn(hid, game.areaOf?.(q) ?? def.areaId, skill, r.correct, r.hint, r.errTag);
+  const titles = grantKunskapTitles(hid, def);
+  if (m.xp) toast(`🧠 ${cap(skillLabel(skill))} sitter bättre än någonsin! +${m.xp} kunskap`);
+  for (const t of titles) toast(`🏷️ Ny titel: ${t}`);
+  if (m.xp || titles.length) touch();
+}
 
 function FreeStages({ def, game }: { def: AreaDef; game: GameModule }) {
   const stages = def.eras.flatMap((e) => e.nodes).filter((n): n is StageDef => n.type === 'stage');
@@ -29,7 +42,7 @@ function FreeStages({ def, game }: { def: AreaDef; game: GameModule }) {
       <View key={`${sel.id}-${n}`} q={q} hint={false}
         onAnswer={(r) => {
           setScore((s) => ({ ok: s.ok + (r.correct ? 1 : 0), all: s.all + 1 }));
-          if (heroId.value) noteAnswer(heroId.value, def.areaId, game.skillOf(q), r.correct, r.hint, r.errTag);
+          learnFree(def, game, q, r);
         }}
         onDone={() => setN((x) => x + 1)} />
       <p class="note">Rätt: {score.ok} av {score.all}</p>
@@ -65,7 +78,7 @@ function Tidslabbet({ areaId, tab, game, back }: { areaId: string; tab: string; 
         <button role="tab" aria-selected={tab !== 'tolka'} class={tab !== 'tolka' ? 'on' : ''} onClick={() => go(`labb/${areaId}`)}>Öva fritt</button>
         <button role="tab" aria-selected={tab === 'tolka'} class={tab === 'tolka' ? 'on' : ''} onClick={() => go(`labb/${areaId}/tolka`)}>Tolka en tid</button>
       </div>
-      {tab === 'tolka' ? <Tolkaren /> : <FreePractice onResult={(q, r) => { if (heroId.value) noteAnswer(heroId.value, areaId, game.skillOf(q), r.correct, r.hint, r.errTag); }} />}
+      {tab === 'tolka' ? <Tolkaren /> : <FreePractice onResult={(q, r) => learnFree(playable(areaId)!.def, game, q, r)} />}
     </Screen>
   );
 }

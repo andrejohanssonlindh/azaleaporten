@@ -45,7 +45,7 @@ export const STAPELBADDSPARKEN: AreaDef = {
   areaId: 'stapelbaddsparken',
   gameId: 'cirklar',
   title: 'Stapelbäddsparken',
-  kunskap: { name: 'Cirkelkraft', icon: '⭕' },
+  kunskap: { name: 'Cirkelkraft', icon: '⭕', titles: ['Cirkelritare', 'Pi-kännare'] },
   texts: { cleared: 'Perfekt landning!', notYet: 'Minst 9 rätt för att landa – försök igen!', back: 'Till Stapelbäddsparken' },
   story: 'Stapelbäddsparken nere vid hamnen är den största parken av alla. Här finns bowlar, rundade ramper och hjul som snurrar – allt är cirklar! Här får du ta fram räknaren och formelkortet, precis som på ett riktigt prov. Nio rätt av tio, så landar du.',
   eras: [

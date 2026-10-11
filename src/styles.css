@@ -896,3 +896,8 @@ button.stat.on { border-color: var(--accent); }
 .kbd-key.space { max-width: none; flex-grow: 5; font-size: 15px; color: var(--muted); }
 .kbd-key.ok { max-width: none; flex-grow: 2; font-size: 17px; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 @media (prefers-reduced-motion: reduce) { .kbd-key:active { transform: none; } }
+
+/* Kunskaper: behärskning och nästa titel under varje rad */
+.skill-block { border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.skill-block .skill-row { border-bottom: none; padding-bottom: 2px; }
+.skill-sub { display: block; color: var(--muted); font-size: 13px; }

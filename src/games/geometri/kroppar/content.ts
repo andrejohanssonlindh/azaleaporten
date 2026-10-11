@@ -44,7 +44,7 @@ export const KROKSBACK: AreaDef = {
   areaId: 'kroksback',
   gameId: 'kroppar',
   title: 'Kroksbäck',
-  kunskap: { name: 'Rymdkraft', icon: '📦' },
+  kunskap: { name: 'Rymdkraft', icon: '📦', titles: ['Kubstaplare', 'Volymvirtuos'] },
   texts: { cleared: 'Blocket står!', notYet: 'Minst 9 rätt för att bygga klart – försök igen!', back: 'Till Kroksbäck' },
   story: 'I Kroksbäcks park är allt byggt i 3D: lådor, block, rör och pyramider att skejta på. Men Ugglan Framsida tror att bara det hon ser finns, och Plusormen har räknat fel på alla lådor. Hjälp till att bygga rätt! Nio rätt av tio, så står blocket.',
   eras: [

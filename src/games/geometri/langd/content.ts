@@ -44,7 +44,7 @@ export const OXIE: AreaDef = {
   areaId: 'oxie',
   gameId: 'langd',
   title: 'Oxie skatepark',
-  kunskap: { name: 'Mätkraft', icon: '📏' },
+  kunskap: { name: 'Mätkraft', icon: '📏', titles: ['Måttbandsbärare', 'Millimeterjägare'] },
   texts: { cleared: 'Måttet stämmer!', notYet: 'Minst 9 rätt för att klara rampen – försök igen!', back: 'Till Oxie' },
   story: 'I Oxie skatepark mäts allt: ramper, räcken och hela banan runt. Men Mätmasken och Kantkrabban har mätt fel överallt, och nu passar ingenting! Hjälp till att mäta rätt. Nio rätt av tio klarar en ramp.',
   eras: [

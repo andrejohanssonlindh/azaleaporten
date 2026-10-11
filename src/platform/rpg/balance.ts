@@ -44,6 +44,17 @@ export const needXP = (l: number) => 60 + 30 * l;
 export const TITLES: [number, string][] = [[1, 'Lärling'], [3, 'Upptäckare'], [5, 'Äventyrare'], [8, 'Hjälte'], [12, 'Mästarhjälte'], [16, 'Legend']];
 export const levelTitle = (l: number) => TITLES.filter(([n]) => l >= n).pop()![1];
 
+/**
+ * Behärskning: när en färdighet för första gången når en högre låda i repetitionsschemat
+ * (alltså sitter kvar dag efter dag) får områdets kunskap XP. Lådorna går bara upp en gång per dag,
+ * så det här kan bara växa av riktigt lärande över tid. Utrustning och klass påverkar det aldrig.
+ * xp[b] = XP för att nå låda b första gången.
+ */
+export const MASTERY = { xp: [0, 0, 10, 15, 25, 40] };
+
+/** Kunskapsnivåer som ger områdets titlar (AreaDef.kunskap.titles). */
+export const KUNSKAP_TITLE_LEVELS = [5, 10];
+
 /** Kunskapsnivå (per område) ur områdets XP. */
 export function kunskapLevel(xp: number): { level: number; into: number; need: number } {
   let level = 0, left = xp;

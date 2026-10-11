@@ -44,7 +44,7 @@ export const SIBBARP: AreaDef = {
   areaId: 'sibbarp',
   gameId: 'vinklar',
   title: 'Sibbarp',
-  kunskap: { name: 'Vinkelkraft', icon: '📐' },
+  kunskap: { name: 'Vinkelkraft', icon: '📐', titles: ['Vinkelspanare', 'Gradskivans hjälte'] },
   texts: { cleared: 'Snyggt landat!', notYet: 'Minst 9 rätt för att landa tricket – försök igen!', back: 'Till Sibbarp' },
   story: 'I Sibbarp, nere vid havet, ligger den stora bowlen. Varje kant och varje snurr är en vinkel – och de som kan sina vinklar landar sina trick. Men Bläckfisken och Sälen har trasslat till allt! Nio rätt av tio, så landar du tricket.',
   eras: [

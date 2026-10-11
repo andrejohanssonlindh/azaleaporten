@@ -103,7 +103,7 @@ function Aura({ c }: { c: Cosmetic }) {
       {c.id === 'aura.eld' && <ellipse cx="60" cy="96" rx="44" ry="54" fill={c.color} opacity=".22" />}
       {spots.map(([x, y], i) => (
         <text key={i} x={x} y={y} font-size={i % 2 ? 11 : 14} text-anchor="middle" dominant-baseline="central" style={{ animationDelay: `${i * 0.35}s` }}>
-          {c.id === 'aura.hjartan' ? '💖' : c.id === 'aura.eld' ? '🔥' : '✨'}
+          {c.id === 'aura.hjartan' ? '💖' : c.id === 'aura.eld' ? '🔥' : c.id === 'aura.visdom' ? '💡' : '✨'}
         </text>
       ))}
     </g>

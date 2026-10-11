@@ -2,14 +2,14 @@ import { useEffect, useState } from 'preact/hooks';
 import { chestModal, dataRev, go, heroId, toast, touch } from '../state';
 import { getHeroState, getProfile, saveHeroState } from '../platform/profiles';
 import { getArea } from '../platform/rpg/progress';
-import { kunskapLevel, levelTitle, needXP } from '../platform/rpg/balance';
+import { KUNSKAP_TITLE_LEVELS, kunskapLevel, levelTitle, needXP } from '../platform/rpg/balance';
 import { ensurePioneerChest, equip, getInv, heroStats, isEquipped, salvage, salvageCommon, statDiff, statExplain, syncPetItems, unequip } from '../platform/rpg/inventory';
 import { salvageValue, SLOTS, STATS, type Slot, type Stat } from '../platform/rpg/items';
 import { COSMETICS, getWardrobe, LOOK_SLOTS, owns, takeOff, unlockText, wear } from '../platform/rpg/wardrobe';
 import type { BossDef } from '../platform/rpg/types';
 import { gradeName, heroClass } from '../content/heroes';
 import { PLAYABLE } from '../content/areas';
-import { mistByArea } from '../platform/learning/skills';
+import { mistByArea, solidCount } from '../platform/learning/skills';
 import { leaveToPicker } from '../session';
 import { bossName } from './AreaView';
 import { ItemCard } from './Loot';
@@ -214,15 +214,26 @@ function SkillsTab({ hid }: { hid: string }) {
   return (
     <section class="card">
       <h2>📚 Kunskaper</h2>
-      <p class="muted small">Kunskaper växer bara av att öva – utrustning hjälper inte här.</p>
+      <p class="muted small">Kunskaper växer bara av att öva – utrustning hjälper inte här. Det som sitter kvar dag efter dag (🧠) ger extra kunskap.</p>
       {Object.values(PLAYABLE).filter(({ def }) => !def.region).map(({ def }) => {
         const mist = mistByArea(p.id)[def.areaId] ?? 0;
         const k = kunskapLevel(getArea(p.id, def.areaId).xp);
+        const solid = solidCount(p.id, def.areaId);
+        const nextTitle = def.kunskap.titles?.map((t, i) => [KUNSKAP_TITLE_LEVELS[i], t] as const).find(([lvl]) => k.level < lvl);
         return (
-          <div class="skill-row" key={def.areaId}>
-            <span>{def.kunskap.icon} {def.kunskap.name}</span>
-            <span class="skill-bar"><span style={{ width: `${(k.into / k.need) * 100}%` }} /></span>
-            <span class="skill-level">Nivå {k.level}{mist > 0 && <span class="skill-mist" title={`${mist} att repetera`}> 🌫️</span>}</span>
+          <div class="skill-block" key={def.areaId}>
+            <div class="skill-row">
+              <span>{def.kunskap.icon} {def.kunskap.name}</span>
+              <span class="skill-bar"><span style={{ width: `${(k.into / k.need) * 100}%` }} /></span>
+              <span class="skill-level">Nivå {k.level}{mist > 0 && <span class="skill-mist" title={`${mist} att repetera`}> 🌫️</span>}</span>
+            </div>
+            {(solid > 0 || nextTitle) && (
+              <small class="skill-sub">
+                {solid > 0 && `🧠 ${solid} ${solid === 1 ? 'sak sitter' : 'saker sitter'} som berget`}
+                {solid > 0 && nextTitle && ' · '}
+                {nextTitle && `Nivå ${nextTitle[0]}: titeln ${nextTitle[1]}`}
+              </small>
+            )}
           </div>
         );
       })}

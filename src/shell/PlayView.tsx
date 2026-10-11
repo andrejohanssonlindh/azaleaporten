@@ -9,6 +9,7 @@ import { reviewPlan } from '../platform/learning/skills';
 import { noteRun, type QuestNews } from '../platform/learning/quests';
 import { PRACTICE_LENGTH } from '../platform/rpg/balance';
 import { levelTitle } from '../platform/rpg/balance';
+import { skillLabel } from '../content/skills';
 import type { BossDef, GameModule, PathNode } from '../platform/rpg/types';
 import { playable, regionProgress } from '../content/areas';
 import { personaFor } from '../content/bosses';
@@ -300,6 +301,9 @@ function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome
         {head}
         <div class="rewards">
           {o.xp > 0 && <span>✨ +{o.xp} XP</span>}
+          {o.mastery && <span>🧠 Sitter bättre än någonsin: {[...new Set(o.mastery.skills)].map(skillLabel).join(', ')} (+{o.mastery.xp} kunskap)</span>}
+          {o.kunskap && <span>{pl.def.kunskap.icon} {pl.def.kunskap.name} nivå {o.kunskap.level}!</span>}
+          {o.kunskap?.titles.map((t) => <span key={t}>🏷️ Ny titel: {t}</span>)}
           {o.mobs && o.mobs.beaten > 0 && <span>👾 {o.mobs.beaten} stigmonster besegrade{o.mobs.blad > 0 ? ` · 🌸 +${o.mobs.blad}` : ''}</span>}
           {o.kastanjer > 0 && <span>🌰 +{o.kastanjer}</span>}
           {o.levelUps > 0 && <span>⭐ Nivå {hs.level} – {levelTitle(hs.level)}</span>}

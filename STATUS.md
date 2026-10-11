@@ -4,6 +4,8 @@
 
 ## Done
 
+- **Mastery in kunskap levels** (PLAN §9.4, 2026-10-11): a skill that reaches a higher Leitner box than ever (only possible over days) gives its area 10/15/25/40 kunskap XP for box 2/3/4/5, once each, with no class/gear bonus; errors never take it back (`SkillItem.best`). Shown on the result screen (🧠 Sitter bättre än någonsin…) and as a toast in free practice. Kunskap level 5 and 10 give each area's two titles (`kunskap.titles` in every area's content), shown with the next title in Azaleagården → Kunskaper, which also shows how many skills sit "som berget". Two new wardrobe rewards: 💡 Visdomsljus (15 solid skills) and 🦉 Ugglemanteln (40). Tests: `tests/beharskning.test.ts`, `e2e/beharskning.spec.ts`.
+
 - **Ordskogen S1 – the ord engine and Stavningsträsket** (2026-10-11, plan in PLAN.md §14c):
   - `src/engines/ord/`: choose / dictation / find-the-error questions, in-app åäö keyboard on touch devices, no spellcheck or autocorrect, fallback to choice without a Swedish voice, answer masked out of every explanation and hint.
   - Platform: `makeQuestion(spec, rng, ctx?)` with `QuestionCtx { seed, index }` so word games draw from a per-run deck (no repeats); speech moved to `src/platform/speech.ts` (voices signal, on-device voice first); Vuxenläge → Uppläsning (test button, install guides for Windows/iPad/Android).
@@ -113,12 +115,10 @@ Older options:
 Talbergen, Betongbukten, the village, Vuxenläge and the three mini-games are done, and games are lazy-loaded (see below). Options, to pick with the user:
 1. Svenska/engelska (wordpack engine) – the user put this on hold.
 2. Read-aloud of drill questions (PLAN §12: read-aloud on every instruction; only mentor text has 🔊 today).
-3. The mastery component of kunskap levels (PLAN §9.4).
 
 Smaller things:
 - Mini-games: all three planned ones are done (Dimstormen, Grottdyket, Bossduellen in Arenan). They need a playtest with the kids for balance: Dimstormen `stormNumbers()`, `WAVES`/`stegScale()`; Grottdyket `caveNumbers()`, `MONS`/`depthScale()`, what `genFloor()` places; Bossduellen `duelNumbers()`, `OPPONENTS` (hp, atk, wind, open), `HOP_SECS`. Ideas for later: sound effects, more opponents/monsters.
 - The hero figure is not in the top bar or the hero picker yet (they still use the round avatar).
-- The kunskap level has no mastery component yet (Biblioteket shows "Sitter som berget" per skill instead).
 - The teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`), now including `talbergen.region` and the six area Mästare.
 
 ## How to add a drill area

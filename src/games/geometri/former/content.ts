@@ -44,7 +44,7 @@ export const FLUFFY: AreaDef = {
   areaId: 'fluffy',
   gameId: 'former',
   title: 'Fluffy',
-  kunskap: { name: 'Formkraft', icon: '🔷' },
+  kunskap: { name: 'Formkraft', icon: '🔷', titles: ['Formspanare', 'Formgeni'] },
   texts: { cleared: 'Rampen är din!', notYet: 'Minst 9 rätt för att klara rampen – försök igen!', back: 'Till Fluffy' },
   story: 'Fluffy är den första skejtparken i Betongbukten. Varje ramp och kant har sin form – men Snurrsnigeln har vridit på allt, så ingen vet vad som är vad! Lär dig känna igen formerna. Nio rätt av tio, så klarar du rampen.',
   eras: [
