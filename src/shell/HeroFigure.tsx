@@ -83,12 +83,13 @@ function Backdrop({ c }: { c: Cosmetic }) {
     <g aria-hidden="true">
       <defs><clipPath id="fig-bg"><rect width="120" height="150" rx="14" /></clipPath></defs>
       <g clip-path="url(#fig-bg)">
-        <rect width="120" height="150" fill={c.id === 'bg.natt' || c.id === 'bg.tornet' ? a : b} />
+        <rect width="120" height="150" fill={c.id === 'bg.natt' || c.id === 'bg.tornet' || c.id === 'bg.grotta' ? a : b} />
         {c.id === 'bg.angen' && <><rect y="110" width="120" height="40" fill={a} /><circle cx="98" cy="22" r="10" fill="#ffd43b" />{[12, 30, 90, 108].map((x) => <circle key={x} cx={x} cy="122" r="3" fill="#fff" />)}</>}
         {c.id === 'bg.berg' && <><path d="M0 120 L28 60 L48 92 L74 44 L104 100 L120 80 V150 H0 Z" fill={a} /><path d="M66 58 L74 44 L82 58 Z" fill="#fff" /><rect y="128" width="120" height="22" fill="#69db7c" /></>}
         {c.id === 'bg.hav' && <><rect y="96" width="120" height="54" fill={a} /><path d="M0 100 Q15 94 30 100 T60 100 T90 100 T120 100" fill="none" stroke="#fff" stroke-width="2" opacity=".7" /><rect y="128" width="120" height="22" fill={b} /><circle cx="22" cy="24" r="9" fill="#ffd43b" /></>}
         {c.id === 'bg.betong' && <><rect y="118" width="120" height="32" fill={a} /><path d="M0 118 a26 26 0 0 1 26 -26 v26 z M120 118 a26 26 0 0 0 -26 -26 v26 z" fill="#868e96" /><rect y="0" width="120" height="150" fill={b} opacity=".25" /></>}
         {c.id === 'bg.natt' && <><circle cx="96" cy="22" r="9" fill={b} />{[[14, 18], [34, 40], [70, 14], [104, 56], [20, 70], [50, 26]].map(([x, y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r="1.6" fill="#fff" />)}<rect y="128" width="120" height="22" fill="#1b1530" /></>}
+        {c.id === 'bg.grotta' && <><path d="M0 0 H120 V10 L112 30 L104 12 L92 26 L84 10 L70 34 L60 12 L48 28 L36 10 L24 30 L12 12 L0 24 Z" fill="#1a1528" /><path d="M14 128 L20 104 L26 128 Z M96 128 L103 98 L110 128 Z" fill={b} opacity=".85" /><path d="M20 104 L23 116 M103 98 L106 112" stroke="#fff" stroke-width="1.5" opacity=".6" /><rect y="128" width="120" height="22" fill="#1a1528" /></>}
         {c.id === 'bg.tornet' && <><rect x="86" y="20" width="26" height="130" fill="#3b2a7a" /><circle cx="99" cy="40" r="9" fill="#fff8e1" stroke={b} stroke-width="2" /><path d="M99 40 V34 M99 40 H104" stroke="#2b2118" stroke-width="1.5" /><rect y="128" width="120" height="22" fill="#2a1f55" /></>}
       </g>
     </g>

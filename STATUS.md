@@ -1,6 +1,6 @@
 # Status – Azaleaporten
 
-*Updated 2026-10-11: **Dimstormen**, a real mini-game (survivors-style action, gear decides how you fight), plus 2 tokens a day from the daily quests. Before that, Vuxenläge (Phase 6) is done: a per-hero overview, quota and multi-tab guards, a backup reminder. Before that, games became lazy-loaded per area (main chunk 137 → 82 KB gzipped), and the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
+*Updated 2026-10-11: **Grottdyket**, the second real mini-game (turn-based dungeon dive, push your luck at each staircase). Before that **Dimstormen**, a real mini-game (survivors-style action, gear decides how you fight), plus 2 tokens a day from the daily quests. Before that, Vuxenläge (Phase 6) is done: a per-hero overview, quota and multi-tab guards, a backup reminder. Before that, games became lazy-loaded per area (main chunk 137 → 82 KB gzipped), and the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
 
 ## Done
 
@@ -63,7 +63,7 @@
   - **Multi-tab guard** (`src/platform/tabs.ts`): the newest tab announces itself on a `BroadcastChannel`, and older tabs replace the whole app with a "Spela här i stället" screen (which reloads to read fresh data and take over).
   - **Backup reminder:** `Meta.lastExport` (set when the backup is downloaded); after 30 days without one (`backupDue()`), Vuxenläge and the hero picker's Vuxenläge link say so. Vuxenläge also shows whether the app runs installed (`isInstalled()`).
 
-Tests: `npm test` (Vitest, 202 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
+Tests: `npm test` (Vitest, 217 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
 
 - **Gear round (after the user's playtest notes):**
   - Mästare Kastanj introduces gear in Azaleabyn the first time a hero has an item or chest (`HeroState.tips`).
@@ -82,41 +82,10 @@ Tests: `npm test` (Vitest, 202 tests; `tests/betongbukten.test.ts` covers the ge
   - **Tokens:** all daily quests done now also gives 2 🎟️ (capped at 10), shown on the result screen and the quest board.
   - Balance was set with a headless bot (`tests/dimstorm.test.ts` checks determinism, that better gear lasts longer, that higher steg is harder, and that a lightly geared hero can win steg 1). A child who actually dodges will do better than the bot.
 
-## Next mission
-
-Talbergen, Betongbukten, the village and Vuxenläge are done, and games are lazy-loaded (see below). Options, to pick with the user:
-1. Svenska/engelska (wordpack engine) – the user put this on hold.
-2. Read-aloud of drill questions (PLAN §12: read-aloud on every instruction; only mentor text has 🔊 today).
-3. The mastery component of kunskap levels (PLAN §9.4).
-
-Smaller things:
-- Mini-games: Dimstormen is done. Two more are planned in PLAN.md ("Minispel"): **Grottdyket** (a turn-based dungeon crawl) and **Bossduellen** (Arenan reworked into a dodge-and-counter duel). Dimstormen needs a playtest with the kids for balance (numbers in `stormNumbers()` and `WAVES`/`stegScale()` in `sim.ts`).
-- The hero figure is not in the top bar or the hero picker yet (they still use the round avatar).
-- The kunskap level has no mastery component yet (Biblioteket shows "Sitter som berget" per skill instead).
-- The teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`), now including `talbergen.region` and the six area Mästare.
-
-## How to add a drill area
-
-Tiokompisbron, Tabellgruvan, Myntmarknaden, Tallinjebron and Bråkbageriet are the templates; the Betongbukten parks (`src/games/geometri/<game>/`) show drawn SVG visuals (shared helpers in `geometri/draw.tsx`), the toolbox and answer tolerance.
-1. `src/games/<game>/logic.ts`: seeded `makeQ(spec, rng)` returning a `DrillQ` (`parts` with exactly one `null` box – possibly inside a `Frac` –, `answer`, `skill`, optional `prompt`, `choices`, `keypad`, `tol` for rounded answers, `tools: 'kladd' | 'raknare'` for the toolbox on harder stages only), plus `specsForSkill`, `diagnose`, `explain` (never state the answer), `solution`, `hint` and `ERR` labels. Boss traps: `makeQ` must produce a question that can trigger `spec.trap`.
-2. `index.tsx`: `drillModule({ id, make, specsForSkill, diagnose, explain, solution, hint, Visual?, notes?, errLabels })` (`notes(q)` = the formula card).
-3. `content.ts`: an `AreaDef` with `texts`, eras, stages, monster bosses (trap + pet) and a final `mastare`; a generic persona in `src/content/bosses.ts` under `<area>.mastare`; the trap's pet stat in `PET_STAT` (`inventory.ts`); skill names in `src/content/skills.ts`.
-4. Register in `src/content/areas.ts`, set `status: 'open'` in `world.ts`, and add the game to `GAMES` in `tests/drill-games.test.ts`. The generic tests then cover it (that file, and the playthrough in `tests/talbergen.test.ts`); put game-specific trap/misconception tests in their own file (like `tests/betongbukten.test.ts`).
-5. A new region boss: an `AreaDef` with `region` (see `src/games/talbergen.ts`, `src/games/geometri/betongbukten.ts`), registered in `PLAYABLE` with `regionGame(id, gamesOf(id))`, plus a persona under `<region>.region`.
-
-## Next after that (in PLAN.md order)
-
-- Ordskogen (svenska) and Västerön (engelska), via a wordpack engine with JSON content.
-- Biblioteket: the child's own statistics (common mistakes per skill).
-- Teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`), now also the seven park Mästare and `betongbukten.region`.
-
-## Known minor things
-
-- The main chunk is about 82 KB gzipped JS + 10 KB CSS; each game is a 3–6 KB chunk, plus the shared drill engine (~4 KB) and klocka's question view (~7 KB). CSS is still one file for all games.
-- On a phone the calculator sits below the answer box, so the child scrolls between them. Fine for now; a floating panel could come later.
-- Read-aloud of drill questions isn't there yet (the 🔊 button exists only on mentor text).
-- `e2e/loot.spec.ts` failed once (2 "Ta av" buttons after one "Använd"), then passed 3/3 reruns. Possibly a double render in Azaleagården; worth a look if it recurs.
-
-- The map art is drawn in SVG by hand; Ordskogen's trees slightly overlap Azaleabyn.
-- Emoji look different on different platforms (Windows is flatter).
-- The Malmö skatepark names are in the public code (see the privacy section in PLAN.md if they should move into the family pack).
+- **Grottdyket** (`#/grottdyket`):
+  - A turn-based roguelite: one move at a time on a 9×11 grid, monsters move only after the hero, so there is time to think. Tap a tile to walk there (the hero stops when a new monster shows up, something is found or it gets hurt), tap a monster to hit or shoot; arrows/WASD, space = wait, Q = potion, E = spell.
+  - Fog of war: tiles in the light are bright, seen ones dim, the rest black. Rooms + corridors per floor, seeded by dive seed + floor, stairs at the farthest tile.
+  - **Gear:** svärd = solid hit, yxa = hits every adjacent monster, stav = magic shot 3 tiles, båge = arrow 4 tiles, hammare = stuns, fists = weak; sköld = 25 % block, trollbok = ⚡ hits every visible monster every 8 turns, lykta = light radius 5 instead of 3; the pet bites adjacent monsters. Skydd = life/armour, Kraft = damage, Tur = crits, Snabbhet = chance monsters lose their move, Klurighet = chance to spot hidden traps, Visdom = potion strength and a starting potion. Class perks: riddare +5 life, ranger crits, trollkarl a starting potion, uppfinnare spots traps.
+  - Each floor: 🌸 piles (worth more deeper down), sometimes 🧪 potions, 🗝️ key + 🧰 locked chest, run-only boosts (🪨 +1 damage, 🔩 +1 armour, 💖 +5 life), hidden 🪤 traps (spotted traps are safe). Monsters: rat and bat from floor 1, then spider, snake, scorpion, troll; Grottdraken guards the stairs on every 5th floor.
+  - **Push your luck:** at each staircase, "Djupare" (rest +5 life) or "Gå hem" with all the blad. Falling, or leaving mid-floor, keeps half (rounded up). Deepest floor is the record; floor 10 unlocks the 💎 Kristallgrottan background.
+  - Lobby parts (purse, buy tokens) shared with Dimstormen in `src/shell/Polletter.tsx`.

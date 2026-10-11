@@ -60,6 +60,8 @@ export interface HeroState {
   arena: { rank: number; wins: number };
   /** Dimstormen: högsta öppna steget (1 = det första), antal vinster och högsta vunna steget. */
   storm: { steg: number; wins: number; best: number };
+  /** Grottdyket: djupaste våningen man har nått och antal dyk. */
+  grotta: { best: number; dives: number };
 }
 
 const uuid = () => globalThis.crypto?.randomUUID?.() ?? `h-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
@@ -80,7 +82,7 @@ export const PROFILE: RecordSpec<Profile> = {
 
 export const HERO: RecordSpec<HeroState> = {
   version: 1,
-  defaults: () => ({ v: 1, xp: 0, level: 1, kastanjer: 0, blad: 0, titles: [], title: null, achievements: {}, pets: [], mentors: [], legacy: {}, tips: [], polletter: 0, arena: { rank: 0, wins: 0 }, storm: { steg: 1, wins: 0, best: 0 } }),
+  defaults: () => ({ v: 1, xp: 0, level: 1, kastanjer: 0, blad: 0, titles: [], title: null, achievements: {}, pets: [], mentors: [], legacy: {}, tips: [], polletter: 0, arena: { rank: 0, wins: 0 }, storm: { steg: 1, wins: 0, best: 0 }, grotta: { best: 0, dives: 0 } }),
 };
 
 export const heroKey = (id: string, part: string) => `h:${id}:${part}`;

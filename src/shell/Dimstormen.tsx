@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { dataRev, heroId, toast, touch } from '../state';
+import { Purse, TokenRow } from './Polletter';
 import { getHeroState, getProfile } from '../platform/profiles';
 import { randomSeed } from '../platform/rng';
-import { ARENA, buyToken, payToken } from '../platform/rpg/arena';
+import { payToken } from '../platform/rpg/arena';
 import { finishStorm, OFFHANDS, STORM_WAVES, stormLoadout, WEAPONS } from '../platform/rpg/dimstorm';
 import { leaveToPicker } from '../session';
 import { HeroFigure } from './HeroFigure';
@@ -36,7 +37,6 @@ export function Dimstormen() {
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   const s = getHeroState(p.id);
   const chosen = Math.min(steg ?? s.storm.steg, s.storm.steg);
-  const purse = <span class="purse">🌰 {s.kastanjer} · 🎟️ {s.polletter} · 🌸 {s.blad}</span>;
 
   function start() {
     if (!payToken(p!.id)) { toast('Du behöver en pollett 🎟️'); return; }
@@ -64,7 +64,7 @@ export function Dimstormen() {
   const lo = stormLoadout(p.id);
   return (
     <Screen class="place storm-place">
-      <BackBar label="Azaleabyn" to="by" right={purse} />
+      <BackBar label="Azaleabyn" to="by" right={<Purse hid={p.id} />} />
       <div class="place-banner storm-banner"><span>🌪️</span><h1>Dimstormen</h1></div>
 
       {result && (
@@ -91,12 +91,8 @@ export function Dimstormen() {
           <div class="row center-row">
             <button class="btn primary big" disabled={s.polletter < 1} onClick={start}>🌪️ Starta steg {chosen} (1 🎟️)</button>
           </div>
-          <div class="row center-row">
-            <span class="small">Du har {s.polletter} 🎟️</span>
-            <button class="btn small" disabled={s.kastanjer < ARENA.tokenCost || s.polletter >= ARENA.maxTokens}
-              onClick={() => { if (buyToken(p.id)) { toast('🎟️ En pollett!'); touch(); } }}>Köp pollett {ARENA.tokenCost} 🌰</button>
-          </div>
-          <p class="muted small">Klarar du alla dagens uppdrag får du {ARENA.dailyTokens} polletter. Stormen ger azaleablad 🌸: de du plockar, ett per våg och extra om du vinner.</p>
+          <TokenRow hid={p.id} />
+          <p class="muted small">Stormen ger azaleablad 🌸: de du plockar, ett per våg och extra om du vinner.</p>
         </div>
       </section>
 

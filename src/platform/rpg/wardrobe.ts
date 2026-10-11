@@ -7,7 +7,7 @@ import { bestStreak } from '../learning/quests';
 
 export type LookSlot = 'hatt' | 'mantel' | 'skor' | 'bakgrund' | 'aura';
 
-export interface Unlock { kind: 'mastare' | 'niva' | 'svit' | 'arena' | 'storm'; n: number }
+export interface Unlock { kind: 'mastare' | 'niva' | 'svit' | 'arena' | 'storm' | 'grotta'; n: number }
 
 export interface Cosmetic {
   id: string;
@@ -56,6 +56,7 @@ export const COSMETICS: Cosmetic[] = [
   { id: 'bg.hav', slot: 'bakgrund', name: 'Havet', icon: '🌊', cost: 60, color: '#339af0', color2: '#fff3bf' },
   { id: 'bg.betong', slot: 'bakgrund', name: 'Skejtparken', icon: '🛹', cost: 60, color: '#adb5bd', color2: '#ffe066' },
   { id: 'bg.natt', slot: 'bakgrund', name: 'Stjärnnatt', icon: '🌙', cost: 80, color: '#2f2346', color2: '#ffe066' },
+  { id: 'bg.grotta', slot: 'bakgrund', name: 'Kristallgrottan', icon: '💎', unlock: { kind: 'grotta', n: 10 }, color: '#2b2440', color2: '#63e6be' },
   { id: 'bg.tornet', slot: 'bakgrund', name: 'Tidstornet', icon: '🕰️', unlock: { kind: 'svit', n: 7 }, color: '#5f3dc4', color2: '#ffd43b' },
 
   { id: 'aura.gnistor', slot: 'aura', name: 'Gnistor', icon: '✨', cost: 80, color: '#ffd43b' },
@@ -84,10 +85,11 @@ export function unlockText(u: Unlock): string {
     case 'svit': return `Klara alla uppdrag ${u.n} dagar i rad`;
     case 'arena': return `Vinn över ${u.n} motståndare i Arenan`;
     case 'storm': return `Klara steg ${u.n} i Dimstormen`;
+    case 'grotta': return `Nå våning ${u.n} i Grottdyket`;
   }
 }
 
-/** Belöningar låses upp av saker som aldrig minskar (nivå, mentorer, längsta svit, arenasteg, stormsteg). */
+/** Belöningar låses upp av saker som aldrig minskar (nivå, mentorer, längsta svit, arenasteg, stormsteg, grottdjup). */
 export function unlocked(hid: string, u: Unlock): boolean {
   const s = getHeroState(hid);
   switch (u.kind) {
@@ -96,6 +98,7 @@ export function unlocked(hid: string, u: Unlock): boolean {
     case 'svit': return bestStreak(hid) >= u.n;
     case 'arena': return s.arena.rank >= u.n;
     case 'storm': return s.storm.best >= u.n;
+    case 'grotta': return s.grotta.best >= u.n;
   }
 }
 
