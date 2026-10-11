@@ -83,9 +83,12 @@ export interface QuestionViewProps {
   nextLabel?: string;
 }
 
+/** Var i rundan frågan ligger. Ett spel kan dra ur en blandad kortlek per runda (inga upprepade ord). */
+export interface QuestionCtx { seed: number; index: number }
+
 export interface GameModule {
   id: string;
-  makeQuestion(spec: QuestionSpec, rng: Rng): unknown;
+  makeQuestion(spec: QuestionSpec, rng: Rng, ctx?: QuestionCtx): unknown;
   skillOf(q: unknown): string;
   /** Frågeinställningar som brukar ge en viss färdighet (för repetition av just den). */
   specsForSkill(skill: string): QuestionSpec[];

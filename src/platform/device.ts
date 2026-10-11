@@ -1,7 +1,7 @@
 import { signal } from '@preact/signals';
 import { registerSW } from 'virtual:pwa-register';
 
-// Enhetsnära saker: beständig lagring, uppdateringar av appen, uppläsning.
+// Enhetsnära saker: beständig lagring och uppdateringar av appen.
 
 /** Ber webbläsaren att inte rensa vår lagring (viktigt på iPad/Safari). */
 export async function requestPersistentStorage(): Promise<boolean> {
@@ -49,20 +49,5 @@ export function applyUpdate() {
   else location.reload();
 }
 
-export function speak(text: string, lang: 'sv-SE' | 'en-GB' = 'sv-SE') {
-  try {
-    const synth = globalThis.speechSynthesis;
-    if (!synth) return;
-    synth.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang;
-    const voice = synth.getVoices().find((v) => v.lang.replace('_', '-').startsWith(lang));
-    if (voice) u.voice = voice;
-    u.rate = 0.95;
-    synth.speak(u);
-  } catch {
-    /* uppläsning saknas på enheten */
-  }
-}
-
-export const canSpeak = () => typeof globalThis.speechSynthesis !== 'undefined';
+// Uppläsningen bor i speech.ts (ingen PWA-import där, så spelen kan använda den i tester).
+export { canSpeak, speak } from './speech';

@@ -5,6 +5,7 @@ import { exportAll, importReplace, isDeviceExport, listBackups, restoreBackup } 
 import { kv } from '../platform/storage/kv';
 import { initGate, lockGate } from '../platform/gate/gate';
 import { isInstalled, requestPersistentStorage, storageInfo } from '../platform/device';
+import { canSpeak, speak, voiceFor, voices } from '../platform/speech';
 import { GRADES, gradeName } from '../content/heroes';
 import { selectHero } from '../session';
 import type { V01Player } from '../platform/legacy/klockaV01';
@@ -107,6 +108,27 @@ function LegacyImport({ heroes }: { heroes: Profile[] }) {
         </div>
       ))}
     </>
+  );
+}
+
+/** Finns en svensk röst? Stavningsträskets diktamen behöver en; utan den blir det flerval. */
+function Upplasning() {
+  voices.value;
+  const v = voiceFor('sv-SE');
+  return (
+    <section class="card">
+      <h2>Uppläsning</h2>
+      {!canSpeak() ? <p class="note warn">Den här webbläsaren kan inte läsa upp text.</p>
+        : v ? <p>Svensk röst: <b>{v.name}</b>{!v.localService && ' (hämtas via nätet)'}</p>
+          : <p class="note warn">Ingen svensk röst hittades. I Stavningsträsket blir diktamen då flerval i stället.</p>}
+      {canSpeak() && <button class="btn small" onClick={() => speak('Hej! Så här låter uppläsningen. Kan du stava till sjöjungfru?')}>🔊 Testa uppläsning</button>}
+      <h3>Saknas svensk röst?</h3>
+      <ul class="install">
+        <li><b>Windows:</b> Inställningar → Tid och språk → Tal → Lägg till röster → Svenska. Starta om webbläsaren efteråt. Syns rösten ändå inte i Chrome, prova Microsoft Edge – den hittar fler röster.</li>
+        <li><b>iPad:</b> Inställningar → Hjälpmedel → Uppläst innehåll → Röster → Svenska.</li>
+        <li><b>Android:</b> Inställningar → Hjälpmedel → Text till tal → Googles talmotor → Installera röstdata → Svenska.</li>
+      </ul>
+    </section>
   );
 }
 
@@ -226,6 +248,8 @@ export function Vuxen() {
           <li><b>Dator (Chrome/Edge):</b> installera-ikonen i adressfältet.</li>
         </ul>
       </section>
+
+      <Upplasning />
 
       <section class="card">
         <h2>Flytta in från gamla Klockövning</h2>

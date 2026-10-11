@@ -4,6 +4,13 @@
 
 ## Done
 
+- **Ordskogen S1 – the ord engine and Stavningsträsket** (2026-10-11, plan in PLAN.md §14c):
+  - `src/engines/ord/`: choose / dictation / find-the-error questions, in-app åäö keyboard on touch devices, no spellcheck or autocorrect, fallback to choice without a Swedish voice, answer masked out of every explanation and hint.
+  - Platform: `makeQuestion(spec, rng, ctx?)` with `QuestionCtx { seed, index }` so word games draw from a per-run deck (no repeats); speech moved to `src/platform/speech.ts` (voices signal, on-device voice first); Vuxenläge → Uppläsning (test button, install guides for Windows/iPad/Android).
+  - Stavningsträsket: 6 eras, 19 stages, ~260 words over 12 rules (småord, kort/lång vokal, m-regeln, ck, ng, j, sj, tj, o som låter å, stor/liten bokstav, sammansatta ord). Monsters Grodan Enkelhopp (`enkel-konsonant`), Sj-spöket (`sj-ljud`), Särskrivnings Trollet (`sarskrivning`); Mästare Stavmästaren (generic persona Mästarinnan Bläckfjäder, slot `stavningstrasket.mastare`).
+  - Meningssmedjan added to Ordskogen as `soon`.
+  - **The word lists need a proofread by a parent** (`src/games/stavning/ord.ts`).
+
 - **Phase 1, platform:**
   - Vite + Preact + TS PWA on GitHub Pages
   - versioned storage with migrations and backups
@@ -98,6 +105,10 @@ Tests: `npm test` (Vitest, 226 tests; `tests/betongbukten.test.ts` covers the ge
   - Controls: buttons, swipes (left/right/down, tap = hit) or keys (←/→, ↓ block, ↑/space hit, E superslag).
 
 ## Next mission
+
+**Ordskogen S2: Veckans ord** – the parent types the school's weekly spelling words in Vuxenläge; they become a stage in Stavningsträsket and a quest from Mästare Kastanj. Then S3 Rimbäcken, S4 Meningssmedjan, S5 Ordklassernas tempel, S6 Berättelsebiblioteket + region boss (PLAN.md §14c). Still to verify on the kids' real devices: a Swedish voice on the Windows PCs (Chrome may not list voices that Edge sees).
+
+Older options:
 
 Talbergen, Betongbukten, the village, Vuxenläge and the three mini-games are done, and games are lazy-loaded (see below). Options, to pick with the user:
 1. Svenska/engelska (wordpack engine) – the user put this on hold.

@@ -199,6 +199,16 @@ export const GENERIC_PERSONAS: Persona[] = [
     defeat: 'Du räknar cirklar som ett proffs! Ta min passaramulett – den hittar alltid mitten.',
     signatureItem: { name: 'Passarens amulett', slot: 'amulett', flavor: 'Hittar alltid mittpunkten.' },
   },
+  {
+    boss: 'stavningstrasket.mastare', name: 'Mästarinnan Bläckfjäder', title: 'Stavningsträskets Mästare', portrait: '🪶', color: '#2b8a3e',
+    entrance: 'Välkommen till Träskets hjärta! Här stavar orden sig inte själva – här läser jag upp och du skriver. Pennan redo? Diktamen börjar… nu!',
+    phase2: 'Svåra ord! Nu kommer orden som till och med vuxna stavar fel.',
+    phase3: 'Sista provet: hitta felen i mina meningar!',
+    onHeroMiss: ['Läs det du skrev en gång till!', 'Lyssna på ljuden – ett i taget.'],
+    onBossHit: ['Felfritt!', 'Vilken stavning!'],
+    defeat: 'Du stavar som en riktig mästare! Ta min bläckfjäder – den darrar aldrig.',
+    signatureItem: { name: 'Bläckfjädern', slot: 'vapen', flavor: 'Skriver aldrig ett enda stavfel.' },
+  },
 ];
 
 /** Väljer persona för en boss-plats: familjepaketets (matchande årskurs först), annars den allmänna. */

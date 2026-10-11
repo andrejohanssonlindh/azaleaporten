@@ -6,7 +6,7 @@ import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, he
 import type { Item } from './items';
 import { getEvents, logEvents, type LogEvent } from '../learning/events';
 import { noteAnswer } from '../learning/skills';
-import { allNodes, type AreaDef, type BossDef, type GameModule, type PathNode, type QuestionSpec, type StageDef } from './types';
+import { allNodes, type AreaDef, type BossDef, type GameModule, type PathNode, type QuestionCtx, type QuestionSpec, type StageDef } from './types';
 
 // Rundor, bossstrider och belöningar. Allt sparas direkt efter varje svar,
 // så att en omladdning fortsätter exakt där barnet var (samma frågor via seed + index).
@@ -186,12 +186,12 @@ export function startReview(hid: string, area: AreaDef, skills: string[]): RunSt
 }
 
 /** En fråga som tränar exakt en färdighet: provar spelets inställningar för den tills frågan träffar. */
-export function questionForSkill(game: GameModule, skill: string, rng: Rng): unknown {
+export function questionForSkill(game: GameModule, skill: string, rng: Rng, ctx?: QuestionCtx): unknown {
   const specs = game.specsForSkill(skill);
   if (!specs.length) throw new Error(`Ingen fråga för ${skill}`);
   let q: unknown;
   for (let i = 0; i < 200; i++) {
-    q = game.makeQuestion(rng.pick(specs), rng);
+    q = game.makeQuestion(rng.pick(specs), rng, ctx);
     if (game.skillOf(q) === skill) return q;
   }
   return q;
@@ -209,8 +209,9 @@ export function questionSpec(run: RunState, node: PathNode, rngNext: () => numbe
 
 export function currentQuestion(run: RunState, node: PathNode, game: GameModule): unknown {
   const rng = rngFrom(run.seed + run.index * 7919);
-  if (run.review) return questionForSkill(game, run.review[run.index % run.review.length], rng);
-  return game.makeQuestion(questionSpec(run, node, rng.next), rng);
+  const ctx = { seed: run.seed, index: run.index };
+  if (run.review) return questionForSkill(game, run.review[run.index % run.review.length], rng, ctx);
+  return game.makeQuestion(questionSpec(run, node, rng.next), rng, ctx);
 }
 
 /** Registrerar första svaret på aktuell fråga. */

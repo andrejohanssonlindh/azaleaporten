@@ -17,6 +17,7 @@ import { SIBBARP } from '../games/geometri/vinklar/content';
 import { BRYGGERIET } from '../games/geometri/area/content';
 import { KROKSBACK } from '../games/geometri/kroppar/content';
 import { STAPELBADDSPARKEN } from '../games/geometri/cirklar/content';
+import { STAVNINGSTRASKET } from '../games/stavning/content';
 
 // Spelbara områden: områdets innehåll (litet, laddas direkt) + spelet som levererar frågorna.
 // Spelkoden laddas först när någon spelar i området, så att startsidan förblir liten.
@@ -36,6 +37,7 @@ const AREAS: Record<string, Playable> = {
   bryggeriet: { def: BRYGGERIET, load: () => import('../games/geometri/area').then((m) => m.area) },
   kroksback: { def: KROKSBACK, load: () => import('../games/geometri/kroppar').then((m) => m.kroppar) },
   stapelbaddsparken: { def: STAPELBADDSPARKEN, load: () => import('../games/geometri/cirklar').then((m) => m.cirklar) },
+  stavningstrasket: { def: STAVNINGSTRASKET, load: () => import('../games/stavning').then((m) => m.stavning) },
 };
 
 // Regionbossar: en blandning av regionens spel.

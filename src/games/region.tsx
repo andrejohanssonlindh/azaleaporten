@@ -18,7 +18,7 @@ export function regionGame(id: string, games: Record<string, GameModule>): GameM
   }
   return {
     id,
-    makeQuestion: (spec, rng) => { const [area, s] = split(spec); return { area, q: games[area].makeQuestion(s, rng) } satisfies RQ; },
+    makeQuestion: (spec, rng, ctx) => { const [area, s] = split(spec); return { area, q: games[area].makeQuestion(s, rng, ctx) } satisfies RQ; },
     skillOf: (q) => games[(q as RQ).area].skillOf((q as RQ).q),
     areaOf: (q) => (q as RQ).area,
     specsForSkill: (skill) => {

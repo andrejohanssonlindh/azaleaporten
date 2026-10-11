@@ -45,9 +45,16 @@ const GEO: Record<string, string> = {
   'radie-diameter': 'radie och diameter', 'cirkel-omkrets': 'cirkelns omkrets', 'cirkel-area': 'cirkelns area', 'cirkel-delar': 'halv- och kvartscirklar',
   skala: 'skala', 'skala-forstoring': 'förstoring i skala',
 };
+const STAV: Record<string, string> = {
+  smaord: 'småorden', dubbel: 'dubbelteckning', lang: 'lång vokal med en konsonant', m: 'm-regeln', ck: 'ck',
+  ng: 'ng-ljudet', j: 'j-ljudet', sj: 'sj-ljudet', tj: 'tj-ljudet', oa: 'o som låter å',
+  stor: 'stor och liten bokstav', sammansatt: 'sammansatta ord',
+};
 const TAL = ['nollans', 'ettans', 'tvåans', 'treans', 'fyrans', 'femmans', 'sexans', 'sjuans', 'åttans', 'nians', 'tians', 'elvans', 'tolvans'];
 
 export function skillLabel(skill: string): string {
+  const [, svTopic, svRest] = /^sv\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
+  if (svTopic === 'stav' && STAV[svRest]) return STAV[svRest];
   const [, topic, rest] = /^ma\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
   if (topic === 'tid' && TID[rest]) return TID[rest];
   if (topic === 'add' && ADD[rest]) return ADD[rest];
