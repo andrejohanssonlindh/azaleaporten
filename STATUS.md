@@ -1,6 +1,6 @@
 # Status – Azaleaporten
 
-*Updated 2026-10-11: Betongbukten (geometri) is complete: seven skateparks + region boss, with a calculator/notes toolbox. Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
+*Updated 2026-10-11: the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
 
 ## Done
 
@@ -56,14 +56,24 @@
 
 Tests: `npm test` (Vitest, 163 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
 
+- **Gear round (after the user's playtest notes):**
+  - Mästare Kastanj introduces gear in Azaleabyn the first time a hero has an item or chest (`HeroState.tips`).
+  - Azaleagården has tabs: **Hjälten** (hero figure, stats you tap for an explanation with your own numbers, equipment slots directly above the backpack, compare vs what you wear, melt one item or all grey ones), **Garderoben**, **Kunskaper** (skills, titles, mentors).
+  - **Hero figure** (`src/shell/HeroFigure.tsx`): SVG body + animal emoji head; gear is drawn on it (helmet/hat/cap/crown, armour/tunic/cape, five weapons, shield/book/lantern, amulet, pet) and coloured by material tier and rarity.
+  - **Skräddaren** (`#/skraddaren`): 28 cosmetics (hats, capes, shoes, backgrounds, glitter) for kastanjer, with try-on; 7 of them are rewards (Mästare, level, best streak, arena rank). Record `h:<id>:wardrobe`.
+  - **Gear in fights:** the boss intro shows the hero vs the boss, the real hearts and where they come from, the damage per hit and about how many hits are needed. The boss HUD shows the hero attacking. Every stage run has **path monsters**: correct answers hit them, gear decides how hard, and each beaten monster gives 1 🌸 (not when tired). Run length and stars are unchanged.
+  - **Arenan** (`#/arenan`): a prototype timing game played with tokens (15 🌰 each, max 10). Nine opponents; all six stats matter; wins pay azaleablad only.
+
 ## Next mission
 
 Talbergen, Betongbukten and the village are done. Options, to pick with the user:
-1. **Lazy-load games per area**: the main JS chunk is now ~126 KB gzipped (budget 150 KB for the app). Do this before adding more content.
+1. **Lazy-load games per area**: the main JS chunk is now ~137 KB gzipped (budget 150 KB for the app). Do this before adding more content.
 2. **Vuxenläge, Phase 6**: the skills map (green/yellow/red per skill from `h:<id>:skills`, the most common error tags from the event log), time per day, quests done, install guides, quota and multi-tab guards. Much of it can reuse `src/shell/Biblioteket.tsx`.
 3. Svenska/engelska (wordpack engine) – the user put this on hold.
 
 Smaller things:
+- Arenan is a prototype: the user wants more mini-games later that the kids play with their characters, paid with tokens. Ideas: a second game type, tokens as quest rewards, rematches of beaten opponents.
+- The hero figure is not in the top bar or the hero picker yet (they still use the round avatar).
 - The kunskap level has no mastery component yet (Biblioteket shows "Sitter som berget" per skill instead).
 - The teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`), now including `talbergen.region` and the six area Mästare.
 
@@ -84,7 +94,7 @@ Tiokompisbron, Tabellgruvan, Myntmarknaden, Tallinjebron and Bråkbageriet are t
 
 ## Known minor things
 
-- Games are bundled into the main chunk (about 126 KB gzipped JS + 9 KB CSS). Lazy-load them per area next (see above).
+- Games are bundled into the main chunk (about 137 KB gzipped JS + 10 KB CSS after the gear round). Lazy-load them per area next (see above).
 - On a phone the calculator sits below the answer box, so the child scrolls between them. Fine for now; a floating panel could come later.
 - Read-aloud of drill questions isn't there yet (the 🔊 button exists only on mentor text).
 - `e2e/loot.spec.ts` failed once (2 "Ta av" buttons after one "Använd"), then passed 3/3 reruns. Possibly a double render in Azaleagården; worth a look if it recurs.

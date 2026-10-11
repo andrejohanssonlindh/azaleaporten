@@ -95,6 +95,8 @@ export function currentStreak(r: QuestState, day = dayOf(), amulets = 0): { n: n
 const amuletsOf = (hid: string) => getInv(hid).potions.skold ?? 0;
 
 /** Sviten utan att skapa dagens uppdrag (för topplisten på kartan). */
+/** Längsta sviten någonsin (minskar aldrig). */
+export const bestStreak = (hid: string) => loadRecord(key(hid), QUESTS).value.best;
 export const streakOf = (hid: string) => currentStreak(loadRecord(key(hid), QUESTS).value, dayOf(), amuletsOf(hid)).n;
 
 export interface RunReport { kind: RunState['kind']; areaId: string; nodeId: string; cleared: boolean; won: boolean; progressed: boolean }

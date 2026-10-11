@@ -17,6 +17,8 @@ import { LabbView } from './shell/LabbView';
 import { Gard } from './shell/Gard';
 import { ChestModal, Smedjan } from './shell/Loot';
 import { Vuxen } from './shell/Vuxen';
+import { Skraddaren } from './shell/Skraddaren';
+import { Arenan } from './shell/Arenan';
 
 let started = false;
 async function start() {
@@ -41,9 +43,11 @@ export function App() {
   else if (page === 'vuxen') view = <Vuxen />;
   else if (page === 'ny') view = <NewHero />;
   else if (!heroId.value || page === 'hjaltar') view = <HeroPicker />;
-  else if (page === 'gard') view = <Gard />;
+  else if (page === 'gard') view = <Gard tab={a} />;
   else if (page === 'by') view = <Azaleabyn />;
   else if (page === 'smedjan') view = <Smedjan />;
+  else if (page === 'skraddaren') view = <Skraddaren />;
+  else if (page === 'arenan') view = <Arenan />;
   else if (page === 'region' && a) view = <RegionView id={a} />;
   else if (page === 'omrade' && a) view = <AreaView id={a} />;
   // key = sökvägen, så att en ny bana alltid får ett nytt spel-tillstånd

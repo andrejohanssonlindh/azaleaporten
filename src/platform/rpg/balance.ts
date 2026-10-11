@@ -68,3 +68,7 @@ export const BOSS_HP_SCALE = 10;
 export const minHits = (kind: 'monster' | 'mastare', hp: number) => (kind === 'mastare' ? Math.max(10, hp - 2) : Math.ceil(hp * 0.75));
 /** Snabbt svar i bossstrid (ms) ger extra skada med Snabbhet. */
 export const FAST_MS = 6000;
+
+/** Stigmonster i vanliga banor: rätta svar slår till det, utrustningen avgör hur hårt.
+ *  Rundan är alltid 10 frågor och stjärnorna räknas som vanligt; monstret ger bara azaleablad. */
+export const MOB = { hp: 50, blad: 1 };

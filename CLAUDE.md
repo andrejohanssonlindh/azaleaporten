@@ -43,11 +43,12 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
   - the gate if not opened or `#/porten`
   - `vuxen`, `ny`, `hjaltar`, `gard`
   - otherwise the map
-- **State:** UI state lives in signals in `src/state.ts`. Persisted data is read synchronously from storage on render; call `touch()` after writing so views re-render. `src/session.ts` handles selecting or leaving a hero (`enterHero` returns the previous visit, which drives Mästare Kastanj's greeting in `src/platform/greeting.ts`).
+- **State:** UI state lives in signals in `src/state.ts`. Persisted data is read synchronously from storage on render; call `touch()` after writing so views re-render. Every component that reads storage must itself read `dataRev.value`: `@preact/signals` skips re-rendering a child whose props didn't change, so a child that only gets `hid` would otherwise show stale data. `src/session.ts` handles selecting or leaving a hero (`enterHero` returns the previous visit, which drives Mästare Kastanj's greeting in `src/platform/greeting.ts`).
 - **Storage layout** (see `src/platform/profiles.ts`):
   - `meta` (hero ids, last hero)
   - `h:<uuid>:profile` (name, animal, color, heroClass, grade, settings)
-  - `h:<uuid>:hero` (xp, level, kastanjer, blad…)
+  - `h:<uuid>:hero` (xp, level, kastanjer, blad, tips already shown, arena tokens and rank…)
+  - `h:<uuid>:inventory` (items, equipped, chests), `h:<uuid>:wardrobe` (cosmetics owned/worn)
   - `gate` (unlock key; excluded from backups and exports)
   - `backup:<iso>` (automatic snapshots, the last 3 are kept)
 
@@ -79,7 +80,13 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
   - chests are stored with a seed when found and opened later, so a reload never rerolls them
   - stats only affect boss damage (capped by `minHits`), hearts, crits, loot luck, XP % and hints per day
   - tamed bosses become unique pet items, and a Mästare drops their persona's `signatureItem`
-  - the Smedjan (`#/smedjan`) has a shop, melting into azaleablad, and +1–+5 upgrades
+  - the Smedjan (`#/smedjan`) has a shop, melting into azaleablad, and +1–+5 upgrades; items can also be melted (one, or all grey at once) straight from the backpack in Azaleagården
+  - Azaleagården (`#/gard`) has tabs: Hjälten (the hero figure, tappable stats with `statExplain()`, equipment slots directly above the backpack, compare vs equipped), Garderoben, Kunskaper
+  - **Path monsters** (`RunState.mob`, `MOB` in `balance.ts`, names in `src/content/monsters.ts`): stage runs only. Correct answers hit with gear damage (crit seeded from `seed + index`); a beaten monster gives azaleablad (not when tired) and the next one appears. It never changes run length, clearing or stars.
+  - the boss intro shows the real hearts (`bossHearts`) and damage/hits (`bossPreview`)
+- **Hero figure and cosmetics:** `src/shell/HeroFigure.tsx` draws an SVG body with the animal emoji as head; equipped gear is drawn by base id (`shapeOf`; colour = material tier from ilvl + rarity) and worn cosmetics on top. Cosmetics are in `src/platform/rpg/wardrobe.ts` (ids permanent; `cost` in kastanjer or an `unlock` from things that never go down: Mästare, level, best streak, arena rank), sold in Skräddaren (`#/skraddaren`, with try-on).
+- **Arenan** (`#/arenan`, `src/platform/rpg/arena.ts`): a proof-of-concept timing mini-game played with tokens (🎟️, bought for kastanjer). Stats set damage, life, zone widths and meter speed. It pays azaleablad only, never kastanjer. More mini-games are meant to come later.
+- **Introductions:** `HeroState.tips` + `markTip()`; Mästare Kastanj explains gear in Azaleabyn the first time a hero has an item or chest.
 - **Tidstornet** (`src/games/klocka/`):
   - `logic/` holds the pure Swedish time-language model, the diagnosis of mistakes and the parser, ported from v0.1 and tested over all 720 times
   - `content.ts` holds the eras, stages, monster bosses (tamed → pets) and the final Mästare (persona via `personaFor`)

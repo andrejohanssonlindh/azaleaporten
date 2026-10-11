@@ -1,5 +1,6 @@
-import { dataRev, go, heroId, toast } from '../state';
-import { getProfile } from '../platform/profiles';
+import { dataRev, go, heroId, toast, touch } from '../state';
+import { getHeroState, getProfile, markTip, type Profile } from '../platform/profiles';
+import { getInv } from '../platform/rpg/inventory';
 import { mistByArea } from '../platform/learning/skills';
 import { getArea, nodeDone } from '../platform/rpg/progress';
 import { personaFor } from '../content/bosses';
@@ -8,7 +9,7 @@ import { allNodes } from '../platform/rpg/types';
 import { PLAYABLE, playable, regionProgress } from '../content/areas';
 import { region as regionById, fitsGrade, type Region } from '../content/world';
 import { leaveToPicker } from '../session';
-import { BackBar, Screen, Stars } from './ui';
+import { BackBar, Mentor, Screen, Stars } from './ui';
 import { KastanjGreeting } from './Kastanj';
 
 // Azaleabyn (byn i mitten av ön) och regionsidorna med sina områden ("grottor").
@@ -17,8 +18,28 @@ const BUILDINGS = [
   { id: 'gard', icon: '🏡', name: 'Azaleagården', desc: 'Ditt hem och ditt hjälteblad', to: 'gard' },
   { id: 'uppdrag', icon: '📜', name: 'Uppdragstavlan', desc: 'Dagens uppdrag', to: 'uppdrag' },
   { id: 'smedjan', icon: '⚒️', name: 'Smedjan', desc: 'Butik, smält och förbättra', to: 'smedjan' },
+  { id: 'skraddaren', icon: '🧵', name: 'Skräddaren', desc: 'Kläder och utseende', to: 'skraddaren' },
+  { id: 'arenan', icon: '🏟️', name: 'Arenan', desc: 'Slåss med din utrustning', to: 'arenan' },
   { id: 'biblioteket', icon: '📖', name: 'Biblioteket', desc: 'Dina framsteg', to: 'biblioteket' },
 ];
+
+/** Första gången hjälten har utrustning: Mästare Kastanj förklarar vad den är till för. */
+function GearIntro({ p }: { p: Profile }) {
+  const inv = getInv(p.id);
+  const items = inv.items.length > 0;
+  const text = items
+    ? 'Du har hittat utrustning! Varje sak ger dig egenskaper, som Kraft och Skydd. Ta på dig den i Azaleagården, så syns den på din hjälte. ' +
+      'Med Kraft slår du hårdare mot bossar och stigmonster, och med Skydd får du fler hjärtan. Men svaren måste du alltid kunna själv!'
+    : 'Du har hittat en skattkista! I den ligger utrustning som gör din hjälte starkare i strider. Öppna den i Azaleagården.';
+  return (
+    <Mentor text={text}>
+      <div class="row mentor-actions">
+        <button class="btn small primary" onClick={() => { markTip(p.id, 'utrustning'); touch(); go('gard'); }}>Visa mig!</button>
+        <button class="btn small" onClick={() => { markTip(p.id, 'utrustning'); touch(); }}>Okej</button>
+      </div>
+    </Mentor>
+  );
+}
 
 export function Azaleabyn() {
   dataRev.value;
@@ -28,7 +49,7 @@ export function Azaleabyn() {
     <Screen class="place">
       <BackBar label="Till ön" to="karta" />
       <div class="place-banner village"><span>🌸</span><h1>Azaleabyn</h1></div>
-      <KastanjGreeting p={p} />
+      {needsGearIntro(p.id) ? <GearIntro p={p} /> : <KastanjGreeting p={p} />}
       <div class="building-grid">
         {BUILDINGS.map((b) => (
           <button key={b.id} class={`building${b.to ? '' : ' soon'}`} onClick={() => (b.to ? go(b.to) : toast(`${b.icon} ${b.name} öppnar snart!`))}>
@@ -42,6 +63,11 @@ export function Azaleabyn() {
     </Screen>
   );
 }
+
+const needsGearIntro = (hid: string) => {
+  const inv = getInv(hid);
+  return (inv.items.length > 0 || inv.chests.length > 0) && !getHeroState(hid).tips.includes('utrustning');
+};
 
 function RegionBanner({ r }: { r: Region }) {
   const [top, bottom, ground] = r.sky;

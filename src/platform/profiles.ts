@@ -50,6 +50,12 @@ export interface HeroState {
   /** Besegrade mästare som blivit mentorer, id "<område>:<boss>". */
   mentors: string[];
   legacy: { klockaV01?: { importedAt: string; from: string }[]; pioneerChest?: 'pending' | 'opened' };
+  /** Introduktioner som Mästare Kastanj redan har visat (t.ex. 'utrustning'). */
+  tips: string[];
+  /** Polletter till Arenan (köps för kastanjer). */
+  polletter: number;
+  /** Arenan: nästa motståndare (0 = den första) och antal vinster. */
+  arena: { rank: number; wins: number };
 }
 
 const uuid = () => globalThis.crypto?.randomUUID?.() ?? `h-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
@@ -70,7 +76,7 @@ export const PROFILE: RecordSpec<Profile> = {
 
 export const HERO: RecordSpec<HeroState> = {
   version: 1,
-  defaults: () => ({ v: 1, xp: 0, level: 1, kastanjer: 0, blad: 0, titles: [], title: null, achievements: {}, pets: [], mentors: [], legacy: {} }),
+  defaults: () => ({ v: 1, xp: 0, level: 1, kastanjer: 0, blad: 0, titles: [], title: null, achievements: {}, pets: [], mentors: [], legacy: {}, tips: [], polletter: 0, arena: { rank: 0, wins: 0 } }),
 };
 
 export const heroKey = (id: string, part: string) => `h:${id}:${part}`;
@@ -99,6 +105,12 @@ export function saveProfile(p: Profile) { saveRecord(heroKey(p.id, 'profile'), P
 
 export function getHeroState(id: string): HeroState { return loadRecord(heroKey(id, 'hero'), HERO).value; }
 export function saveHeroState(id: string, s: HeroState) { saveRecord(heroKey(id, 'hero'), HERO, s); }
+
+/** Markerar att en introduktion har visats (visas bara en gång per hjälte). */
+export function markTip(id: string, tip: string) {
+  const s = getHeroState(id);
+  if (!s.tips.includes(tip)) saveHeroState(id, { ...s, tips: [...s.tips, tip] });
+}
 
 export const cleanName = (name: string) => name.replace(/\s+/g, ' ').trim().slice(0, 20);
 

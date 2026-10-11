@@ -76,8 +76,11 @@ const BASES: Base[] = [
 const MATERIALS = ['Trä', 'Läder', 'Brons', 'Järn', 'Silver', 'Guld', 'Stjärn'];
 const AFFIX: Record<Stat, string> = { kraft: 'styrka', skydd: 'skydd', tur: 'tur', visdom: 'visdom', snabbhet: 'snabbhet', klurighet: 'klurighet' };
 
+/** Materialsteg ur föremålsnivån: 0 trä/läder … 6 stjärn. Används också för färgen på hjältefiguren. */
+export const materialTier = (ilvl: number) => Math.max(0, Math.min(MATERIALS.length - 1, Math.floor((ilvl - 1) / 2)));
+
 const materialFor = (base: Base, ilvl: number) => {
-  const tier = Math.min(MATERIALS.length - 1, Math.floor((ilvl - 1) / 2));
+  const tier = materialTier(ilvl);
   // Läder passar bättre för luva/tunika/mantel, trä för stav/båge/sköld.
   const m = MATERIALS[tier];
   if (tier <= 1) return ['luva', 'tunika', 'mantel', 'hatt'].includes(base.id) ? 'Läder' : 'Trä';

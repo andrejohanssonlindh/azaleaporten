@@ -3,7 +3,7 @@ import { chestModal, dataRev, gate, go, heroId, toast, touch } from '../state';
 import { getHeroState, getProfile } from '../platform/profiles';
 import {
   abandonRun, advance, currentQuestion, findNode, finishRun, getPlay, hintsLeft, nextOpenNode, getArea,
-  recordAnswer, recordFixed, REVIEW_NODE, runLength, runOver, startReview, startRun, useHint, type Outcome, type RunState,
+  bossHearts, bossPreview, recordAnswer, recordFixed, REVIEW_NODE, runLength, runOver, startReview, startRun, useHint, type Hit, type Outcome, type RunState,
 } from '../platform/rpg/progress';
 import { reviewPlan } from '../platform/learning/skills';
 import { noteRun, type QuestNews } from '../platform/learning/quests';
@@ -17,6 +17,8 @@ import { leaveToPicker } from '../session';
 import { Portrait, Screen, Stars } from './ui';
 import { ItemCard } from './Loot';
 import { getInv } from '../platform/rpg/inventory';
+import { stigmonster } from '../content/monsters';
+import { HeroFigure } from './HeroFigure';
 
 // Spelskärmen: en runda (10 frågor), en repetition (5 frågor) eller en bossstrid.
 
@@ -110,18 +112,26 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
 
   /* ---------- bossintro ---------- */
   if (!run && boss && face) {
-    const hearts = getProfile(p.id)?.heroClass === 'riddare' ? 4 : 3;
+    const h = bossHearts(p.id, getInv(p.id).potions.liv > 0);
+    const pv = bossPreview(p.id, boss);
+    const extra = [h.klass && `+${h.klass} riddare`, h.skydd && `+${h.skydd} från Skydd`, h.potion && '+1 livsdryck'].filter(Boolean);
     return (
       <Screen class="play boss-intro">
         <div class="boss-card">
-          <Portrait src={face.portrait} size={120} />
+          <div class="versus">
+            <HeroFigure hid={p.id} size={96} />
+            <span class="arena-vs">VS</span>
+            <Portrait src={face.portrait} size={110} />
+          </div>
           <h1>{face.name}</h1>
           <p class="boss-title">{face.title}</p>
           <blockquote class="boss-speech">"{face.entrance}"</blockquote>
           <p class="boss-rules">
-            Du har {'❤️'.repeat(hearts)}. Svara rätt {boss.hp} gånger för att vinna – ett fel kostar ett hjärta.
+            Du har {'❤️'.repeat(h.total)}{extra.length > 0 && <small> ({h.base} {extra.join(', ')})</small>}. Ett fel kostar ett hjärta.
+            {' '}{face.name} har {pv.maxHp} liv. Varje rätt svar gör {pv.dmg} skada, så du behöver ungefär {pv.hits} träffar.
             {boss.trap && <> Akta dig: varannan fråga är en fälla ({pl.game.errLabel(boss.trap)?.toLowerCase()}).</>}
           </p>
+          <p class="note">Bättre utrustning ger fler hjärtan och hårdare slag. Svaren måste du alltid kunna själv!</p>
           <div class="row center-row">
             <button class="btn" onClick={() => go(back)}>Inte än</button>
             <button class="btn primary big" onClick={() => { setRun(startRun(p.id, area, node, 'boss')); setBossLine(face.entrance); }}>⚔️ Strid!</button>
@@ -181,20 +191,26 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
       {boss && !practice ? (
         <div class="boss-hud">
           <div class="boss-hud-row">
-            <Portrait src={face!.portrait} size={56} />
-            <div class="hpbar" aria-label={`Bossen har ${run.hp} av ${run.maxHp} kvar`}><div style={{ width: `${((run.hp ?? 0) / (run.maxHp ?? 1)) * 100}%` }} /></div>
+            <span key={run.results.length}><HeroFigure hid={p.id} size={52} pose={answered ? (run.lastHit ? 'attack' : 'hurt') : null} /></span>
+            <div class="boss-hud-mid">
+              <div class="hpbar" aria-label={`Bossen har ${run.hp} av ${run.maxHp} kvar`}><div style={{ width: `${((run.hp ?? 0) / (run.maxHp ?? 1)) * 100}%` }} /></div>
+              <div class="hearts" aria-label={`${run.hearts} hjärtan kvar`}>{'❤️'.repeat(run.hearts ?? 0)}<span class="hearts-off">{'🖤'.repeat((run.maxHearts ?? 0) - (run.hearts ?? 0))}</span></div>
+            </div>
+            <span key={`b${run.results.length}`} class={answered && run.lastHit ? 'shake' : ''}><Portrait src={face!.portrait} size={56} /></span>
           </div>
-          <div class="hearts" aria-label={`${run.hearts} hjärtan kvar`}>{'❤️'.repeat(run.hearts ?? 0)}<span class="hearts-off">{'🖤'.repeat((run.maxHearts ?? 0) - (run.hearts ?? 0))}</span></div>
-          {run.lastHit && answered && <p class={`hit${run.lastHit.crit ? ' crit' : ''}`}>💥 −{run.lastHit.dmg}{run.lastHit.crit ? ' Fullträff!' : ''}</p>}
+          {run.lastHit && answered && <p class={`hit${run.lastHit.crit ? ' crit' : ''}`}>{hitText(run.lastHit)}</p>}
           {bossLine && <p class="boss-line">"{bossLine}"</p>}
         </div>
       ) : (
+        <>
+        {run.mob && <MobStrip hid={p.id} run={run} answered={answered} />}
         <div class="run-dots" aria-label={`Fråga ${Math.min(run.index + 1, len)} av ${len}`}>
           {Array.from({ length: len }, (_, i) => {
             const r = run.results[i];
             return <span key={i} class={`dot${r ? (r.correct ? ' ok' : ' bad') : i === run.index ? ' now' : ''}`} />;
           })}
         </div>
+        </>
       )}
 
       {canHint && (
@@ -204,6 +220,28 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
       <View key={`${run.seed}-${run.index}`} q={q} hint={hintIdx === run.index} onAnswer={onAnswer} onDone={onDone}
         nextLabel={runOver(run) ? 'Se resultat' : 'Nästa'} />
     </Screen>
+  );
+}
+
+const hitText = (h: Hit) => `💥 −${h.dmg}${h.fast ? ' ⚡ Snabbt!' : ''}${h.crit ? ' ⭐ Fullträff!' : ''}`;
+
+/** Stigmonstret i en vanlig bana: rätta svar slår till det, utrustningen avgör hur hårt. */
+function MobStrip({ hid, run, answered }: { hid: string; run: RunState; answered: boolean }) {
+  const mob = run.mob!;
+  const m = stigmonster(run.seed, mob.k);
+  const hit = answered ? mob.lastHit : undefined;
+  const beaten = hit?.beat ? stigmonster(run.seed, mob.k - 1) : null;
+  return (
+    <div class="mob-strip">
+      <span key={run.results.length}><HeroFigure hid={hid} size={40} pose={hit ? 'attack' : null} /></span>
+      <div class="mob-mid">
+        {hit
+          ? <p class={`hit small${hit.crit ? ' crit' : ''}`}>{beaten ? `${beaten.icon} ${beaten.name} besegrad!${hit.blad ? ` +${hit.blad} 🌸` : ''}` : hitText(hit)}</p>
+          : <small>{mob.beaten > 0 ? `${mob.beaten} besegrade · ` : ''}{m.name}</small>}
+        <div class="hpbar small" aria-label={`${m.name} har ${mob.hp} av ${mob.maxHp} kvar`}><div style={{ width: `${(mob.hp / mob.maxHp) * 100}%` }} /></div>
+      </div>
+      <span key={`m${run.results.length}`} class={`mob-icon${hit && !beaten ? ' shake' : ''}${beaten ? ' pop' : ''}`}>{m.icon}</span>
+    </div>
   );
 }
 
@@ -252,6 +290,7 @@ function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome
         {head}
         <div class="rewards">
           {o.xp > 0 && <span>✨ +{o.xp} XP</span>}
+          {o.mobs && o.mobs.beaten > 0 && <span>👾 {o.mobs.beaten} stigmonster besegrade{o.mobs.blad > 0 ? ` · 🌸 +${o.mobs.blad}` : ''}</span>}
           {o.kastanjer > 0 && <span>🌰 +{o.kastanjer}</span>}
           {o.levelUps > 0 && <span>⭐ Nivå {hs.level} – {levelTitle(hs.level)}</span>}
           {o.gained.pet && <span>🐾 {o.gained.pet} följer med dig hem!</span>}

@@ -67,6 +67,43 @@ export const effects = {
   lootLuck: (s: Stats, ranger: boolean) => s.tur + (ranger ? 5 : 0),
 };
 
+const nextAt = (v: number, step: number, maxSteps: number) => (Math.floor(v / step) < maxSteps ? (Math.floor(v / step) + 1) * step : null);
+
+/** Vad en egenskap gör just nu, med hjältens egna siffror (visas när barnet trycker på den). */
+export function statExplain(stat: Stat, s: Stats, ranger: boolean): string {
+  switch (stat) {
+    case 'kraft': {
+      const n = nextAt(s.kraft, 4, 4);
+      return `Varje rätt svar i en strid gör ${effects.damage(s)} skada (utan utrustning 10).${n ? ` Vid ${n} Kraft blir det ${effects.damage({ ...s, kraft: n })}.` : ' Det är max!'}`;
+    }
+    case 'skydd': {
+      const h = effects.extraHearts(s), n = nextAt(s.skydd, 6, 3);
+      return `${h ? `+${h} hjärta${h > 1 ? 'n' : ''} i bossstrider.` : 'Inga extra hjärtan än.'}${n ? ` Vid ${n} Skydd får du ${h + 1}.` : ''} I Arenan tål du också mer.`;
+    }
+    case 'tur':
+      return `${Math.round(effects.critChance(s, ranger) * 100)} % chans till fullträff (+5 skada), och finare saker i skattkistorna.`;
+    case 'visdom':
+      return `+${Math.round(effects.xpBonus(s) * 100)} % XP på allt du gör (högst +25 %).`;
+    case 'snabbhet':
+      return effects.fastBonus(s) ? `Svarar du på under 6 sekunder i en strid gör du +${effects.fastBonus(s)} extra skada.` : 'Ger extra skada när du svarar snabbt i en strid. Du har ingen Snabbhet än.';
+    case 'klurighet': {
+      const h = effects.extraHints(s), n = nextAt(s.klurighet, 5, 2);
+      return `${h ? `+${h} ledtråd${h > 1 ? 'ar' : ''} per dag.` : 'Inga extra ledtrådar än.'}${n ? ` Vid ${n} Klurighet får du ${h + 1}.` : ''}`;
+    }
+  }
+}
+
+/** Skillnad i egenskaper om man byter till `it` från det som sitter i samma plats nu. */
+export function statDiff(it: Item, current: Item | undefined): Partial<Record<Stat, number>> {
+  const a = itemStats(it), b = current ? itemStats(current) : {};
+  const out: Partial<Record<Stat, number>> = {};
+  for (const { id } of STATS) {
+    const d = (a[id] ?? 0) - (b[id] ?? 0);
+    if (d) out[id] = d;
+  }
+  return out;
+}
+
 /* ---------- kistor ---------- */
 
 export function addChest(hid: string, c: Omit<Chest, 'id' | 'seed' | 'at'>): Chest {
@@ -142,6 +179,18 @@ export function salvage(hid: string, itemId: string): number {
   const s = getHeroState(hid);
   saveHeroState(hid, { ...s, blad: s.blad + blad });
   return blad;
+}
+
+/** Smälter alla vanliga (gråa) föremål som inte används. Returnerar antal föremål och blad. */
+export function salvageCommon(hid: string): { n: number; blad: number } {
+  const inv = getInv(hid);
+  const melt = inv.items.filter((it) => it.rarity === 0 && !it.unique && !isEquipped(inv, it.id));
+  if (!melt.length) return { n: 0, blad: 0 };
+  const blad = melt.reduce((a, it) => a + salvageValue(it), 0);
+  saveInv(hid, { ...inv, items: inv.items.filter((it) => !melt.includes(it)) });
+  const s = getHeroState(hid);
+  saveHeroState(hid, { ...s, blad: s.blad + blad });
+  return { n: melt.length, blad };
 }
 
 export function canUpgrade(hid: string, it: Item): boolean {

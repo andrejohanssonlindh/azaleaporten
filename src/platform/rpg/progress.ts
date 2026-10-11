@@ -1,7 +1,7 @@
 import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey, saveHeroState } from '../profiles';
 import { randomSeed, rngFrom, type Rng } from '../rng';
-import { BOSS, BOSS_HP_SCALE, CLEAR_MIN, FAST_MS, HINTS_PER_DAY, LOOT, minHits, needXP, PRACTICE_LENGTH, REWARD, RUN_LENGTH, TIRED_AFTER_MS, XP } from './balance';
+import { BOSS, BOSS_HP_SCALE, CLEAR_MIN, FAST_MS, HINTS_PER_DAY, LOOT, minHits, MOB, needXP, PRACTICE_LENGTH, REWARD, RUN_LENGTH, TIRED_AFTER_MS, XP } from './balance';
 import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, heroStats, useLifePotion, type Chest } from './inventory';
 import type { Item } from './items';
 import { getEvents, logEvents, type LogEvent } from '../learning/events';
@@ -38,10 +38,17 @@ export interface RunState {
   maxHearts?: number;
   /** Satt för bossstrider från fas 3: HP räknas i poäng (träffar × 10) och utrustning påverkar skadan. */
   hpScale?: number;
-  lastHit?: { dmg: number; crit: boolean };
+  lastHit?: Hit;
+  /** Stigmonster i vanliga banor (saknas i rundor som startade före stigmonstren). */
+  mob?: MobState;
   /** Repetitionsrunda: färdigheten för varje fråga (bestäms när rundan startar). */
   review?: string[];
 }
+
+export interface Hit { dmg: number; crit: boolean; fast?: boolean }
+
+/** k = vilket monster i ordningen (se content/monsters.ts), beaten/blad = besegrade och blad de gav. */
+export interface MobState { k: number; hp: number; maxHp: number; beaten: number; blad: number; lastHit?: Hit & { beat?: boolean; blad?: number } }
 
 /** Repetitionsrundor hör inte till stigen; de spelas på den här låtsasnoden. */
 export const REVIEW_NODE: StageDef = { type: 'stage', id: 'dimma', name: 'Glömskans dimma', icon: '🌫️', desc: 'Repetition', spec: { mode: '', level: 0 }, thrMs: 0 };
@@ -139,12 +146,26 @@ export function runLength(run: RunState): number {
   return run.kind === 'practice' ? PRACTICE_LENGTH : run.kind === 'stage' ? RUN_LENGTH : Infinity;
 }
 
+/** Hjärtan i en bossstrid, uppdelat så att introt kan visa varifrån de kommer. */
+export function bossHearts(hid: string, potion: boolean) {
+  const klass = getProfile(hid)?.heroClass === 'riddare' ? BOSS.riddareHearts : 0;
+  const skydd = effects.extraHearts(heroStats(hid));
+  const p = potion ? 1 : 0;
+  return { base: BOSS.hearts, klass, skydd, potion: p, total: Math.min(BOSS.maxHearts, BOSS.hearts + klass + skydd + p) };
+}
+
+/** Skada per vanligt rätt svar mot en boss (utan snabbhet och fullträff), och ungefär hur många träffar som behövs. */
+export function bossPreview(hid: string, boss: BossDef) {
+  const maxHp = boss.hp * BOSS_HP_SCALE;
+  const dmg = Math.min(effects.damage(heroStats(hid)), Math.floor(maxHp / minHits(boss.kind, boss.hp)));
+  return { maxHp, dmg, hits: Math.ceil(maxHp / dmg) };
+}
+
 export function startRun(hid: string, area: AreaDef, node: PathNode, kind: RunState['kind'] = node.type === 'boss' ? 'boss' : 'stage'): RunState {
   const run: RunState = { kind, areaId: area.areaId, nodeId: node.id, seed: randomSeed(), index: 0, results: [], startedAt: new Date().toISOString(), xp: 0, levelUps: 0 };
+  if (kind === 'stage') run.mob = { k: 0, hp: MOB.hp, maxHp: MOB.hp, beaten: 0, blad: 0 };
   if (kind === 'boss' && node.type === 'boss') {
-    const cls = getProfile(hid)?.heroClass;
-    const potion = useLifePotion(hid) ? 1 : 0;
-    const hearts = Math.min(BOSS.maxHearts, BOSS.hearts + (cls === 'riddare' ? BOSS.riddareHearts : 0) + effects.extraHearts(heroStats(hid)) + potion);
+    const hearts = bossHearts(hid, useLifePotion(hid)).total;
     const hp = node.hp * BOSS_HP_SCALE;
     Object.assign(run, { hp, maxHp: hp, hearts, maxHearts: hearts, hpScale: BOSS_HP_SCALE });
     const a = getArea(hid, area.areaId);
@@ -200,6 +221,8 @@ export function recordAnswer(hid: string, run: RunState, node: PathNode, a: Answ
   const g = giveXP(hid, run.areaId, base);
   next.xp += g.xp;
   next.levelUps += g.levelUps;
+  if (run.mob && a.correct) next.mob = mobHit(hid, run, run.mob, a.ms);
+  else if (run.mob) next.mob = { ...run.mob, lastHit: undefined };
   if (run.kind === 'boss') {
     if (a.correct) {
       const hit = bossHit(hid, run, node as BossDef, a.ms);
@@ -217,15 +240,34 @@ export function recordAnswer(hid: string, run: RunState, node: PathNode, a: Answ
   return next;
 }
 
+/** Ett rätt svar slår till stigmonstret. Fullträffen slumpas ur seed + index, så en omladdning ger samma slag.
+ *  Ett besegrat monster ger blad (inte när hjälten är trött) och nästa monster kliver fram. */
+function mobHit(hid: string, run: RunState, mob: MobState, ms: number): MobState {
+  const st = heroStats(hid);
+  const ranger = getProfile(hid)?.heroClass === 'ranger';
+  const crit = rngFrom(run.seed + run.index * 104729 + 17).next() < effects.critChance(st, ranger);
+  const fast = ms < FAST_MS && effects.fastBonus(st) > 0;
+  const dmg = effects.damage(st) + (fast ? effects.fastBonus(st) : 0) + (crit ? 5 : 0);
+  if (mob.hp - dmg > 0) return { ...mob, hp: mob.hp - dmg, lastHit: { dmg, crit, fast } };
+  let blad = 0;
+  if (!isTired(hid)) {
+    const s = getHeroState(hid);
+    saveHeroState(hid, { ...s, blad: s.blad + MOB.blad });
+    blad = MOB.blad;
+  }
+  return { k: mob.k + 1, hp: mob.maxHp, maxHp: mob.maxHp, beaten: mob.beaten + 1, blad: mob.blad + blad, lastHit: { dmg, crit, fast, beat: true, blad } };
+}
+
 /** Skada för ett rätt svar. Taket gör att ingen utrustning kan vinna med färre än minHits rätta svar. */
-export function bossHit(hid: string, run: RunState, boss: BossDef, ms: number): { dmg: number; crit: boolean } {
+export function bossHit(hid: string, run: RunState, boss: BossDef, ms: number): Hit {
   if (!run.hpScale) return { dmg: 1, crit: false }; // strid påbörjad före fas 3
   const st = heroStats(hid);
   const ranger = getProfile(hid)?.heroClass === 'ranger';
   const crit = Math.random() < effects.critChance(st, ranger);
-  const raw = effects.damage(st) + (ms < FAST_MS ? effects.fastBonus(st) : 0) + (crit ? 5 : 0);
+  const fast = ms < FAST_MS && effects.fastBonus(st) > 0;
+  const raw = effects.damage(st) + (fast ? effects.fastBonus(st) : 0) + (crit ? 5 : 0);
   const cap = Math.floor((run.maxHp ?? 0) / minHits(boss.kind, boss.hp));
-  return { dmg: Math.min(raw, cap), crit };
+  return { dmg: Math.min(raw, cap), crit, fast };
 }
 
 /** Barnet rättade sitt fel: liten XP-bonus, och frågan räknas som klar. */
@@ -281,6 +323,8 @@ export interface Outcome {
   tired: boolean;
   gained: { pet?: string; mentor?: string; title?: string; items?: Item[] };
   chests: Chest[];
+  /** Stigmonster besegrade under rundan och azaleablad de gav. */
+  mobs?: { beaten: number; blad: number };
 }
 
 export function starsFor(correct: number, total: number, avgMs: number, usedHint: boolean, thrMs: number): number {
@@ -302,7 +346,8 @@ export function finishRun(hid: string, area: AreaDef, run: RunState, extras: { s
   const avgMs = total ? run.results.reduce((s, r) => s + r.ms, 0) / total : 0;
   const usedHint = run.results.some((r) => r.hint);
   const o: Outcome = { kind: run.kind, correct, total, avgMs, usedHint, cleared: false, firstClear: false, stars: 0, newStars: 0,
-    bossWon: false, firstWin: false, xp: run.xp, kastanjer: 0, levelUps: run.levelUps, tired: isTired(hid), gained: {}, chests: [] };
+    bossWon: false, firstWin: false, xp: run.xp, kastanjer: 0, levelUps: run.levelUps, tired: isTired(hid), gained: {}, chests: [],
+    ...(run.mob ? { mobs: { beaten: run.mob.beaten, blad: run.mob.blad } } : {}) };
   const ilvl = run.kind === 'review' ? areaIlvl(area, getArea(hid, area.areaId)) : nodeIlvl(area, run.nodeId);
   let chest: { minRarity: 0 | 1 | 2; boss?: boolean } | null = null;
   const reward = (r: { xp?: number; kastanjer?: number }) => {

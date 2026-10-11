@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { useState } from 'preact/hooks';
-import { chestModal, dataRev, heroId, toast, touch } from '../state';
+import { chestModal, dataRev, go, heroId, route, toast, touch } from '../state';
 import { getHeroState, getProfile } from '../platform/profiles';
 import { buy, canUpgrade, getInv, isEquipped, openChest, salvage, SHOP, upgrade } from '../platform/rpg/inventory';
 import { itemStats, MAX_PLUS, RARITIES, salvageValue, statLine, upgradeCost, type Item } from '../platform/rpg/items';
@@ -10,7 +10,7 @@ import { BackBar, Screen } from './ui';
 
 // Föremålskort, kistöppning och Smedjan.
 
-export function ItemCard({ it, children, equipped = false }: { it: Item; children?: ComponentChildren; equipped?: boolean }) {
+export function ItemCard({ it, children, equipped = false, note }: { it: Item; children?: ComponentChildren; equipped?: boolean; note?: ComponentChildren }) {
   const r = RARITIES[it.rarity];
   return (
     <div class={`item-card${equipped ? ' equipped' : ''}`} style={{ borderColor: r.color }}>
@@ -20,6 +20,7 @@ export function ItemCard({ it, children, equipped = false }: { it: Item; childre
         <small>{r.name}{it.unique ? ' · Unik' : ''} · Nivå {it.ilvl}{equipped ? ' · Används' : ''}</small>
         <span class="item-stats">{statLine(itemStats(it))}</span>
         {it.flavor && <i class="item-flavor">{it.flavor}</i>}
+        {note}
       </div>
       {children && <div class="item-actions">{children}</div>}
     </div>
@@ -66,8 +67,11 @@ export function ChestModal() {
             <div class="chest-big">✨</div>
             <h2>Du fick:</h2>
             {items.map((it) => <ItemCard key={it.id} it={it} />)}
-            <p class="note">Gå till Azaleagården för att använda {items.length > 1 ? 'dem' : 'den'}.</p>
-            <div class="row center-row"><button class="btn primary" onClick={close}>Toppen!</button></div>
+            <p class="note">Ta på dig {items.length > 1 ? 'dem' : 'den'} i Azaleagården, så syns {items.length > 1 ? 'de' : 'den'} på din hjälte.</p>
+            <div class="row center-row">
+              <button class="btn" onClick={close}>Toppen!</button>
+              {route.value[0] !== 'gard' && <button class="btn primary" onClick={() => { close(); go('gard'); }}>Till Azaleagården</button>}
+            </div>
           </>
         )}
       </div>
