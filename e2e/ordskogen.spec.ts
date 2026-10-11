@@ -30,7 +30,8 @@ test('Ordskogen → Rimbäcken → Vad rimmar?, en hel runda med ett rättat fel
       await shot(page, '2-rim');
       await page.locator('.ord-choice').filter({ hasNotText: new RegExp(`^${right}$`) }).first().click();
       await expect(page.locator('.errcard')).toBeVisible();
-      await expect(page.locator('.errcard')).not.toContainText(right);
+      // Svaret får inte stå som eget ord i förklaringen ("dit" i "ditt" räknas inte).
+      await expect(page.locator('.errcard')).not.toContainText(new RegExp(`(?<!\\p{L})${right}(?!\\p{L})`, 'iu'));
       await shot(page, '3-rim-fel');
     }
     await page.getByRole('button', { name: right, exact: true }).click();

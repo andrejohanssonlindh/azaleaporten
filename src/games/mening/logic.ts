@@ -326,7 +326,7 @@ const SAMBAND_TEXT: Record<Samband, string> = {
   foljd: 'Den andra delen berättar vad som hände på grund av den första. Vilket ord visar det?',
   orsak: 'Den andra delen förklarar varför. Vilket ord visar en orsak?',
   tid: 'Orden handlar om tid – vad som händer först, sist eller samtidigt. Vilket ord passar då?',
-  villkor: 'Det ena händer bara ifall det andra stämmer. Vilket ord visar det?',
+  villkor: 'Det ena händer bara under ett villkor – att det andra stämmer. Vilket ord visar det?',
   tillagg: 'Här läggs en sak till en annan. Vilket ord binder ihop dem?',
 };
 

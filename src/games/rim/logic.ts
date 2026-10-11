@@ -109,8 +109,9 @@ function rimQ(i: number, rng: Rng, trap?: string): Omit<RQ, 'mode' | 'level' | '
   const wrong: Alt[] = [];
   const startPick = start2.length ? start2 : start1;
   if (startPick.length) wrong.push({ text: rng.pick(startPick).w, err: 'rim-borjan' });
-  if (near.length) wrong.push({ text: rng.pick(near).w, err: 'rim-nastan' });
-  while (wrong.length < 2) wrong.push({ text: rng.pick(others).w, err: 'inte-rim' });
+  const unused = (xs: typeof others) => xs.filter((x) => !wrong.some((a) => a.text === x.w));
+  if (unused(near).length) wrong.push({ text: rng.pick(unused(near)).w, err: 'rim-nastan' });
+  while (wrong.length < 2) wrong.push({ text: rng.pick(unused(others)).w, err: 'inte-rim' });
   const alts = choose(rng, right, wrong, trap);
   const prompt = `Vilket ord rimmar på "${w}"?`;
   return { kind: 'val', prompt, answer: right, alts, word: w, say: `Vilket ord rimmar på ${w}? ${alts.map((a) => a.text).join('. ')}.` };
