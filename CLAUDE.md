@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Azaleaporten: a free, adventure/RPG-themed practice app (matematik, svenska, engelska) for school kids, hosted on GitHub Pages at `https://andrejohanssonlindh.github.io/azaleaporten/`. No backend: all progress lives in the browser's `localStorage` on each device. UI text, comments and many identifiers are **Swedish**; keep new user-facing text Swedish and child-friendly.
 
-The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phases 1–4 are done (platform, Tidstornet, loot/gear, the learning loop), plus Tiokompisbron and Tabellgruvan from Phase 5. **Current status and the next mission are in `STATUS.md`. Read it first.**
+The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phases 1–4 are done (platform, Tidstornet, loot/gear, the learning loop), plus all of Talbergen (six areas and the region boss) and the village from Phase 5. **Current status and the next mission are in `STATUS.md`. Read it first.**
 
 ## Commands
 
@@ -56,7 +56,7 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
 - **The island:** the map (`src/shell/IslandMap.tsx`, a hand-drawn SVG) is the start screen. Tapping a place opens its page:
   - Azaleabyn (`#/by`, the village with the buildings, including Azaleagården `#/gard`)
   - Övningsängen (`#/ovning`, review runs where Glömskans dimma lies, else a repeat of the last thing played)
-  - Uppdragstavlan (`#/uppdrag`, daily quests, streak)
+  - Uppdragstavlan (`#/uppdrag`, daily quests, streak) and Biblioteket (`#/biblioteket`, the child's own statistics)
   - regions (`#/region/<id>`)
   - fog spots and the dotted islands are reserved for future subjects
 
@@ -85,7 +85,8 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
   - `content.ts` holds the eras, stages, monster bosses (tamed → pets) and the final Mästare (persona via `personaFor`)
   - `V01_STAGE_MAP` maps the old v0.1 stage indexes
 - **Learning loop** (`src/platform/learning/`): `events.ts` (the answer log), `skills.ts` (Leitner schedule per skill id, record `h:<id>:skills`; `noteAnswer` is called from `recordAnswer` and the free-practice labs; due skills = Glömskans dimma), `quests.ts` (daily quests, daily chest, streak with a weekly frysdag; `noteRun` is called by `PlayView` after `finishRun`). Skill names for the mentor are in `src/content/skills.ts` – a new skill id needs a label there (a test checks it).
-- **Drill engine** (`src/engines/drill/`): for questions whose answer is an integer typed into a box in an equation. A game supplies `make / diagnose / explain / solution / hint` (+ optional `Visual`); `drillModule()` makes the `GameModule`. Explanations after a mistake explain the method and **never state the answer** (`tests/talbergen.test.ts` checks this), so the child fixes it themselves. Used by Tiokompisbron (`src/games/tiokompis/`) and Tabellgruvan (`src/games/tabeller/`). Skill ids are by topic, not area: `ma.add.*`, `ma.sub.*`, `ma.mult.<n>`, `ma.div.<n>`.
+- **Drill engine** (`src/engines/drill/`): for questions whose answer is an integer typed into a box in an equation. A game supplies `make / diagnose / explain / solution / hint` (+ optional `Visual`); `drillModule()` makes the `GameModule`. Explanations after a mistake explain the method and **never state the answer** (`tests/talbergen.test.ts` checks this), so the child fixes it themselves. It supports a prompt, units, multiple choice, fractions, decimals and negatives. Used by all Talbergen areas except Tidstornet: `src/games/tiokompis/`, `tabeller/`, `pengar/`, `tallinje/`, `brak/`. Skill ids are by topic, not area: `ma.add.*`, `ma.sub.*`, `ma.mult.<n>`, `ma.div.<n>`, `ma.pengar.*`, `ma.tallinje.*`, `ma.avrunda.*`, `ma.negativa.*`, `ma.decimal.*`, `ma.brak.*`.
+- **Region bosses:** an `AreaDef` with `region` (not on the map; shown on the region page, locked until `mastareNeeded` area Mästare are beaten) whose game is `regionGame()` (`src/games/region.tsx`) mixing the region's games via `mode: '<area>/<mode>'`. A boss can point at another persona slot with `personaId`.
 - **Importing old progress:** `src/platform/legacy/klockaV01.ts` imports the old file's `localStorage` (via a console snippet pasted into Vuxenläge). The fixture is `tests/fixtures/storage/legacy-klocka-v01.json`.
 - **PWA:** `vite-plugin-pwa` with `registerType: 'prompt'`. `UpdateBanner` is shown only on calm screens (map, picker), never mid-exercise.
 - **Tests:**

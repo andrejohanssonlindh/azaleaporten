@@ -1,6 +1,6 @@
 # Status – Azaleaporten
 
-*Updated 2026-10-11 after Phase 4 (the learning loop) and Phase 5a (Tiokompisbron + Tabellgruvan). Live: https://andrejohanssonlindh.github.io/azaleaporten/*
+*Updated 2026-10-11: Talbergen is complete (six areas + region boss), and the village has all four buildings. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
 
 ## Done
 
@@ -28,6 +28,13 @@
   - Explanations after a mistake explain the method but never state the answer (tested), so the child really fixes it.
   - Platform: `GameModule.errLabel`, `AreaDef.texts` (result-screen words per area), a generic "Öva fritt" for every non-klocka area (`#/labb/<area>`), and the map's "Fortsätt" button follows the last area played (else the first one fitting the hero's årskurs).
 
+- **Talbergen complete:**
+  - The drill engine also handles a text prompt, units (`'kr'`), multiple choice (`choices`, e.g. < = >), fractions (`Frac` parts), decimals (comma or point) and negatives (a ± button, `keypad: 'signed'`).
+  - **Myntmarknaden** (`src/games/pengar/`): count coins and notes, add prices, change, price × quantity. Myntskatan (`raknade-antal`), Tvättbjörnen Tvärtom (`lanade-inte`), Marknadsmästarinnan.
+  - **Tallinjebron** (`src/games/tallinje/`): number lines 0–20/100/1000 and tenths, rounding (5 rounds up), negative numbers and the thermometer, decimal arithmetic. Velpaddan (`fem-regeln`), Isbjörnen Minus (`teckenfel`), Lindansaren.
+  - **Bråkbageriet** (`src/games/brak/`): naming fractions from pies/bars, comparing, equivalent fractions, fraction of a number, + and − with the same denominator. Glufsgrisen (`storre-namnare`), Tårtmusen (`adderade-namnare`), Bagarmästarinnan.
+  - **Talbergens topp** (`src/games/talbergen.ts`, `src/games/region.tsx`): the region boss (persona slot `talbergen.region`, Professor Pi in the public build) mixes questions from all six games (`mode: '<area>/<mode>'`). It opens on the region page after 3 area Mästare (`regionProgress()` in `src/content/areas.ts`). Mistakes there put mist on the area the question came from (`GameModule.areaOf`).
+- **The village is complete:** Azaleagården, Uppdragstavlan, Smedjan (now with the 🧿 Sköldamulett, which saves the streak for a missed day after the weekly frysdag) and **Biblioteket** (`#/biblioteket`: totals, and per area how sure each skill is plus what has been tricky lately).
 - **Phase 4, the learning loop** (`src/platform/learning/`):
   - `skills.ts`: a Leitner schedule per skill id (`h:<id>:skills`). Boxes 0–5 = 1, 1, 2, 4, 8, 16 days. Right when due = one box up (at most once a day), wrong = two boxes down and back tomorrow (not today: the child just corrected it). Fed by every first answer in runs, bosses, reviews and free practice. Heroes from before the schedule get it built from the event log; the v0.1 import makes old mistakes due at once.
   - **Glömskans dimma**: on the island map (per region, with a count), on region cards, on the area page (banner with "Jaga bort den"), and on the hero sheet.
@@ -36,31 +43,26 @@
   - **Mästare Kastanj** (`src/shell/Kastanj.tsx`) says how the last run went and what the mist covers, with [Ja, kör!] and [Visa uppdragen]. Skill names live in `src/content/skills.ts`.
   - The event log moved to `src/platform/learning/events.ts`.
 
-Tests: `npm test` (Vitest, 100 tests) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
+Tests: `npm test` (Vitest, 121 tests; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
 
 ## Next mission
 
-Two good options; pick with the user:
-1. **Ordskogen + Västerön via a wordpack engine** (Phase 5b): Stavningsträsket (hear and spell, diagnosis of dubbelteckning, sj/tj-ljud, ng/gn) and Glosviken (English words with picture and sound). Needs text answers and read-aloud (`speak()` in `src/platform/device.ts`; check sv-SE/en-GB voices on iPad), and content as JSON. This brings the first subjects outside maths, which matters before the kids start.
-2. **Vuxenläge, Phase 6**: the skills map (green/yellow/red per skill from `h:<id>:skills`, the most common error tags from the event log), time per day, quests done. Most of the data is already there.
+Talbergen and the village are done. Options, to pick with the user:
+1. **Vuxenläge, Phase 6**: the skills map (green/yellow/red per skill from `h:<id>:skills`, the most common error tags from the event log), time per day, quests done, install guides, quota and multi-tab guards. Much of it can reuse `src/shell/Biblioteket.tsx`.
+2. **Betongbukten** (geometri, the Malmö skateparks): Fluffy → … → Stapelbäddsparken. Shapes, symmetry, perimeter, angles, area, volume. Needs drawn shapes as Visuals; the drill engine (choices + numbers) fits most of it.
+3. Svenska/engelska (wordpack engine) – the user put this on hold.
 
-Smaller things left from Phase 4:
-- The kunskap level has no mastery component yet (skills in high boxes); it is still XP only.
-- Consumables in PLAN §9.5 (Sköldamulett protects the streak) are not built.
-- Biblioteket (the child's own statistics) is still "Snart" in Azaleabyn.
+Smaller things:
+- The kunskap level has no mastery component yet (Biblioteket shows "Sitter som berget" per skill instead).
+- The teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`), now including `talbergen.region` and the six area Mästare.
 
-## Then: more of Talbergen
+## How to add a drill area
 
-How to add a drill area (Tiokompisbron/Tabellgruvan are the templates):
-1. `src/games/<game>/logic.ts`: seeded `makeQ(spec, rng)` returning a `DrillQ` (`parts` with `null` for the answer box, `answer`, `skill`), plus `diagnose`, `explain` (never state the answer), `solution`, `hint` and `ERR` labels. Boss traps: `makeQ` must produce a question that can trigger `spec.trap`.
-2. `index.tsx`: `drillModule({ id, make, diagnose, explain, solution, hint, Visual?, errLabels })`.
-3. `content.ts`: an `AreaDef` with `texts`, eras, stages, monster bosses (trap + pet) and a final `mastare`; a generic persona in `src/content/bosses.ts` under `<area>.mastare`; the trap's pet stat in `PET_STAT` (`inventory.ts`).
-4. Register in `src/content/areas.ts`, set `status: 'open'` in `world.ts`. `tests/talbergen.test.ts` already plays every registered area through.
-
-Remaining Talbergen areas:
-- **Myntmarknaden:** Swedish coins and notes, adding up a price, giving change. Needs a coin Visual; answers are still integers (kronor).
-- **Bråkbageriet** (åk 3–6): fractions as pizza pieces, comparing, equivalent fractions, adding with the same denominator. Answers aren't single integers – extend the drill engine with a choice mode or a fraction input.
-- **Tallinjebron:** placing numbers on a number line, rounding, decimals, negative numbers.
+Tiokompisbron, Tabellgruvan, Myntmarknaden, Tallinjebron and Bråkbageriet are the templates.
+1. `src/games/<game>/logic.ts`: seeded `makeQ(spec, rng)` returning a `DrillQ` (`parts` with exactly one `null` box – possibly inside a `Frac` –, `answer`, `skill`, optional `prompt`, `choices`, `keypad`), plus `specsForSkill`, `diagnose`, `explain` (never state the answer), `solution`, `hint` and `ERR` labels. Boss traps: `makeQ` must produce a question that can trigger `spec.trap`.
+2. `index.tsx`: `drillModule({ id, make, specsForSkill, diagnose, explain, solution, hint, Visual?, errLabels })`.
+3. `content.ts`: an `AreaDef` with `texts`, eras, stages, monster bosses (trap + pet) and a final `mastare`; a generic persona in `src/content/bosses.ts` under `<area>.mastare`; the trap's pet stat in `PET_STAT` (`inventory.ts`); skill names in `src/content/skills.ts`.
+4. Register in `src/content/areas.ts`, set `status: 'open'` in `world.ts`. The generic tests then cover it (`tests/drill-games.test.ts`, the playthrough in `tests/talbergen.test.ts`).
 
 ## Next after that (in PLAN.md order)
 
@@ -71,7 +73,7 @@ Remaining Talbergen areas:
 
 ## Known minor things
 
-- Games are bundled into the main chunk (65 KB gzipped in total). Lazy-load them per area when the bundle nears the 150 KB budget.
+- Games are bundled into the main chunk (about 82 KB gzipped in total). Lazy-load them per area when the bundle nears the 150 KB budget.
 - Read-aloud of drill questions isn't there yet (the 🔊 button exists only on mentor text).
 - `e2e/loot.spec.ts` failed once (2 "Ta av" buttons after one "Använd"), then passed 3/3 reruns. Possibly a double render in Azaleagården; worth a look if it recurs.
 
