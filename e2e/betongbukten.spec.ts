@@ -21,6 +21,7 @@ test('varje bana i varje park ritar sin fråga', async ({ page }) => {
   for (const park of PARKS) {
     await page.goto(`./#/labb/${park}`);
     const stages = page.locator('.seg button');
+    await expect(stages.first()).toBeVisible(); // spelet laddas först
     const n = await stages.count();
     expect(n).toBeGreaterThan(8);
     for (let i = 0; i < n; i++) {

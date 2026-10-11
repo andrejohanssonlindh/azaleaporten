@@ -1,3 +1,4 @@
+import { useEffect } from 'preact/hooks';
 import { dataRev, go, heroId, toast } from '../state';
 import { getProfile } from '../platform/profiles';
 import { getArea, nextOpenNode, nodeStatus } from '../platform/rpg/progress';
@@ -11,6 +12,7 @@ import { leaveToPicker } from '../session';
 import { BackBar, Screen, Stars } from './ui';
 import { dueSkills } from '../platform/learning/skills';
 import { skillLabel } from '../content/skills';
+import { preloadGame } from './useGame';
 
 // Ett område som en stig genom epoker: banor och bossar i tur och ordning.
 
@@ -21,6 +23,7 @@ export function bossName(areaId: string, b: BossDef, grade: number): string {
 
 export function AreaView({ id }: { id: string }) {
   dataRev.value;
+  useEffect(() => { if (playable(id)) preloadGame(id); }, [id]);
   const p = getProfile(heroId.value!);
   const pl = playable(id);
   const info = areaById(id);

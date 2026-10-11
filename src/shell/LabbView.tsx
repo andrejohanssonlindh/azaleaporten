@@ -1,11 +1,14 @@
+import type { ComponentChildren } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import { go, heroId } from '../state';
 import { noteAnswer } from '../platform/learning/skills';
-import { FreePractice, Tolkaren } from '../games/klocka/ui/Labb';
 import { playable } from '../content/areas';
 import { randomSeed, rngFrom } from '../platform/rng';
 import type { AreaDef, GameModule, StageDef } from '../platform/rpg/types';
 import { BackBar, Screen } from './ui';
+import { Loading, useGame, useLoaded } from './useGame';
+
+const loadKlockLabb = () => import('../games/klocka/ui/Labb');
 
 // Fri övning utanför äventyret: inga stjärnor eller belöningar.
 // Tidstornet har sitt eget Tidslabb (fri övning + tolkaren); andra områden övar fritt på sina banor.
@@ -36,17 +39,24 @@ function FreeStages({ def, game }: { def: AreaDef; game: GameModule }) {
 
 export function LabbView({ areaId, tab }: { areaId: string; tab: string }) {
   const pl = playable(areaId);
+  const game = useGame(areaId);
   if (!pl) { queueMicrotask(() => go('karta')); return null; }
+  if (typeof game === 'string') return <Loading failed={game === 'fel'} back={`omrade/${areaId}`} />;
   const back = <BackBar label={pl.def.title} to={`omrade/${areaId}`} />;
-  if (pl.def.gameId !== 'klocka') {
-    return (
-      <Screen class="place">
-        {back}
-        <h1 class="page-title">🧪 Öva fritt</h1>
-        <FreeStages def={pl.def} game={pl.game} />
-      </Screen>
-    );
-  }
+  if (pl.def.gameId === 'klocka') return <Tidslabbet areaId={areaId} tab={tab} game={game} back={back} />;
+  return (
+    <Screen class="place">
+      {back}
+      <h1 class="page-title">🧪 Öva fritt</h1>
+      <FreeStages def={pl.def} game={game} />
+    </Screen>
+  );
+}
+
+function Tidslabbet({ areaId, tab, game, back }: { areaId: string; tab: string; game: GameModule; back: ComponentChildren }) {
+  const labb = useLoaded('klocka-labb', loadKlockLabb);
+  if (typeof labb === 'string') return <Loading failed={labb === 'fel'} back={`omrade/${areaId}`} />;
+  const { FreePractice, Tolkaren } = labb;
   return (
     <Screen class="place">
       {back}
@@ -55,7 +65,7 @@ export function LabbView({ areaId, tab }: { areaId: string; tab: string }) {
         <button role="tab" aria-selected={tab !== 'tolka'} class={tab !== 'tolka' ? 'on' : ''} onClick={() => go(`labb/${areaId}`)}>Öva fritt</button>
         <button role="tab" aria-selected={tab === 'tolka'} class={tab === 'tolka' ? 'on' : ''} onClick={() => go(`labb/${areaId}/tolka`)}>Tolka en tid</button>
       </div>
-      {tab === 'tolka' ? <Tolkaren /> : <FreePractice onResult={(q, r) => { if (heroId.value) noteAnswer(heroId.value, areaId, pl.game.skillOf(q), r.correct, r.hint, r.errTag); }} />}
+      {tab === 'tolka' ? <Tolkaren /> : <FreePractice onResult={(q, r) => { if (heroId.value) noteAnswer(heroId.value, areaId, game.skillOf(q), r.correct, r.hint, r.errTag); }} />}
     </Screen>
   );
 }

@@ -8,9 +8,8 @@ import { parseAny } from '../../games/klocka/logic/parse';
 import { phraseKind, structs } from '../../games/klocka/logic/language';
 
 // Import av framsteg från Klockövning v0.1 (den nedladdade HTML-filen).
-// Föräldern kör KONSOLSNUTTEN i den gamla filen och klistrar in resultatet i Vuxenläge.
-
-export const CONSOLE_SNIPPET = "copy(JSON.stringify(Object.fromEntries(Object.keys(localStorage).filter(k=>k.startsWith('klocka_')).map(k=>[k,JSON.parse(localStorage[k])]))))";
+// Föräldern kör konsolsnutten (snippet.ts) i den gamla filen och klistrar in resultatet i Vuxenläge.
+// Modulen drar med sig klockans språkmodell, så Vuxenläge laddar den först när den behövs.
 
 /** Formatet som v0.1 sparade per spelare (bara fälten vi använder). */
 export interface V01Player {

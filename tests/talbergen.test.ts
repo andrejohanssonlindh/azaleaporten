@@ -5,11 +5,13 @@ import { makeQ as makeT, diagnose as diagT, type TQ } from '../src/games/tiokomp
 import { makeQ as makeM, diagnose as diagM, type MQ } from '../src/games/tabeller/logic';
 import { tiokompisGame } from '../src/games/tiokompis';
 import { tabellerGame } from '../src/games/tabeller';
-import { PLAYABLE } from '../src/content/areas';
+import { loadAllGames, PLAYABLE } from '../src/content/areas';
 import { createHero, getHeroState } from '../src/platform/profiles';
 import { advance, currentQuestion, finishRun, getArea, nextOpenNode, recordAnswer, runOver, startRun } from '../src/platform/rpg/progress';
 import { allNodes, type AreaDef, type PathNode } from '../src/platform/rpg/types';
 import { freshStorage } from './helpers';
+
+const GAMES = await loadAllGames();
 
 const SEEDS = 400;
 /** Text som säger vad svaret är: "= 13", "är 13", "blir 13". */
@@ -163,7 +165,7 @@ describe('alla spelbara områden', () => {
   beforeEach(() => { freshStorage(); });
 
   function play(hid: string, area: AreaDef, n: PathNode, answers: boolean[], ms = 1000) {
-    const game = PLAYABLE[area.areaId].game;
+    const game = GAMES[area.areaId];
     let run = startRun(hid, area, n);
     for (const c of answers) {
       const q = currentQuestion(run, n, game);
@@ -174,7 +176,8 @@ describe('alla spelbara områden', () => {
     return finishRun(hid, area, run);
   }
 
-  for (const { def, game } of Object.values(PLAYABLE)) {
+  for (const [id, { def }] of Object.entries(PLAYABLE)) {
+    const game = GAMES[id];
     it(`${def.title}: unika id:n, frågor för varje nod, och en hel genomspelning`, () => {
       const ids = allNodes(def).map((n) => n.id);
       expect(new Set(ids).size).toBe(ids.length);

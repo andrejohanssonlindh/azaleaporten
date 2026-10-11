@@ -11,10 +11,12 @@ import { getInv, saveInv } from '../src/platform/rpg/inventory';
 import { importV01, parseV01Paste } from '../src/platform/legacy/klockaV01';
 import { greeting } from '../src/platform/greeting';
 import { skillLabel } from '../src/content/skills';
-import { PLAYABLE, regionProgress } from '../src/content/areas';
+import { loadAllGames, PLAYABLE, regionProgress } from '../src/content/areas';
 import { rngFrom } from '../src/platform/rng';
 import { allNodes, type AreaDef, type PathNode, type StageDef } from '../src/platform/rpg/types';
 import { freshStorage } from './helpers';
+
+const GAMES = await loadAllGames();
 
 const T0 = new Date(2026, 9, 12, 16, 0); // en måndag
 const setDay = (n: number) => vi.setSystemTime(new Date(T0.getFullYear(), T0.getMonth(), T0.getDate() + n, 16, 0));
@@ -27,7 +29,7 @@ const area = (id: string) => PLAYABLE[id].def;
 
 /** Spelar en runda; answers[i] = rätt/fel. Returnerar resultatet och frågornas färdigheter. */
 function play(hid: string, a: AreaDef, n: PathNode, answers: boolean[], kind?: 'practice') {
-  const game = PLAYABLE[a.areaId].game;
+  const game = GAMES[a.areaId];
   let run = startRun(hid, a, n, kind);
   const skills: string[] = [];
   for (const c of answers) {
@@ -41,7 +43,7 @@ function play(hid: string, a: AreaDef, n: PathNode, answers: boolean[], kind?: '
 }
 
 function review(hid: string, a: AreaDef, correct = true) {
-  const game = PLAYABLE[a.areaId].game;
+  const game = GAMES[a.areaId];
   let run = startReview(hid, a, reviewPlan(hid, a.areaId, 5));
   const asked: string[] = [];
   while (!runOver(run)) {
@@ -105,7 +107,8 @@ describe('dimman och repetitionen', () => {
   });
 
   it('varje färdighet som spelen ger kan repeteras för sig', () => {
-    for (const { def, game } of Object.values(PLAYABLE)) {
+    for (const [id, { def }] of Object.entries(PLAYABLE)) {
+      const game = GAMES[id];
       const seen = new Set<string>();
       for (const n of allNodes(def).filter((x): x is StageDef => x.type === 'stage')) {
         for (let i = 0; i < 60; i++) seen.add(game.skillOf(game.makeQuestion(n.spec, rngFrom(i * 31 + n.id.length))));
@@ -255,9 +258,9 @@ describe('Talbergens regionboss', () => {
     let run = startRun(hid, top.def, boss);
     const areas = new Set<string>();
     for (let i = 0; i < 12; i++) {
-      const q = currentQuestion(run, boss, top.game);
-      areas.add(top.game.areaOf!(q));
-      run = recordAnswer(hid, run, boss, { correct: false, ms: 1000, hint: false }, top.game.skillOf(q), undefined, top.game.areaOf!(q));
+      const q = currentQuestion(run, boss, GAMES.talbergen);
+      areas.add(GAMES.talbergen.areaOf!(q));
+      run = recordAnswer(hid, run, boss, { correct: false, ms: 1000, hint: false }, GAMES.talbergen.skillOf(q), undefined, GAMES.talbergen.areaOf!(q));
       if (runOver(run)) run = startRun(hid, top.def, boss); else run = advance(hid, run);
     }
     expect(areas.size).toBeGreaterThan(2);

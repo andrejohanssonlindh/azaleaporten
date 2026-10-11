@@ -9,6 +9,7 @@ import { PLAYABLE } from '../content/areas';
 import { cap, skillLabel } from '../content/skills';
 import { leaveToPicker } from '../session';
 import { BackBar, Mentor, Screen } from './ui';
+import { useGame } from './useGame';
 
 // Biblioteket i Azaleabyn: barnets egen statistik. Hur säker varje färdighet är (repetitionslådan),
 // och vad som har varit klurigt på sistone (felkoderna). Inga jämförelser med andra, bara med sig själv.
@@ -18,6 +19,14 @@ function status(it: SkillItem, today: string): { cls: string; text: string } {
   if (it.box >= 4) return { cls: 'safe', text: 'Sitter som berget' };
   if (it.box >= 2) return { cls: 'near', text: 'Nästan säker' };
   return { cls: 'practice', text: 'Övar på' };
+}
+
+/** Felkodernas namn finns i spelet, som laddas först när det behövs. */
+function Tricky({ areaId, tags }: { areaId: string; tags: string[] }) {
+  const game = useGame(areaId);
+  if (typeof game === 'string') return null;
+  const labels = tags.map((t) => game.errLabel(t)).filter(Boolean);
+  return labels.length ? <p class="tricky"><b>Klurigt på sistone:</b> {labels.join(', ').toLowerCase()}.</p> : null;
 }
 
 export function Biblioteket() {
@@ -47,7 +56,7 @@ export function Biblioteket() {
         <div class="stat-tile"><b>{days}</b><small>{days === 1 ? 'dag' : 'dagar'} med övning</small></div>
       </div>
 
-      {Object.values(PLAYABLE).filter(({ def }) => !def.region).map(({ def, game }) => {
+      {Object.values(PLAYABLE).filter(({ def }) => !def.region).map(({ def }) => {
         const prog = getArea(p.id, def.areaId);
         const nodes = allNodes(def);
         const done = nodes.filter((n) => nodeDone(prog, n)).length;
@@ -57,7 +66,7 @@ export function Biblioteket() {
         if (!mine.length && !done) return null;
         const errs = new Map<string, number>();
         for (const e of events.filter((x) => x.a === def.areaId && !x.c && x.e && x.e !== 'annat').slice(-200)) errs.set(e.e!, (errs.get(e.e!) ?? 0) + 1);
-        const tricky = [...errs.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([tag]) => game.errLabel(tag)).filter(Boolean);
+        const tricky = [...errs.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([tag]) => tag);
         const due = mine.filter(([, it]) => it.due <= today).length;
         return (
           <details class="card shelf" key={def.areaId}>
@@ -78,7 +87,7 @@ export function Biblioteket() {
                 })}
               </ul>
             )}
-            {tricky.length > 0 && <p class="tricky"><b>Klurigt på sistone:</b> {tricky.join(', ').toLowerCase()}.</p>}
+            {tricky.length > 0 && <Tricky areaId={def.areaId} tags={tricky} />}
             <div class="row">
               <button class="btn small" onClick={() => go(`omrade/${def.areaId}`)}>Till {def.title}</button>
               {due > 0 && <button class="btn small primary" onClick={() => go(`repetera/${def.areaId}`)}>Jaga bort dimman</button>}

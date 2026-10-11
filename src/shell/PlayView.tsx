@@ -9,7 +9,7 @@ import { reviewPlan } from '../platform/learning/skills';
 import { noteRun, type QuestNews } from '../platform/learning/quests';
 import { PRACTICE_LENGTH } from '../platform/rpg/balance';
 import { levelTitle } from '../platform/rpg/balance';
-import type { BossDef, PathNode } from '../platform/rpg/types';
+import type { BossDef, GameModule, PathNode } from '../platform/rpg/types';
 import { playable, regionProgress } from '../content/areas';
 import { personaFor } from '../content/bosses';
 import { region as regionById } from '../content/world';
@@ -19,6 +19,7 @@ import { ItemCard } from './Loot';
 import { getInv } from '../platform/rpg/inventory';
 import { stigmonster } from '../content/monsters';
 import { HeroFigure } from './HeroFigure';
+import { Loading, useGame } from './useGame';
 
 // Spelskärmen: en runda (10 frågor), en repetition (5 frågor) eller en bossstrid.
 
@@ -52,7 +53,16 @@ function resumeOrStart(hid: string, areaId: string, node: PathNode, kind: RunSta
   return startRun(hid, pl.def, node, kind);
 }
 
-export function PlayView({ areaId, nodeId, practice = false, review = false }: { areaId: string; nodeId: string; practice?: boolean; review?: boolean }) {
+interface PlayProps { areaId: string; nodeId: string; practice?: boolean; review?: boolean }
+
+export function PlayView(props: PlayProps) {
+  const g = useGame(props.areaId);
+  if (!playable(props.areaId)) { queueMicrotask(() => go('karta')); return null; }
+  if (typeof g === 'string') return <Loading failed={g === 'fel'} back={`omrade/${props.areaId}`} />;
+  return <PlayRun {...props} game={g} />;
+}
+
+function PlayRun({ areaId, nodeId, practice = false, review = false, game }: PlayProps & { game: GameModule }) {
   dataRev.value;
   const hid = heroId.value;
   const p = hid ? getProfile(hid) : null;
@@ -65,7 +75,7 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
   const [hintIdx, setHintIdx] = useState<number | null>(null);
   const [bossLine, setBossLine] = useState<string>('');
   const [confirmQuit, setConfirmQuit] = useState(false);
-  const q = useMemo(() => (run && node && pl ? currentQuestion(run, node, pl.game) : null), [run?.seed, run?.index]);
+  const q = useMemo(() => (run && node && pl ? currentQuestion(run, node, game) : null), [run?.seed, run?.index]);
 
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   if (!pl || !node) { queueMicrotask(() => go('karta')); return null; }
@@ -129,7 +139,7 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
           <p class="boss-rules">
             Du har {'❤️'.repeat(h.total)}{extra.length > 0 && <small> ({h.base} {extra.join(', ')})</small>}. Ett fel kostar ett hjärta.
             {' '}{face.name} har {pv.maxHp} liv. Varje rätt svar gör {pv.dmg} skada, så du behöver ungefär {pv.hits} träffar.
-            {boss.trap && <> Akta dig: varannan fråga är en fälla ({pl.game.errLabel(boss.trap)?.toLowerCase()}).</>}
+            {boss.trap && <> Akta dig: varannan fråga är en fälla ({game.errLabel(boss.trap)?.toLowerCase()}).</>}
           </p>
           <p class="note">Bättre utrustning ger fler hjärtan och hårdare slag. Svaren måste du alltid kunna själv!</p>
           <div class="row center-row">
@@ -142,13 +152,13 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
   }
   if (!run || !q) return null;
 
-  const View = pl.game.View;
+  const View = game.View;
   const answered = run.results.length > run.index;
   const canHint = !answered && hintIdx !== run.index && hintsLeft(p.id) > 0;
 
   function onAnswer(r: { correct: boolean; ms: number; errTag?: string; hint: boolean }) {
     const before = run!;
-    const next = recordAnswer(p!.id, before, node!, { correct: r.correct, ms: r.ms, hint: r.hint }, pl!.game.skillOf(q), r.errTag, pl!.game.areaOf?.(q));
+    const next = recordAnswer(p!.id, before, node!, { correct: r.correct, ms: r.ms, hint: r.hint }, game.skillOf(q), r.errTag, game.areaOf?.(q));
     if (next.levelUps > before.levelUps) toast(`⭐ Ny nivå: ${getHeroState(p!.id).level}!`);
     if (face && boss) {
       const half = (next.maxHp ?? 0) / 2;

@@ -1,6 +1,6 @@
 # Status – Azaleaporten
 
-*Updated 2026-10-11: the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
+*Updated 2026-10-11: games are now lazy-loaded per area (main chunk 137 → 82 KB gzipped). Before that, the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
 
 ## Done
 
@@ -54,6 +54,8 @@
   - **Mästare Kastanj** (`src/shell/Kastanj.tsx`) says how the last run went and what the mist covers, with [Ja, kör!] and [Visa uppdragen]. Skill names live in `src/content/skills.ts`.
   - The event log moved to `src/platform/learning/events.ts`.
 
+- **Lazy-loaded games:** `PLAYABLE[id]` is `{ def, load }`. The area definitions (data only) stay in the main chunk, so the map, quests and mentor work at once; the game code is `import()`ed when it is needed (`loadGame()`, cached; `useGame()` / `<Loading>` in `src/shell/useGame.tsx` show 🌸 while it loads and a "Försök igen" if it fails). A region boss loads all its region's games. The area page preloads its game. Klocka's Tidslabb UI and the v0.1 importer (Vuxenläge) are also loaded on demand; the console snippet lives in `src/platform/legacy/snippet.ts`. The service worker still precaches every chunk, so offline play works after the first visit. Tests get all games with `await loadAllGames()`.
+
 Tests: `npm test` (Vitest, 163 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
 
 - **Gear round (after the user's playtest notes):**
@@ -66,10 +68,9 @@ Tests: `npm test` (Vitest, 163 tests; `tests/betongbukten.test.ts` covers the ge
 
 ## Next mission
 
-Talbergen, Betongbukten and the village are done. Options, to pick with the user:
-1. **Lazy-load games per area**: the main JS chunk is now ~137 KB gzipped (budget 150 KB for the app). Do this before adding more content.
-2. **Vuxenläge, Phase 6**: the skills map (green/yellow/red per skill from `h:<id>:skills`, the most common error tags from the event log), time per day, quests done, install guides, quota and multi-tab guards. Much of it can reuse `src/shell/Biblioteket.tsx`.
-3. Svenska/engelska (wordpack engine) – the user put this on hold.
+Talbergen, Betongbukten and the village are done, and games are lazy-loaded (see below). Options, to pick with the user:
+1. **Vuxenläge, Phase 6**: the skills map (green/yellow/red per skill from `h:<id>:skills`, the most common error tags from the event log), time per day, quests done, install guides, quota and multi-tab guards. Much of it can reuse `src/shell/Biblioteket.tsx`.
+2. Svenska/engelska (wordpack engine) – the user put this on hold.
 
 Smaller things:
 - Arenan is a prototype: the user wants more mini-games later that the kids play with their characters, paid with tokens. Ideas: a second game type, tokens as quest rewards, rematches of beaten opponents.
@@ -94,7 +95,7 @@ Tiokompisbron, Tabellgruvan, Myntmarknaden, Tallinjebron and Bråkbageriet are t
 
 ## Known minor things
 
-- Games are bundled into the main chunk (about 137 KB gzipped JS + 10 KB CSS after the gear round). Lazy-load them per area next (see above).
+- The main chunk is about 82 KB gzipped JS + 10 KB CSS; each game is a 3–6 KB chunk, plus the shared drill engine (~4 KB) and klocka's question view (~7 KB). CSS is still one file for all games.
 - On a phone the calculator sits below the answer box, so the child scrolls between them. Fine for now; a floating panel could come later.
 - Read-aloud of drill questions isn't there yet (the 🔊 button exists only on mentor text).
 - `e2e/loot.spec.ts` failed once (2 "Ta av" buttons after one "Använd"), then passed 3/3 reruns. Possibly a double render in Azaleagården; worth a look if it recurs.

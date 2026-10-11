@@ -7,7 +7,10 @@ import { initGate, lockGate } from '../platform/gate/gate';
 import { requestPersistentStorage, storageInfo } from '../platform/device';
 import { GRADES, gradeName } from '../content/heroes';
 import { selectHero } from '../session';
-import { alreadyImported, CONSOLE_SNIPPET, importV01, parseV01Paste, type V01Player } from '../platform/legacy/klockaV01';
+import type { V01Player } from '../platform/legacy/klockaV01';
+import { CONSOLE_SNIPPET } from '../platform/legacy/snippet';
+
+const legacy = () => import('../platform/legacy/klockaV01');
 import { Avatar, Screen } from './ui';
 
 function AdultCheck({ onPass }: { onPass: () => void }) {
@@ -82,7 +85,7 @@ function LegacyImport({ heroes }: { heroes: Profile[] }) {
       </div>
       <textarea class="paste" rows={3} value={text} placeholder="Klistra in här" aria-label="Inklistrade framsteg"
         onInput={(e) => { setText(e.currentTarget.value); setBad(false); setFound(null); }} />
-      <button class="btn small primary" disabled={!text.trim()} onClick={() => { const f = parseV01Paste(text); setFound(f); setBad(!f); if (f) setTarget(Object.fromEntries(Object.keys(f).map((n) => [n, heroes.find((h) => h.name.toLowerCase() === n.toLowerCase())?.id ?? heroes[0].id]))); }}>Läs in</button>
+      <button class="btn small primary" disabled={!text.trim()} onClick={async () => { const f = (await legacy()).parseV01Paste(text); setFound(f); setBad(!f); if (f) setTarget(Object.fromEntries(Object.keys(f).map((n) => [n, heroes.find((h) => h.name.toLowerCase() === n.toLowerCase())?.id ?? heroes[0].id]))); }}>Läs in</button>
       {bad && <p class="note warn">Hittade inga klockframsteg i texten.</p>}
       {found && Object.entries(found).map(([name, data]) => (
         <div class="row legacy-row" key={name}>
@@ -91,7 +94,8 @@ function LegacyImport({ heroes }: { heroes: Profile[] }) {
           <select value={target[name]} onChange={(e) => setTarget({ ...target, [name]: e.currentTarget.value })} aria-label={`Hjälte för ${name}`}>
             {heroes.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
           </select>
-          <button class="btn small primary" onClick={() => {
+          <button class="btn small primary" onClick={async () => {
+            const { alreadyImported, importV01 } = await legacy();
             const hid = target[name];
             if (alreadyImported(hid, name)) { toast(`${name} är redan inflyttad i den hjälten.`); return; }
             const r = importV01(hid, name, data);
