@@ -66,9 +66,10 @@ test('utrustning: introduktion, figuren, smälta, Skräddaren och Arenan', async
 
   await page.goto('./#/arenan');
   await page.getByRole('button', { name: /Köp pollett/ }).click();
+  await page.getByRole('button', { name: /Mot 🌾 Halmdockan/ }).click();
   await page.getByRole('button', { name: /Strid!/ }).click();
-  await page.getByRole('button', { name: /Slå!/ }).click();
-  await expect(page.locator('.arena-msg')).toContainText(/Träff|Fullträff|Miss/);
+  await page.getByRole('button', { name: '⚔️ Slå' }).dispatchEvent('pointerdown');
+  await expect(page.locator('.duel-fx').first()).toContainText('Blockerat');
   await shot(page, '5-arenan');
 });
 

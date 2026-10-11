@@ -1,6 +1,6 @@
 # Status – Azaleaporten
 
-*Updated 2026-10-11: **Grottdyket**, the second real mini-game (turn-based dungeon dive, push your luck at each staircase). Before that **Dimstormen**, a real mini-game (survivors-style action, gear decides how you fight), plus 2 tokens a day from the daily quests. Before that, Vuxenläge (Phase 6) is done: a per-hero overview, quota and multi-tab guards, a backup reminder. Before that, games became lazy-loaded per area (main chunk 137 → 82 KB gzipped), and the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
+*Updated 2026-10-11: **Arenan rebuilt as Bossduellen**, the third mini-game (dodge-and-counter duel). Before that **Grottdyket**, the second real mini-game (turn-based dungeon dive, push your luck at each staircase). Before that **Dimstormen**, a real mini-game (survivors-style action, gear decides how you fight), plus 2 tokens a day from the daily quests. Before that, Vuxenläge (Phase 6) is done: a per-hero overview, quota and multi-tab guards, a backup reminder. Before that, games became lazy-loaded per area (main chunk 137 → 82 KB gzipped), and the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
 
 ## Done
 
@@ -63,7 +63,7 @@
   - **Multi-tab guard** (`src/platform/tabs.ts`): the newest tab announces itself on a `BroadcastChannel`, and older tabs replace the whole app with a "Spela här i stället" screen (which reloads to read fresh data and take over).
   - **Backup reminder:** `Meta.lastExport` (set when the backup is downloaded); after 30 days without one (`backupDue()`), Vuxenläge and the hero picker's Vuxenläge link say so. Vuxenläge also shows whether the app runs installed (`isInstalled()`).
 
-Tests: `npm test` (Vitest, 217 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
+Tests: `npm test` (Vitest, 226 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
 
 - **Gear round (after the user's playtest notes):**
   - Mästare Kastanj introduces gear in Azaleabyn the first time a hero has an item or chest (`HeroState.tips`).
@@ -71,7 +71,7 @@ Tests: `npm test` (Vitest, 217 tests; `tests/betongbukten.test.ts` covers the ge
   - **Hero figure** (`src/shell/HeroFigure.tsx`): SVG body + animal emoji head; gear is drawn on it (helmet/hat/cap/crown, armour/tunic/cape, five weapons, shield/book/lantern, amulet, pet) and coloured by material tier and rarity.
   - **Skräddaren** (`#/skraddaren`): 28 cosmetics (hats, capes, shoes, backgrounds, glitter) for kastanjer, with try-on; 7 of them are rewards (Mästare, level, best streak, arena rank). Record `h:<id>:wardrobe`.
   - **Gear in fights:** the boss intro shows the hero vs the boss, the real hearts and where they come from, the damage per hit and about how many hits are needed. The boss HUD shows the hero attacking. Every stage run has **path monsters**: correct answers hit them, gear decides how hard, and each beaten monster gives 1 🌸 (not when tired). Run length and stars are unchanged.
-  - **Arenan** (`#/arenan`): a prototype timing game played with tokens (15 🌰 each, max 10). Nine opponents; all six stats matter; wins pay azaleablad only. The user found it pointless after one try.
+  - **Arenan** (`#/arenan`): a prototype timing game played with tokens (15 🌰 each, max 10). The user found it pointless after one try; it was later rebuilt as Bossduellen (below).
 
 - **Dimstormen** (`#/dimstormen`, after the Arenan playtest):
   - A survivors-style action game: the child steers (drag anywhere = a floating joystick, or arrows/WASD) and the hero attacks by itself. 5 waves × 30 s, then Stormjätten (telegraphs a red charge lane, summons bats). Around 3 minutes per token.
@@ -89,3 +89,10 @@ Tests: `npm test` (Vitest, 217 tests; `tests/betongbukten.test.ts` covers the ge
   - Each floor: 🌸 piles (worth more deeper down), sometimes 🧪 potions, 🗝️ key + 🧰 locked chest, run-only boosts (🪨 +1 damage, 🔩 +1 armour, 💖 +5 life), hidden 🪤 traps (spotted traps are safe). Monsters: rat and bat from floor 1, then spider, snake, scorpion, troll; Grottdraken guards the stairs on every 5th floor.
   - **Push your luck:** at each staircase, "Djupare" (rest +5 life) or "Gå hem" with all the blad. Falling, or leaving mid-floor, keeps half (rounded up). Deepest floor is the record; floor 10 unlocks the 💎 Kristallgrottan background.
   - Lobby parts (purse, buy tokens) shared with Dimstormen in `src/shell/Polletter.tsx`.
+
+- **Arenan rebuilt as Bossduellen** (`#/arenan`, replaces the one-button timing prototype):
+  - Three lanes. The opponent winds up a move and the lanes it will hit fill up red; when full, it strikes. Hop left/right (the hero returns to the middle after 0.7 s, so hopping too early fails) or block (needed for the stomp that hits every lane). A dodge (or a shield parry) makes the opponent dizzy 💫, and only then do melee hits do damage; hitting a non-dizzy opponent is "Blockerat!" (the bow chips 30 %). A superslag charges from successful dodges.
+  - The nine opponents keep their names and order (`arena.rank` is unchanged) but each adds moves: Halmdockan straight punch → Grodkungen side sweeps → Krabban faster → Trollungen stomp (block!) → Robotten double hit → Stenjätten heavy → Draken fire on the sides (stay in the middle) → Spöket fake-outs that switch sides → Mästaren everything, fast.
+  - **Gear:** svärd quick, yxa/hammare heavy (hammer keeps them dizzy longer), stav charges the superslag faster, båge chips through; sköld = full parry that opens the opponent, trollbok = faster superslag, lykta = see moves 20 % longer; the pet bites while the opponent is dizzy. Skydd = life/armour, Kraft = damage, Snabbhet = faster hits, Tur = crits, Klurighet = longer wind-ups, Visdom = superslag charge.
+  - **One token = an evening:** start at the next opponent or any beaten one, then keep going (25 % life back between fights) until a loss or "Gå hem nöjd". Each win is saved immediately: a first win moves the ladder and pays 1 + rung/2 🌸, a rematch 1 🌸, +1 for no damage taken.
+  - Controls: buttons, swipes (left/right/down, tap = hit) or keys (←/→, ↓ block, ↑/space hit, E superslag).

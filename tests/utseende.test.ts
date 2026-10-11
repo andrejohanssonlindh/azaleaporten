@@ -5,7 +5,7 @@ import { STATS, type Item } from '../src/platform/rpg/items';
 import { advance, bossHearts, bossPreview, findNode, finishRun, getPlay, recordAnswer, runOver, savePlay, startRun, starsFor } from '../src/platform/rpg/progress';
 import { MOB } from '../src/platform/rpg/balance';
 import { buyCosmetic, COSMETICS, cosmetic, getWardrobe, owns, takeOff, wear as wearLook, wornLook } from '../src/platform/rpg/wardrobe';
-import { ARENA, arenaStats, buyToken, meterAt, OPPONENTS, payToken, swingAt, winArena } from '../src/platform/rpg/arena';
+import { ARENA, buyToken, payToken } from '../src/platform/rpg/arena';
 import { STIGMONSTER } from '../src/content/monsters';
 import { TIDSTORNET } from '../src/games/klocka/content';
 import type { BossDef, PathNode } from '../src/platform/rpg/types';
@@ -193,41 +193,5 @@ describe('Arenan', () => {
     expect(getHeroState(hid).polletter).toBe(ARENA.maxTokens);
     expect(payToken(hid)).toBe(true);
     expect(getHeroState(hid).polletter).toBe(ARENA.maxTokens - 1);
-  });
-
-  it('vinst ger blad (aldrig kastanjer) och nästa motståndare; mästaren går att möta igen', () => {
-    const hid = hero();
-    const k = getHeroState(hid).kastanjer;
-    expect(winArena(hid, 0)).toBe(1);
-    expect(getHeroState(hid)).toMatchObject({ kastanjer: k, blad: 1, arena: { rank: 1, wins: 1 } });
-    for (let i = 0; i < 20; i++) winArena(hid, 0);
-    expect(getHeroState(hid).arena.rank).toBe(OPPONENTS.length);
-  });
-
-  it('mätaren och zonerna: mitten är fullträff, kanten är miss', () => {
-    const zero = Object.fromEntries(STATS.map((s) => [s.id, 0])) as ReturnType<typeof heroStats>;
-    const a = arenaStats(zero, 0);
-    expect(swingAt(0.5, a)).toBe('crit');
-    expect(swingAt(0.5 + a.hitZone / 2 - 0.01, a)).toBe('hit');
-    expect(swingAt(0.02, a)).toBe('miss');
-    expect(meterAt(0, 1)).toBe(0);
-    expect(meterAt(0.5, 1)).toBeCloseTo(0.5);
-    expect(meterAt(1.5, 1)).toBeCloseTo(0.5);
-  });
-
-  it('utrustning gör hjälten starkare i Arenan, med tak', () => {
-    const zero = Object.fromEntries(STATS.map((s) => [s.id, 0])) as ReturnType<typeof heroStats>;
-    const base = arenaStats(zero, 3);
-    const geared = arenaStats({ kraft: 10, skydd: 9, tur: 5, visdom: 5, snabbhet: 10, klurighet: 10 }, 3);
-    expect(geared.dmg).toBeGreaterThan(base.dmg);
-    expect(geared.hp).toBeGreaterThan(base.hp);
-    expect(geared.hurt).toBeLessThan(base.hurt);
-    expect(geared.critZone).toBeGreaterThan(base.critZone);
-    expect(geared.hitZone).toBeGreaterThan(base.hitZone);
-    expect(geared.speed).toBeLessThan(base.speed);
-    const max = arenaStats({ kraft: 999, skydd: 999, tur: 999, visdom: 999, snabbhet: 999, klurighet: 999 }, 8);
-    expect(max.hitZone).toBeLessThanOrEqual(0.45);
-    expect(max.critZone).toBeLessThan(max.hitZone);
-    expect(max.hurt).toBeGreaterThanOrEqual(1);
   });
 });
