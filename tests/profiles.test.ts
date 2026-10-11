@@ -29,7 +29,8 @@ describe('hjältar', () => {
   it('enterHero returnerar förra besöket', () => {
     const p = hero('Hjälte1');
     expect(enterHero(p.id)).toBeNull();
-    expect(enterHero(p.id)).toBe(getProfile(p.id)!.lastActiveAt);
+    const before = getProfile(p.id)!.lastActiveAt; // enterHero sparar ett nytt besök, så läs det förra först
+    expect(enterHero(p.id)).toBe(before);
   });
 
   it('radering tar backup och tar bort alla hjältens nycklar', () => {
