@@ -739,3 +739,38 @@ button.stat.on { border-color: var(--accent); }
 .skill-chip.rod { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--card)); }
 .session-list li { padding: 6px 0; border-bottom: 1px solid var(--line); }
 .session-list li:last-child { border-bottom: 0; }
+
+/* ---------- Dimstormen ---------- */
+.place-banner.storm-banner { background: linear-gradient(135deg, #5f3dc4, #339af0 60%, #99e9f2); }
+.storm-start { display: flex; gap: 14px; align-items: flex-start; }
+.storm-start > div { flex: 1; min-width: 0; }
+.storm-start p { margin-top: 0; }
+.storm-steps { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+@media (max-width: 480px) { .storm-start { flex-direction: column; align-items: center; } }
+.storm { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.storm-top { display: flex; justify-content: space-between; align-items: center; width: min(100%, calc((100dvh - 90px) * .75)); }
+.storm-stage {
+  position: relative; width: min(100%, calc((100dvh - 90px) * .75)); aspect-ratio: 3 / 4;
+  border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); touch-action: none; user-select: none; -webkit-user-select: none;
+  background: #3f6e3c;
+}
+.storm-stage canvas { display: block; width: 100%; height: 100%; }
+.storm-hero { position: absolute; left: 0; top: 0; pointer-events: none; transform-origin: center; will-change: transform; }
+.storm-hero .hero-figure { display: block; }
+.storm-overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px; text-align: center; background: rgba(22, 19, 29, .72); color: #fff;
+}
+.storm-overlay h2 { color: #fff; margin: 0; }
+.storm-overlay p { margin: 0; max-width: 30em; }
+.storm-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; width: 100%; }
+.storm-card {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 8px;
+  border: 3px solid #ffd43b; border-radius: 14px; background: var(--card); color: var(--ink); min-height: 120px;
+}
+.storm-card:hover, .storm-card:focus-visible { background: var(--bg2); }
+.storm-card small { color: var(--muted); font-size: 13px; line-height: 1.25; }
+.storm-card-icon { font-size: 32px; line-height: 1.1; }
+.storm-dots { font-size: 10px; letter-spacing: 2px; color: var(--gold); }
+.storm-key { position: absolute; top: 4px; left: 6px; font-size: 11px; color: var(--muted); font-family: inherit; }
+@media (hover: none) { .storm-key { display: none; } }

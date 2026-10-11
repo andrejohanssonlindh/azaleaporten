@@ -1,6 +1,6 @@
 # Status – Azaleaporten
 
-*Updated 2026-10-11: Vuxenläge (Phase 6) is done: a per-hero overview, quota and multi-tab guards, a backup reminder. Before that, games became lazy-loaded per area (main chunk 137 → 82 KB gzipped), and the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
+*Updated 2026-10-11: **Dimstormen**, a real mini-game (survivors-style action, gear decides how you fight), plus 2 tokens a day from the daily quests. Before that, Vuxenläge (Phase 6) is done: a per-hero overview, quota and multi-tab guards, a backup reminder. Before that, games became lazy-loaded per area (main chunk 137 → 82 KB gzipped), and the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
 
 ## Done
 
@@ -63,7 +63,7 @@
   - **Multi-tab guard** (`src/platform/tabs.ts`): the newest tab announces itself on a `BroadcastChannel`, and older tabs replace the whole app with a "Spela här i stället" screen (which reloads to read fresh data and take over).
   - **Backup reminder:** `Meta.lastExport` (set when the backup is downloaded); after 30 days without one (`backupDue()`), Vuxenläge and the hero picker's Vuxenläge link say so. Vuxenläge also shows whether the app runs installed (`isInstalled()`).
 
-Tests: `npm test` (Vitest, 163 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
+Tests: `npm test` (Vitest, 202 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
 
 - **Gear round (after the user's playtest notes):**
   - Mästare Kastanj introduces gear in Azaleabyn the first time a hero has an item or chest (`HeroState.tips`).
@@ -71,7 +71,16 @@ Tests: `npm test` (Vitest, 163 tests; `tests/betongbukten.test.ts` covers the ge
   - **Hero figure** (`src/shell/HeroFigure.tsx`): SVG body + animal emoji head; gear is drawn on it (helmet/hat/cap/crown, armour/tunic/cape, five weapons, shield/book/lantern, amulet, pet) and coloured by material tier and rarity.
   - **Skräddaren** (`#/skraddaren`): 28 cosmetics (hats, capes, shoes, backgrounds, glitter) for kastanjer, with try-on; 7 of them are rewards (Mästare, level, best streak, arena rank). Record `h:<id>:wardrobe`.
   - **Gear in fights:** the boss intro shows the hero vs the boss, the real hearts and where they come from, the damage per hit and about how many hits are needed. The boss HUD shows the hero attacking. Every stage run has **path monsters**: correct answers hit them, gear decides how hard, and each beaten monster gives 1 🌸 (not when tired). Run length and stars are unchanged.
-  - **Arenan** (`#/arenan`): a prototype timing game played with tokens (15 🌰 each, max 10). Nine opponents; all six stats matter; wins pay azaleablad only.
+  - **Arenan** (`#/arenan`): a prototype timing game played with tokens (15 🌰 each, max 10). Nine opponents; all six stats matter; wins pay azaleablad only. The user found it pointless after one try.
+
+- **Dimstormen** (`#/dimstormen`, after the Arenan playtest):
+  - A survivors-style action game: the child steers (drag anywhere = a floating joystick, or arrows/WASD) and the hero attacks by itself. 5 waves × 30 s, then Stormjätten (telegraphs a red charge lane, summons bats). Around 3 minutes per token.
+  - **Gear decides how you fight:** the weapon base sets the attack (svärd = arc slash, yxa = spin with knockback, stav = homing bolts, båge = piercing arrows, hammare = stunning shockwave, no weapon = fists); the skold slot adds an ability (sköld blocks a hit every 6 s, trollbok orbits and hits, lykta burns and slows nearby monsters); the pet jumps on monsters. All six stats change the numbers (capped): Skydd = life/armour, Kraft = damage, Snabbhet = attack rate/move speed, Tur = crits/🌸 drops, Klurighet = pickup range and 4 cards instead of 3, Visdom = faster in-run levels. Class perks: riddare +20 life, ranger +5 % crit, trollkarl +10 % crystals, uppfinnare 4 cards.
+  - In-run levels: 💠 crystals → pick one of 3–4 power cards (damage, attack speed, reach, an extra slash/arrow/bolt, life, heal, magnet, speed, a petal orbit, lightning, luck).
+  - **Steg:** winning the highest open steg opens the next (monsters get +50 % life, +30 % damage and +12 % spawn rate per steg), so better gear always has somewhere to go. Steg 3 unlocks the 🌪️ Stormvirvel cosmetic.
+  - Reward: picked-up 🌸 + 1 per wave (max 5) + (1 + steg) for a win. Never kastanjer. Leaving mid-storm still saves what was earned.
+  - **Tokens:** all daily quests done now also gives 2 🎟️ (capped at 10), shown on the result screen and the quest board.
+  - Balance was set with a headless bot (`tests/dimstorm.test.ts` checks determinism, that better gear lasts longer, that higher steg is harder, and that a lightly geared hero can win steg 1). A child who actually dodges will do better than the bot.
 
 ## Next mission
 
@@ -81,7 +90,7 @@ Talbergen, Betongbukten, the village and Vuxenläge are done, and games are lazy
 3. The mastery component of kunskap levels (PLAN §9.4).
 
 Smaller things:
-- Arenan is a prototype: the user wants more mini-games later that the kids play with their characters, paid with tokens. Ideas: a second game type, tokens as quest rewards, rematches of beaten opponents.
+- Mini-games: Dimstormen is done. Two more are planned in PLAN.md ("Minispel"): **Grottdyket** (a turn-based dungeon crawl) and **Bossduellen** (Arenan reworked into a dodge-and-counter duel). Dimstormen needs a playtest with the kids for balance (numbers in `stormNumbers()` and `WAVES`/`stegScale()` in `sim.ts`).
 - The hero figure is not in the top bar or the hero picker yet (they still use the round avatar).
 - The kunskap level has no mastery component yet (Biblioteket shows "Sitter som berget" per skill instead).
 - The teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`), now including `talbergen.region` and the six area Mästare.

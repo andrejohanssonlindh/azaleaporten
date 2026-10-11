@@ -7,6 +7,8 @@ import type { Stats } from './inventory';
 export const ARENA = {
   tokenCost: 15,
   maxTokens: 10,
+  /** Polletter när alla dagens uppdrag är klara (polletterna gäller både Arenan och Dimstormen). */
+  dailyTokens: 2,
 };
 
 export interface Opponent { name: string; icon: string; hp: number; atk: number }
@@ -82,4 +84,12 @@ export function winArena(hid: string, bonusBlad: number): number {
   const blad = 1 + Math.floor(Math.min(rank, OPPONENTS.length - 1) / 2) + bonusBlad;
   saveHeroState(hid, { ...s, blad: s.blad + blad, arena: { rank: Math.min(rank + 1, OPPONENTS.length), wins: s.arena.wins + 1 } });
   return blad;
+}
+
+/** Ger polletter upp till taket. Returnerar hur många som faktiskt gavs. */
+export function giveTokens(hid: string, n: number): number {
+  const s = getHeroState(hid);
+  const got = Math.max(0, Math.min(n, ARENA.maxTokens - s.polletter));
+  if (got) saveHeroState(hid, { ...s, polletter: s.polletter + got });
+  return got;
 }

@@ -317,7 +317,7 @@ function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome
         {news && news.done.length > 0 && (
           <div class="quest-news">
             {news.done.map((q) => <p key={q.kind}>📜 Uppdrag klart: {q.label}</p>)}
-            {news.allDone && news.chest && <p><b>Alla dagens uppdrag är klara! 🔥 {news.streak} {news.streak === 1 ? 'dag' : 'dagar'} i rad.</b>{news.usedFreeze ? ' (Frysdagen räddade sviten.)' : ''}{news.usedAmulets ? ` (${news.usedAmulets === 1 ? 'En sköldamulett' : `${news.usedAmulets} sköldamuletter`} räddade sviten.)` : ''} Du får dagens kista!</p>}
+            {news.allDone && news.chest && <p><b>Alla dagens uppdrag är klara! 🔥 {news.streak} {news.streak === 1 ? 'dag' : 'dagar'} i rad.</b>{news.usedFreeze ? ' (Frysdagen räddade sviten.)' : ''}{news.usedAmulets ? ` (${news.usedAmulets === 1 ? 'En sköldamulett' : `${news.usedAmulets} sköldamuletter`} räddade sviten.)` : ''} Du får dagens kista{news.tokens ? ` och ${news.tokens === 1 ? 'en pollett' : `${news.tokens} polletter`} 🎟️` : ''}!</p>}
           </div>
         )}
         {o.tired && <p class="note">Hjälten är trött för idag – inga fler kastanjer, men allt du lär dig räknas!</p>}

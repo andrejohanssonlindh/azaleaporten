@@ -1,6 +1,7 @@
 import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey } from '../profiles';
 import { addChest, getInv, saveInv, type Chest } from '../rpg/inventory';
+import { ARENA, giveTokens } from '../rpg/arena';
 import { findNode, getArea, getPlay, nextOpenNode, type RunState } from '../rpg/progress';
 import { PLAYABLE, regionProgress } from '../../content/areas';
 import { areaById, fitsGrade } from '../../content/world';
@@ -11,7 +12,7 @@ import { addDays, dayOf, daysBetween, mistByArea } from './skills';
 //  1. jaga bort dimman någonstans (repetition)
 //  2. öva på det som var svårt sist
 //  3. ta nästa steg (ny bana, ny stjärna eller en boss)
-// Alla tre klara = dagens kista och en dag till i sviten. En frysdag i veckan räddar sviten om en dag missas.
+// Alla tre klara = dagens kista, två polletter och en dag till i sviten. En frysdag i veckan räddar sviten om en dag missas.
 
 export type QuestKind = 'dimma' | 'ova' | 'framsteg' | 'klara' | 'ang';
 
@@ -118,7 +119,7 @@ function matches(q: Quest, r: RunReport): boolean {
   }
 }
 
-export interface QuestNews { done: Quest[]; allDone: boolean; chest: Chest | null; streak: number; usedFreeze: boolean; usedAmulets: number }
+export interface QuestNews { done: Quest[]; allDone: boolean; chest: Chest | null; streak: number; usedFreeze: boolean; usedAmulets: number; tokens: number }
 
 /** Bockar av uppdrag efter en avslutad runda. Kistan sparas innan den visas (som all loot). */
 export function noteRun(hid: string, r: RunReport, day = dayOf()): QuestNews {
@@ -130,11 +131,12 @@ export function noteRun(hid: string, r: RunReport, day = dayOf()): QuestNews {
     done.push(d);
     return d;
   });
-  const news: QuestNews = { done, allDone: list.length > 0 && list.every((q) => q.done), chest: null, streak: currentStreak(st, day, amuletsOf(hid)).n, usedFreeze: false, usedAmulets: 0 };
+  const news: QuestNews = { done, allDone: list.length > 0 && list.every((q) => q.done), chest: null, streak: currentStreak(st, day, amuletsOf(hid)).n, usedFreeze: false, usedAmulets: 0, tokens: 0 };
   let next: QuestState = { ...st, list };
   if (news.allDone && !st.chest) {
     const lvl = getHeroState(hid).level;
     news.chest = addChest(hid, { ilvl: Math.max(1, Math.min(10, Math.ceil(lvl / 2))), minRarity: 1, kind: 'dag', source: 'Dagens uppdrag' });
+    news.tokens = giveTokens(hid, ARENA.dailyTokens);
     let { streak, freezeWeek } = st;
     if (!st.streakDay) streak = 1;
     else if (st.streakDay !== day) {

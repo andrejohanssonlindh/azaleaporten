@@ -32,7 +32,7 @@ export function Uppdrag() {
   const say = st.chest
     ? `Alla uppdrag klara för idag – bra jobbat, ${p.name}! Kom tillbaka imorgon, så har jag nya.`
     : left === st.list.length
-      ? `Här är dagens uppdrag, ${p.name}. Klarar du alla tre får du dagens kista!`
+      ? `Här är dagens uppdrag, ${p.name}. Klarar du alla tre får du dagens kista och två polletter 🎟️!`
       : `${left === 1 ? 'Ett uppdrag' : `${left} uppdrag`} kvar. Sedan väntar dagens kista!`;
 
   return (

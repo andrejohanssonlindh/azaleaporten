@@ -7,7 +7,7 @@ import { bestStreak } from '../learning/quests';
 
 export type LookSlot = 'hatt' | 'mantel' | 'skor' | 'bakgrund' | 'aura';
 
-export interface Unlock { kind: 'mastare' | 'niva' | 'svit' | 'arena'; n: number }
+export interface Unlock { kind: 'mastare' | 'niva' | 'svit' | 'arena' | 'storm'; n: number }
 
 export interface Cosmetic {
   id: string;
@@ -61,6 +61,7 @@ export const COSMETICS: Cosmetic[] = [
   { id: 'aura.gnistor', slot: 'aura', name: 'Gnistor', icon: '✨', cost: 80, color: '#ffd43b' },
   { id: 'aura.hjartan', slot: 'aura', name: 'Hjärtan', icon: '💖', cost: 80, color: '#f06595' },
   { id: 'aura.eld', slot: 'aura', name: 'Eldaura', icon: '🔥', unlock: { kind: 'niva', n: 10 }, color: '#ff6b00' },
+  { id: 'aura.storm', slot: 'aura', name: 'Stormvirvel', icon: '🌪️', unlock: { kind: 'storm', n: 3 }, color: '#74c0fc' },
 ];
 
 export const cosmetic = (id: string | undefined) => COSMETICS.find((c) => c.id === id);
@@ -82,10 +83,11 @@ export function unlockText(u: Unlock): string {
     case 'niva': return `Nå nivå ${u.n}`;
     case 'svit': return `Klara alla uppdrag ${u.n} dagar i rad`;
     case 'arena': return `Vinn över ${u.n} motståndare i Arenan`;
+    case 'storm': return `Klara steg ${u.n} i Dimstormen`;
   }
 }
 
-/** Belöningar låses upp av saker som aldrig minskar (nivå, mentorer, längsta svit, arenasteg). */
+/** Belöningar låses upp av saker som aldrig minskar (nivå, mentorer, längsta svit, arenasteg, stormsteg). */
 export function unlocked(hid: string, u: Unlock): boolean {
   const s = getHeroState(hid);
   switch (u.kind) {
@@ -93,6 +95,7 @@ export function unlocked(hid: string, u: Unlock): boolean {
     case 'niva': return s.level >= u.n;
     case 'svit': return bestStreak(hid) >= u.n;
     case 'arena': return s.arena.rank >= u.n;
+    case 'storm': return s.storm.best >= u.n;
   }
 }
 

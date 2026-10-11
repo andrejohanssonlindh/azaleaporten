@@ -33,7 +33,8 @@ export function figureLook(hid: string, preview?: Cosmetic | null): FigureLook {
   return { gear, look };
 }
 
-export function HeroFigure({ hid, size = 160, preview, pose, label }: { hid: string; size?: number; preview?: Cosmetic | null; pose?: 'attack' | 'hurt' | null; label?: string }) {
+/** noPet: husdjuret ritas inte (Dimstormen ritar det själv, eftersom det springer omkring). */
+export function HeroFigure({ hid, size = 160, preview, pose, label, noPet }: { hid: string; size?: number; preview?: Cosmetic | null; pose?: 'attack' | 'hurt' | null; label?: string; noPet?: boolean }) {
   dataRev.value; // ritas om när utrustning eller utseende ändras
   const p = getProfile(hid);
   if (!p) return null;
@@ -71,7 +72,7 @@ export function HeroFigure({ hid, size = 160, preview, pose, label }: { hid: str
       <circle cx="60" cy="50" r="25" fill={tunic} opacity=".18" />
       <text x="60" y="52" font-size="46" text-anchor="middle" dominant-baseline="central" class="fig-head">{animal(p.animal).emoji}</text>
       {look.hatt ? <Hat c={look.hatt} /> : head && <Headgear it={head} />}
-      {pet && <text x="102" y="134" font-size="20" text-anchor="middle" dominant-baseline="central">{pet.icon}</text>}
+      {pet && !noPet && <text x="102" y="134" font-size="20" text-anchor="middle" dominant-baseline="central">{pet.icon}</text>}
     </svg>
   );
 }

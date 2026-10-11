@@ -47,7 +47,7 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
 - **Storage layout** (see `src/platform/profiles.ts`):
   - `meta` (hero ids, last hero)
   - `h:<uuid>:profile` (name, animal, color, heroClass, grade, settings)
-  - `h:<uuid>:hero` (xp, level, kastanjer, blad, tips already shown, arena tokens and rank…)
+  - `h:<uuid>:hero` (xp, level, kastanjer, blad, tips already shown, tokens, arena rank, storm steg…)
   - `h:<uuid>:inventory` (items, equipped, chests), `h:<uuid>:wardrobe` (cosmetics owned/worn)
   - `gate` (unlock key; excluded from backups and exports)
   - `backup:<iso>` (automatic snapshots, the last 3 are kept)
@@ -84,8 +84,10 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
   - Azaleagården (`#/gard`) has tabs: Hjälten (the hero figure, tappable stats with `statExplain()`, equipment slots directly above the backpack, compare vs equipped), Garderoben, Kunskaper
   - **Path monsters** (`RunState.mob`, `MOB` in `balance.ts`, names in `src/content/monsters.ts`): stage runs only. Correct answers hit with gear damage (crit seeded from `seed + index`); a beaten monster gives azaleablad (not when tired) and the next one appears. It never changes run length, clearing or stars.
   - the boss intro shows the real hearts (`bossHearts`) and damage/hits (`bossPreview`)
-- **Hero figure and cosmetics:** `src/shell/HeroFigure.tsx` draws an SVG body with the animal emoji as head; equipped gear is drawn by base id (`shapeOf`; colour = material tier from ilvl + rarity) and worn cosmetics on top. Cosmetics are in `src/platform/rpg/wardrobe.ts` (ids permanent; `cost` in kastanjer or an `unlock` from things that never go down: Mästare, level, best streak, arena rank), sold in Skräddaren (`#/skraddaren`, with try-on).
-- **Arenan** (`#/arenan`, `src/platform/rpg/arena.ts`): a proof-of-concept timing mini-game played with tokens (🎟️, bought for kastanjer). Stats set damage, life, zone widths and meter speed. It pays azaleablad only, never kastanjer. More mini-games are meant to come later.
+- **Hero figure and cosmetics:** `src/shell/HeroFigure.tsx` draws an SVG body with the animal emoji as head; equipped gear is drawn by base id (`shapeOf`; colour = material tier from ilvl + rarity) and worn cosmetics on top. Cosmetics are in `src/platform/rpg/wardrobe.ts` (ids permanent; `cost` in kastanjer or an `unlock` from things that never go down: Mästare, level, best streak, arena rank, best storm steg), sold in Skräddaren (`#/skraddaren`, with try-on).
+- **Mini-games** are paid with tokens (🎟️ `HeroState.polletter`, bought for 15 kastanjer in `arena.ts`, plus `ARENA.dailyTokens` when all daily quests are done; max 10). They pay azaleablad only, never kastanjer.
+  - **Dimstormen** (`#/dimstormen`): a survivors-style action game. `src/platform/rpg/dimstorm.ts` (main chunk) turns gear into a `Loadout` (weapon base → attack type, skold slot → sköld/trollbok/lykta ability, pet, capped stat numbers) and saves results (`HeroState.storm`: highest open steg, wins, best won steg). The game itself is lazy-loaded: `src/minigames/dimstorm/sim.ts` is a pure, seeded simulation (`newGame`/`step`/`choose`, testable headless with a bot, see `tests/dimstorm.test.ts`) and `View.tsx` draws it on a canvas with the `HeroFigure` laid on top. 5 waves of 30 s + Stormjätten; in-run level-ups offer `UPS` cards. Leaving mid-storm still saves what was picked up.
+  - **Arenan** (`#/arenan`): the first prototype, a one-button timing duel. The user found it pointless; candidate for a rework (see PLAN.md, "Minispel").
 - **Introductions:** `HeroState.tips` + `markTip()`; Mästare Kastanj explains gear in Azaleabyn the first time a hero has an item or chest.
 - **Tidstornet** (`src/games/klocka/`):
   - `logic/` holds the pure Swedish time-language model, the diagnosis of mistakes and the parser, ported from v0.1 and tested over all 720 times

@@ -19,6 +19,7 @@ import { ChestModal, Smedjan } from './shell/Loot';
 import { Vuxen } from './shell/Vuxen';
 import { Skraddaren } from './shell/Skraddaren';
 import { Arenan } from './shell/Arenan';
+import { Dimstormen } from './shell/Dimstormen';
 import { pausedByOtherTab, takeOverTab } from './platform/tabs';
 import { Mentor, Screen } from './shell/ui';
 
@@ -61,6 +62,7 @@ export function App() {
   else if (page === 'smedjan') view = <Smedjan />;
   else if (page === 'skraddaren') view = <Skraddaren />;
   else if (page === 'arenan') view = <Arenan />;
+  else if (page === 'dimstormen') view = <Dimstormen />;
   else if (page === 'region' && a) view = <RegionView id={a} />;
   else if (page === 'omrade' && a) view = <AreaView id={a} />;
   // key = sökvägen, så att en ny bana alltid får ett nytt spel-tillstånd
