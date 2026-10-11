@@ -69,11 +69,12 @@ Smaller things:
 
 ## How to add a drill area
 
-Tiokompisbron, Tabellgruvan, Myntmarknaden, Tallinjebron and Bråkbageriet are the templates.
-1. `src/games/<game>/logic.ts`: seeded `makeQ(spec, rng)` returning a `DrillQ` (`parts` with exactly one `null` box – possibly inside a `Frac` –, `answer`, `skill`, optional `prompt`, `choices`, `keypad`), plus `specsForSkill`, `diagnose`, `explain` (never state the answer), `solution`, `hint` and `ERR` labels. Boss traps: `makeQ` must produce a question that can trigger `spec.trap`.
-2. `index.tsx`: `drillModule({ id, make, specsForSkill, diagnose, explain, solution, hint, Visual?, errLabels })`.
+Tiokompisbron, Tabellgruvan, Myntmarknaden, Tallinjebron and Bråkbageriet are the templates; the Betongbukten parks (`src/games/geometri/<game>/`) show drawn SVG visuals (shared helpers in `geometri/draw.tsx`), the toolbox and answer tolerance.
+1. `src/games/<game>/logic.ts`: seeded `makeQ(spec, rng)` returning a `DrillQ` (`parts` with exactly one `null` box – possibly inside a `Frac` –, `answer`, `skill`, optional `prompt`, `choices`, `keypad`, `tol` for rounded answers, `tools: 'kladd' | 'raknare'` for the toolbox on harder stages only), plus `specsForSkill`, `diagnose`, `explain` (never state the answer), `solution`, `hint` and `ERR` labels. Boss traps: `makeQ` must produce a question that can trigger `spec.trap`.
+2. `index.tsx`: `drillModule({ id, make, specsForSkill, diagnose, explain, solution, hint, Visual?, notes?, errLabels })` (`notes(q)` = the formula card).
 3. `content.ts`: an `AreaDef` with `texts`, eras, stages, monster bosses (trap + pet) and a final `mastare`; a generic persona in `src/content/bosses.ts` under `<area>.mastare`; the trap's pet stat in `PET_STAT` (`inventory.ts`); skill names in `src/content/skills.ts`.
-4. Register in `src/content/areas.ts`, set `status: 'open'` in `world.ts`. The generic tests then cover it (`tests/drill-games.test.ts`, the playthrough in `tests/talbergen.test.ts`).
+4. Register in `src/content/areas.ts`, set `status: 'open'` in `world.ts`, and add the game to `GAMES` in `tests/drill-games.test.ts`. The generic tests then cover it (that file, and the playthrough in `tests/talbergen.test.ts`); put game-specific trap/misconception tests in their own file (like `tests/betongbukten.test.ts`).
+5. A new region boss: an `AreaDef` with `region` (see `src/games/talbergen.ts`, `src/games/geometri/betongbukten.ts`), registered in `PLAYABLE` with `regionGame(id, gamesOf(id))`, plus a persona under `<region>.region`.
 
 ## Next after that (in PLAN.md order)
 
