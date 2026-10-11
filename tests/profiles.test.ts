@@ -44,8 +44,9 @@ describe('hjältar', () => {
 
 describe('Mästare Kastanjs hälsning', () => {
   const now = new Date('2026-10-11T15:00:00');
-  it('hälsar välkommen första gången', () => expect(greeting('Hjälte1', null, now)).toContain('Välkommen till Azaleaporten'));
-  it('samma dag', () => expect(greeting('Hjälte1', '2026-10-11T08:00:00', now)).toContain('Hej igen'));
-  it('räknar dagar', () => expect(greeting('Hjälte1', '2026-10-06T20:00:00', now)).toContain('5 dagar'));
-  it('lång paus', () => expect(greeting('Hjälte1', '2026-09-01T20:00:00', now)).toContain('värmer upp'));
+  it('hälsar välkommen första gången', () => expect(greeting('Hjälte1', null, null, now)).toContain('Välkommen till ön'));
+  it('samma dag', () => expect(greeting('Hjälte1', '2026-10-11T08:00:00', null, now)).toContain('Hej igen'));
+  it('räknar dagar', () => expect(greeting('Hjälte1', '2026-10-06T20:00:00', null, now)).toContain('5 dagar'));
+  it('lång paus', () => expect(greeting('Hjälte1', '2026-09-01T20:00:00', null, now)).toContain('värmer upp'));
+  it('föreslår repetition av det senaste', () => expect(greeting('Hjälte1', '2026-10-10T08:00:00', 'Halvsaurus', now)).toContain('Övningsängen'));
 });

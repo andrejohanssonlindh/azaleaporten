@@ -1,4 +1,4 @@
-// Mästare Kastanjs hälsning. I fas 4 byggs den ut med vad hjälten övade senast och vad som behöver repeteras.
+// Mästare Kastanjs hälsning. Byggs ut i fas 4 med vad som behöver repeteras (Glömskans dimma).
 
 const DAY = 86_400_000;
 
@@ -8,13 +8,15 @@ function daysBetween(from: Date, to: Date) {
   return Math.round((b - a) / DAY);
 }
 
-export function greeting(name: string, previousVisit: string | null, now = new Date()): string {
+/** lastPlace = namnet på det hjälten spelade senast, t.ex. "Halvsaurus i Tidstornet". */
+export function greeting(name: string, previousVisit: string | null, lastPlace: string | null = null, now = new Date()): string {
   if (!previousVisit) {
-    return `Välkommen till Azaleaporten, ${name}! Jag är Mästare Kastanj. Här ute väntar Talbergen, Ordskogen och Västerön. Snart öppnar Tidstornet sina dörrar – det blir ditt första äventyr.`;
+    return `Välkommen till ön, ${name}! Jag är Mästare Kastanj. Tryck på Talbergen och leta upp Tidstornet – där börjar ditt äventyr.`;
   }
   const days = daysBetween(new Date(previousVisit), now);
-  if (days <= 0) return `Hej igen, ${name}! Redo för mer äventyr?`;
-  if (days === 1) return `Välkommen tillbaka, ${name}! Kul att se dig igen.`;
-  if (days < 10) return `Välkommen tillbaka, ${name}! Det var ${days} dagar sedan sist.`;
-  return `Välkommen tillbaka, ${name}! Det var ${days} dagar sedan sist – vi börjar lugnt och värmer upp.`;
+  const repeat = lastPlace ? ` Senast var du vid ${lastPlace}. Vill du repetera det på Övningsängen?` : '';
+  if (days <= 0) return `Hej igen, ${name}!${repeat}`;
+  if (days === 1) return `Välkommen tillbaka, ${name}!${repeat}`;
+  if (days < 10) return `Välkommen tillbaka, ${name}! Det var ${days} dagar sedan sist.${repeat}`;
+  return `Välkommen tillbaka, ${name}! Det var ${days} dagar sedan sist – vi börjar lugnt och värmer upp.${repeat}`;
 }

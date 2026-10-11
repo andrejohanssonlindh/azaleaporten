@@ -46,8 +46,7 @@ test('porten med familjepaket: fel lösenord, rätt lösenord, ny hjälte, kvar 
   await shot(page, '2-namn');
 
   await createHero(page, 'Hjälte1');
-  await expect(page.getByText('Välkommen till Azaleaporten, Hjälte1!')).toBeVisible();
-  await expect(page.getByText('Passar dig').first()).toBeVisible();
+  await expect(page.getByText('Välkommen till ön, Hjälte1!')).toBeVisible();
   await shot(page, '6-karta');
 
   await page.reload();
@@ -58,7 +57,8 @@ test('porten med familjepaket: fel lösenord, rätt lösenord, ny hjälte, kvar 
   await expect(page.getByRole('heading', { name: /Azaleagården/ })).toBeVisible();
   await shot(page, '7-garden');
 
-  await page.getByRole('button', { name: '← Till kartan' }).click();
+  await page.getByRole('button', { name: '← Azaleabyn' }).click();
+  await page.getByRole('button', { name: '← Till ön' }).click();
   await page.getByRole('button', { name: 'Byt hjälte' }).click();
   await page.getByRole('button', { name: 'Vuxenläge' }).click();
   const q = await page.getByText(/Hur mycket är/).innerText();

@@ -22,7 +22,7 @@ export function TopBar({ p }: { p: Profile }) {
         <Avatar p={p} size={40} />
         <span class="hero-chip-text">
           <b>{p.name}</b>
-          <small>{heroClass(p.heroClass).name} · Nivå {s.level}</small>
+          <small>{s.title ?? heroClass(p.heroClass).name} · Nivå {s.level}</small>
         </span>
       </button>
       <span class="purse" title="Kastanjer">🌰 {s.kastanjer}</span>
@@ -49,12 +49,12 @@ export function UpdateBanner() {
   );
 }
 
-export function Mentor({ text, children }: { text: string; children?: ComponentChildren }) {
+export function Mentor({ text, children, compact = false, who = 'Mästare Kastanj', face = '🌰' }: { text: string; children?: ComponentChildren; compact?: boolean; who?: string; face?: string }) {
   return (
-    <section class="mentor">
-      <div class="mentor-face" aria-hidden="true">🌰</div>
+    <section class={`mentor${compact ? ' compact' : ''}`}>
+      <div class="mentor-face" aria-hidden="true">{face}</div>
       <div class="mentor-bubble">
-        <div class="mentor-name">Mästare Kastanj</div>
+        <div class="mentor-name">{who}</div>
         <p>{text}</p>
         {children}
         {canSpeak() && (
@@ -67,4 +67,24 @@ export function Mentor({ text, children }: { text: string; children?: ComponentC
 
 export function Screen({ children, class: cls = '' }: { children: ComponentChildren; class?: string }) {
   return <main class={`screen ${cls}`}>{children}</main>;
+}
+
+/** Tillbaka-rad överst på undersidor. */
+export function BackBar({ label, to, right }: { label: string; to: string; right?: ComponentChildren }) {
+  return (
+    <header class="topbar">
+      <button class="btn" onClick={() => go(to)}>← {label}</button>
+      {right}
+    </header>
+  );
+}
+
+export function Stars({ n, of = 3 }: { n: number; of?: number }) {
+  return <span class="stars" aria-label={`${n} av ${of} stjärnor`}>{'★'.repeat(n)}<span class="stars-off">{'☆'.repeat(of - n)}</span></span>;
+}
+
+/** Porträtt: emoji eller bild (familjepaketets porträtt är data-URL:er). */
+export function Portrait({ src, size = 96 }: { src: string; size?: number }) {
+  if (src.startsWith('data:')) return <img class="portrait" src={src} width={size} height={size} alt="" />;
+  return <span class="portrait" style={{ fontSize: `${Math.round(size * 0.8)}px` }} aria-hidden="true">{src}</span>;
 }

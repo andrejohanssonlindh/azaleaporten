@@ -33,15 +33,23 @@ export interface Profile {
   settings: Settings;
 }
 
-/** Hjältens gemensamma framsteg (fylls på i fas 3–4). */
+/** Hjältens gemensamma framsteg. Nya fält behöver bara ett standardvärde (mergeDefaults). */
 export interface HeroState {
   v: number;
+  /** XP mot nästa nivå. */
   xp: number;
   level: number;
   kastanjer: number;
   blad: number;
   titles: string[];
+  /** Vald titel som visas på hjältebladet. */
+  title: string | null;
   achievements: Record<string, string>;
+  /** Tämjda monsterbossar, id "<område>:<boss>". */
+  pets: string[];
+  /** Besegrade mästare som blivit mentorer, id "<område>:<boss>". */
+  mentors: string[];
+  legacy: { klockaV01?: { importedAt: string; from: string }[]; pioneerChest?: 'pending' | 'opened' };
 }
 
 const uuid = () => globalThis.crypto?.randomUUID?.() ?? `h-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
@@ -62,7 +70,7 @@ export const PROFILE: RecordSpec<Profile> = {
 
 export const HERO: RecordSpec<HeroState> = {
   version: 1,
-  defaults: () => ({ v: 1, xp: 0, level: 1, kastanjer: 0, blad: 0, titles: [], achievements: {} }),
+  defaults: () => ({ v: 1, xp: 0, level: 1, kastanjer: 0, blad: 0, titles: [], title: null, achievements: {}, pets: [], mentors: [], legacy: {} }),
 };
 
 export const heroKey = (id: string, part: string) => `h:${id}:${part}`;

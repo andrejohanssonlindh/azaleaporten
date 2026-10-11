@@ -7,6 +7,7 @@ import { initGate, lockGate } from '../platform/gate/gate';
 import { requestPersistentStorage, storageInfo } from '../platform/device';
 import { GRADES, gradeName } from '../content/heroes';
 import { selectHero } from '../session';
+import { alreadyImported, CONSOLE_SNIPPET, importV01, parseV01Paste, type V01Player } from '../platform/legacy/klockaV01';
 import { Avatar, Screen } from './ui';
 
 function AdultCheck({ onPass }: { onPass: () => void }) {
@@ -59,6 +60,47 @@ function HeroAdmin({ p }: { p: Profile }) {
         </div>
       )}
     </div>
+  );
+}
+
+function LegacyImport({ heroes }: { heroes: Profile[] }) {
+  const [text, setText] = useState('');
+  const [found, setFound] = useState<Record<string, V01Player> | null>(null);
+  const [target, setTarget] = useState<Record<string, string>>({});
+  const [bad, setBad] = useState(false);
+  if (!heroes.length) return <p class="muted">Skapa hjältarna först, sedan kan du flytta in deras gamla framsteg.</p>;
+  return (
+    <>
+      <ol class="install">
+        <li>Öppna den gamla <b>Klockövning.html</b> på barnets dator, precis som vanligt.</li>
+        <li>Tryck <b>F12</b> (Mac: Cmd+Alt+I), välj fliken <b>Console</b>, klistra in raden nedan och tryck Enter. Nu är framstegen kopierade.</li>
+        <li>Klistra in här nedanför.</li>
+      </ol>
+      <div class="snippet">
+        <code>{CONSOLE_SNIPPET}</code>
+        <button class="btn small" onClick={() => navigator.clipboard?.writeText(CONSOLE_SNIPPET).then(() => toast('Kopierat'))}>Kopiera</button>
+      </div>
+      <textarea class="paste" rows={3} value={text} placeholder="Klistra in här" aria-label="Inklistrade framsteg"
+        onInput={(e) => { setText(e.currentTarget.value); setBad(false); setFound(null); }} />
+      <button class="btn small primary" disabled={!text.trim()} onClick={() => { const f = parseV01Paste(text); setFound(f); setBad(!f); if (f) setTarget(Object.fromEntries(Object.keys(f).map((n) => [n, heroes.find((h) => h.name.toLowerCase() === n.toLowerCase())?.id ?? heroes[0].id]))); }}>Läs in</button>
+      {bad && <p class="note warn">Hittade inga klockframsteg i texten.</p>}
+      {found && Object.entries(found).map(([name, data]) => (
+        <div class="row legacy-row" key={name}>
+          <span><b>{name}</b> ({data.camp?.lvl ? `nivå ${data.camp.lvl}, ` : ''}{Object.values(data.camp?.stages ?? {}).filter((x) => x?.done).length} banor)</span>
+          <span>→</span>
+          <select value={target[name]} onChange={(e) => setTarget({ ...target, [name]: e.currentTarget.value })} aria-label={`Hjälte för ${name}`}>
+            {heroes.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+          </select>
+          <button class="btn small primary" onClick={() => {
+            const hid = target[name];
+            if (alreadyImported(hid, name)) { toast(`${name} är redan inflyttad i den hjälten.`); return; }
+            const r = importV01(hid, name, data);
+            touch();
+            toast(`Klart! ${r.stages} banor, +${r.xp} XP, +${r.kastanjer} kastanjer och en Pionjärkista.`);
+          }}>Flytta in</button>
+        </div>
+      ))}
+    </>
   );
 }
 
@@ -168,8 +210,8 @@ export function Vuxen() {
       </section>
 
       <section class="card">
-        <h2>Gamla Klockövning</h2>
-        <p class="muted">Import av framsteg från den gamla klockappen kommer när Tidstornet öppnar.</p>
+        <h2>Flytta in från gamla Klockövning</h2>
+        <LegacyImport heroes={heroes} />
       </section>
 
       <p class="version">Version {__APP_VERSION__}</p>

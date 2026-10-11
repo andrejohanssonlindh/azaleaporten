@@ -1,0 +1,51 @@
+// ALLA justerbara siffror för belöningar och tempo. Medvetet snålt: barnen fick valuta för fort i v0.1.
+// Ingen valuta per svar – belöningar kommer när en runda eller strid är klar.
+
+export const RUN_LENGTH = 10;
+export const CLEAR_MIN = 9;
+export const PRACTICE_LENGTH = 5;
+
+export const XP = {
+  correct: 5,
+  /** Bonus för att rätta sitt eget fel. */
+  fix: 2,
+  /** Ledtråd halverar XP för frågan. */
+  hintFactor: 0.5,
+  practiceCorrect: 3,
+  /** Trollkarlens perk. */
+  trollkarlBonus: 0.1,
+};
+
+export const REWARD = {
+  firstClear: { xp: 30, kastanjer: 12 },
+  /** Per ny stjärna utöver den första. */
+  newStar: { kastanjer: 8 },
+  replayClear: { xp: 8, kastanjer: 2 },
+  failedRun: { kastanjer: 1 },
+  practiceDone: { kastanjer: 2 },
+  bossFirstWin: { xp: 60, kastanjer: 30 },
+  mastareFirstWin: { xp: 120, kastanjer: 60 },
+  bossRewin: { xp: 12, kastanjer: 4 },
+  bossLoss: { kastanjer: 1 },
+};
+
+export const BOSS = { hearts: 3, riddareHearts: 1, maxHearts: 6 };
+
+export const HINTS_PER_DAY = 2;
+
+/** Efter så här mycket aktiv tid per dag blir hjälten trött: inga fler kastanjer, men XP och lärande räknas. */
+export const TIRED_AFTER_MS = 30 * 60_000;
+
+/** XP som krävs från nivå l till l+1. */
+export const needXP = (l: number) => 60 + 30 * l;
+
+export const TITLES: [number, string][] = [[1, 'Lärling'], [3, 'Upptäckare'], [5, 'Äventyrare'], [8, 'Hjälte'], [12, 'Mästarhjälte'], [16, 'Legend']];
+export const levelTitle = (l: number) => TITLES.filter(([n]) => l >= n).pop()![1];
+
+/** Kunskapsnivå (per område) ur områdets XP. */
+export function kunskapLevel(xp: number): { level: number; into: number; need: number } {
+  let level = 0, left = xp;
+  const need = (l: number) => 40 + 20 * l;
+  while (left >= need(level)) { left -= need(level); level++; }
+  return { level, into: left, need: need(level) };
+}

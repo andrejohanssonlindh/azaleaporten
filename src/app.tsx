@@ -6,7 +6,12 @@ import { selectHero } from './session';
 import { Gate } from './shell/Gate';
 import { HeroPicker } from './shell/HeroPicker';
 import { NewHero } from './shell/NewHero';
-import { WorldMap } from './shell/WorldMap';
+import { IslandMap } from './shell/IslandMap';
+import { Azaleabyn, RegionView } from './shell/Places';
+import { AreaView } from './shell/AreaView';
+import { PlayView } from './shell/PlayView';
+import { Ovning } from './shell/Ovning';
+import { LabbView } from './shell/LabbView';
 import { Gard } from './shell/Gard';
 import { Vuxen } from './shell/Vuxen';
 
@@ -24,7 +29,8 @@ async function start() {
 export function App() {
   useEffect(() => { start(); }, []);
   const g = gate.value;
-  const [page] = route.value;
+  const [page, a, b] = route.value;
+  const path = route.value.join('/');
 
   let view;
   if (!g) view = <div class="splash" aria-busy="true">🌸</div>;
@@ -33,7 +39,15 @@ export function App() {
   else if (page === 'ny') view = <NewHero />;
   else if (!heroId.value || page === 'hjaltar') view = <HeroPicker />;
   else if (page === 'gard') view = <Gard />;
-  else view = <WorldMap />;
+  else if (page === 'by') view = <Azaleabyn />;
+  else if (page === 'region' && a) view = <RegionView id={a} />;
+  else if (page === 'omrade' && a) view = <AreaView id={a} />;
+  // key = sökvägen, så att en ny bana alltid får ett nytt spel-tillstånd
+  else if (page === 'spela' && a && b) view = <PlayView key={path} areaId={a} nodeId={b} />;
+  else if (page === 'ovning' && a && b) view = <PlayView key={path} areaId={a} nodeId={b} practice />;
+  else if (page === 'ovning') view = <Ovning />;
+  else if (page === 'labb' && a) view = <LabbView areaId={a} tab={b ?? ''} />;
+  else view = <IslandMap />;
 
   return (
     <>

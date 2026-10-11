@@ -1,4 +1,5 @@
-// Världskartan. Region- och område-ID:n är permanenta (de blir del av sparnycklar och färdighets-ID:n).
+// Ön. Region- och område-ID:n är permanenta (de blir del av sparnycklar och färdighets-ID:n).
+// Nya ämnen läggs på de reserverade platserna (dimman) eller som nya småöar runt ön.
 
 export interface Area {
   id: string;
@@ -10,13 +11,15 @@ export interface Area {
   status: 'open' | 'soon';
 }
 
+export type RegionId = 'talbergen' | 'ordskogen' | 'vasteron' | 'betongbukten';
+
 export interface Region {
-  id: 'talbergen' | 'ordskogen' | 'vasteron';
+  id: RegionId;
   name: string;
   subject: string;
   icon: string;
   tagline: string;
-  /** Himmelsfärger för regionkortet [topp, botten, mark]. */
+  /** Färger för regionens banner [topp, botten, mark]. */
   sky: [string, string, string];
   areas: Area[];
 }
@@ -24,15 +27,29 @@ export interface Region {
 export const REGIONS: Region[] = [
   {
     id: 'talbergen', name: 'Talbergen', subject: 'Matematik', icon: '⛰️',
-    tagline: 'Höga toppar av tal, tid och former.',
+    tagline: 'Höga toppar av tal och tid. Högst upp står Tidstornet.',
     sky: ['#4f9fe0', '#cde9f8', '#6a7f5a'],
     areas: [
-      { id: 'tidstornet', name: 'Tidstornet', icon: '🕐', desc: 'Läs klockan och räkna tid.', grades: [1, 5], status: 'soon' },
+      { id: 'tidstornet', name: 'Tidstornet', icon: '🕰️', desc: 'Res genom tiden och läs klockor.', grades: [1, 5], status: 'open' },
       { id: 'tiokompisbron', name: 'Tiokompisbron', icon: '🌉', desc: 'Plus och minus med tiotalsövergång.', grades: [1, 3], status: 'soon' },
       { id: 'tabellgruvan', name: 'Tabellgruvan', icon: '⛏️', desc: 'Gångertabeller och division.', grades: [2, 6], status: 'soon' },
       { id: 'myntmarknaden', name: 'Myntmarknaden', icon: '🪙', desc: 'Pengar och växel.', grades: [1, 4], status: 'soon' },
       { id: 'brakbageriet', name: 'Bråkbageriet', icon: '🥧', desc: 'Bråk du kan se och smaka på.', grades: [3, 6], status: 'soon' },
-      { id: 'tallinjebron', name: 'Tallinjebron', icon: '📏', desc: 'Tal på tallinjen, decimaler och negativa tal.', grades: [2, 6], status: 'soon' },
+      { id: 'tallinjebron', name: 'Tallinjebron', icon: '📏', desc: 'Tallinjen, decimaler och negativa tal.', grades: [2, 6], status: 'soon' },
+    ],
+  },
+  {
+    id: 'betongbukten', name: 'Betongbukten', subject: 'Geometri', icon: '🛹',
+    tagline: 'Skejtparkerna vid havet. Former, vinklar och mått – en park i taget.',
+    sky: ['#ff922b', '#ffe8cc', '#868e96'],
+    areas: [
+      { id: 'fluffy', name: 'Fluffy', icon: '🛹', desc: 'Former: cirkel, triangel, kvadrat och rektangel.', grades: [1, 3], status: 'soon' },
+      { id: 'svampen', name: 'Svampen', icon: '🍄', desc: 'Symmetri och mönster.', grades: [1, 4], status: 'soon' },
+      { id: 'oxie', name: 'Oxie skatepark', icon: '📐', desc: 'Mät längd och omkrets.', grades: [2, 5], status: 'soon' },
+      { id: 'sibbarp', name: 'Sibbarp', icon: '🌊', desc: 'Vinklar i bowlen: räta, spetsiga och trubbiga.', grades: [3, 6], status: 'soon' },
+      { id: 'bryggeriet', name: 'Bryggeriet', icon: '🏭', desc: 'Area – hur stor är ytan?', grades: [3, 6], status: 'soon' },
+      { id: 'kroksback', name: 'Kroksbäck', icon: '📦', desc: 'Kroppar i 3D och volym.', grades: [4, 6], status: 'soon' },
+      { id: 'stapelbaddsparken', name: 'Stapelbäddsparken', icon: '🏆', desc: 'Den stora finalparken – allt blandat.', grades: [4, 6], status: 'soon' },
     ],
   },
   {
@@ -48,7 +65,7 @@ export const REGIONS: Region[] = [
   },
   {
     id: 'vasteron', name: 'Västerön', subject: 'Engelska', icon: '🏝️',
-    tagline: 'En ö i väster där alla pratar engelska.',
+    tagline: 'En liten ö i väster där alla pratar engelska. Ta båten dit!',
     sky: ['#2b6cb0', '#ffd8a8', '#c2a878'],
     areas: [
       { id: 'glosviken', name: 'Glosviken', icon: '⚓', desc: 'Engelska ord med bild och ljud.', grades: [1, 6], status: 'soon' },
@@ -58,4 +75,12 @@ export const REGIONS: Region[] = [
   },
 ];
 
+export const region = (id: string) => REGIONS.find((r) => r.id === id);
+export const areaById = (id: string) => {
+  for (const r of REGIONS) {
+    const a = r.areas.find((x) => x.id === id);
+    if (a) return { region: r, area: a };
+  }
+  return undefined;
+};
 export const fitsGrade = (a: Area, grade: number) => grade >= a.grades[0] && grade <= a.grades[1];

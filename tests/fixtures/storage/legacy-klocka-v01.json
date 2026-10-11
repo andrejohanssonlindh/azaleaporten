@@ -1,0 +1,26 @@
+{
+  "klocka_Hjälte1": {
+    "sc": 41, "st": 47,
+    "results": [
+      { "mode": "words", "level": 1, "timeMs": 5200, "n": 1, "target": "14:30", "shown": "halv tre på eftermiddagen", "answer": "15:30", "correct": false, "err": "hour", "fixed": "self" },
+      { "mode": "clock", "level": 2, "timeMs": 4100, "n": 2, "target": "09:25", "shown": "", "answer": "09:25", "correct": true, "err": null },
+      { "mode": "choice", "level": 1, "timeMs": 3000, "n": 3, "target": "kvart i fyra", "shown": "", "answer": "kvart över fyra", "correct": false, "err": "rel" },
+      { "mode": "between", "level": 1, "timeMs": 22000, "n": 4, "target": "09:15–11:45", "shown": "", "answer": "2 tim 30 min", "correct": true, "err": null }
+    ],
+    "q": {},
+    "camp": {
+      "lvl": 6, "xp": 40, "coins": 412, "streak": 3, "best": 14,
+      "stages": {
+        "0": { "win": [], "stars": 3, "done": true, "attempts": 12 },
+        "1": { "win": [], "stars": 2, "done": true, "attempts": 15 },
+        "2": { "win": [], "stars": 1, "done": true, "attempts": 20 },
+        "3": { "win": [], "stars": 1, "done": true, "attempts": 18 },
+        "4": { "win": [], "stars": 0, "done": false, "attempts": 4 }
+      },
+      "ach": { "first": 1759000000000, "s5": 1759100000000 },
+      "skins": ["klassisk", "hav"], "skin": "hav",
+      "inv": { "hint": 2, "shield": 1 }, "turbo": 0,
+      "stats": { "correct": 41, "fixes": 5, "fast": 3, "rel": 12, "between": 1, "bought": 2, "owl": true, "early": false }
+    }
+  }
+}

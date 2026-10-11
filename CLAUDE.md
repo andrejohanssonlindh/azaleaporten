@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Azaleaporten: a free, adventure/RPG-themed practice app (matematik, svenska, engelska) for school kids, hosted on GitHub Pages at `https://andrejohanssonlindh.github.io/azaleaporten/`. No backend: all progress lives in the browser's `localStorage` on each device. UI text, comments and many identifiers are **Swedish**; keep new user-facing text Swedish and child-friendly.
 
-The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phase 1 (platform skeleton) is done; next is Phase 2 (Tidstornet: port the old clock game from `../klocka/Klockövning.html` into `src/games/klocka`).
+The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phase 1 (platform skeleton) and Phase 2 (Tidstornet, the time-travel clock area) are done; next is Phase 3 (loot, Smedjan, equipment).
 
 ## Commands
 
@@ -53,7 +53,30 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
 
   Hero ids are UUIDs, never names.
 - **Gate:** `src/platform/gate/gate.ts` fetches `packs/familj.enc`. If it is missing, the gate is just a button, and generic personas are used. Otherwise the password is needed once per device; the derived key is stored, and the salt is kept stable by the tool so pack updates don't re-lock devices. A boss = public mechanics + a swappable persona: `personaFor()` in `src/content/bosses.ts` picks the pack persona (grade-specific first), else the generic one.
-- **Content:** `src/content/world.ts` (regions/areas with recommended grade ranges, never locks) and `src/content/heroes.ts` (animals, colours, classes).
+- **The island:** the map (`src/shell/IslandMap.tsx`, a hand-drawn SVG) is the start screen. Tapping a place opens its page:
+  - Azaleabyn (`#/by`, the village with the buildings, including Azaleagården `#/gard`)
+  - Övningsängen (`#/ovning`, a 5-question repeat of the last thing played)
+  - regions (`#/region/<id>`)
+  - fog spots and the dotted islands are reserved for future subjects
+
+  Regions and areas are defined in `src/content/world.ts`, with recommended grades only (never locks). Betongbukten (geometry) uses Malmö skateparks as levels. `src/content/heroes.ts` has animals, colours and classes.
+- **Adventure model** (`src/platform/rpg/`):
+  - an area (`AreaDef`) is a list of eras with a path of stage and boss nodes (`types.ts`); each node unlocks when the previous one is done
+  - a game is just a question factory, `GameModule` = `makeQuestion(spec, rng)` + `skillOf(q)` + a Preact `View` that runs open → fixing → done and reports only the first answer
+  - the platform owns everything else in `progress.ts`:
+    - stage runs are exactly 10 questions; 9 right = ★, 10 = ★★, 10 under `thrMs` with no hint = ★★★
+    - practice runs are 5 questions
+    - boss fights have HP = correct answers needed and hearts = 3 (+1 riddare); every other boss question targets its `trap`
+    - XP and kastanjer
+    - the event log
+  - a run is saved after every answer, and questions are regenerated deterministically from `seed + index`, so a reload resumes the same question
+  - all numbers live in `balance.ts`: no currency per answer, and 30 minutes a day after which no more kastanjer
+  - `src/content/areas.ts` registers playable areas (`PLAYABLE`)
+- **Tidstornet** (`src/games/klocka/`):
+  - `logic/` holds the pure Swedish time-language model, the diagnosis of mistakes and the parser, ported from v0.1 and tested over all 720 times
+  - `content.ts` holds the eras, stages, monster bosses (tamed → pets) and the final Mästare (persona via `personaFor`)
+  - `V01_STAGE_MAP` maps the old v0.1 stage indexes
+- **Importing old progress:** `src/platform/legacy/klockaV01.ts` imports the old file's `localStorage` (via a console snippet pasted into Vuxenläge). The fixture is `tests/fixtures/storage/legacy-klocka-v01.json`.
 - **PWA:** `vite-plugin-pwa` with `registerType: 'prompt'`. `UpdateBanner` is shown only on calm screens (map, picker), never mid-exercise.
 - **Tests:**
   - `tests/helpers.ts#freshStorage()` swaps in a `MemoryBackend`
