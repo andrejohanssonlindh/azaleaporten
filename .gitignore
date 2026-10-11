@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+blob-report/
+test-results/
+.DS_Store
+*.local
+# Privat innehåll hör hemma i ../privat, aldrig här
+privat/
+familjepaket/

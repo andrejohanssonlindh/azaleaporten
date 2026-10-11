@@ -1,0 +1,20 @@
+#!/bin/sh
+# Blockerar commits som innehåller ord från den privata listan (barnens namn, lärare, gata, skola).
+# Listan ligger UTANFÖR repot: ../privat/forbjudna-ord.txt (ett ord per rad, # = kommentar).
+LIST="$(git rev-parse --show-toplevel)/../privat/forbjudna-ord.txt"
+if [ ! -f "$LIST" ]; then
+  echo "pre-commit: varning – $LIST saknas, ingen namnkontroll gjord." >&2
+  exit 0
+fi
+ADDED=$(git diff --cached --no-color -U0 | grep '^+' | grep -v '^+++')
+HITS=""
+while IFS= read -r word || [ -n "$word" ]; do
+  case "$word" in ''|'#'*) continue ;; esac
+  if printf '%s\n' "$ADDED" | grep -qiwF -- "$word"; then HITS="$HITS $word"; fi
+  if git diff --cached --name-only | grep -qiF -- "$word"; then HITS="$HITS $word(filnamn)"; fi
+done < "$LIST"
+if [ -n "$HITS" ]; then
+  echo "pre-commit: STOPP – privata ord hittades i ändringarna:$HITS" >&2
+  echo "Ta bort dem (repot är publikt). Hoppa över ENDAST om du är säker: git commit --no-verify" >&2
+  exit 1
+fi

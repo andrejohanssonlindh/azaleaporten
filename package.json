@@ -1,0 +1,36 @@
+{
+  "name": "azaleaporten",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Azaleaporten – ett gratis äventyr för att öva matte, svenska och engelska.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "icons": "pwa-assets-generator",
+    "pack:encrypt": "node tools/pack-encrypt.ts",
+    "setup-hooks": "git config core.hooksPath .githooks",
+    "prepare": "git config core.hooksPath .githooks || true",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@preact/signals": "^2.11.3",
+    "preact": "^11.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@playwright/test": "^1.64.0",
+    "@preact/preset-vite": "^2.10.6",
+    "@types/node": "^26.6.5",
+    "@vite-pwa/assets-generator": "^2.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.0.3",
+    "workbox-window": "^7.4.1"
+  }
+}
