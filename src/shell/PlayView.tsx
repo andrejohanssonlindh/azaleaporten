@@ -3,9 +3,10 @@ import { chestModal, dataRev, gate, go, heroId, toast, touch } from '../state';
 import { getHeroState, getProfile } from '../platform/profiles';
 import {
   abandonRun, advance, currentQuestion, findNode, finishRun, getPlay, hintsLeft, nextOpenNode, getArea,
-  bossHearts, bossPreview, recordAnswer, recordFixed, REVIEW_NODE, runLength, runOver, startReview, startRun, useHint, type Hit, type Outcome, type RunState,
+  bossHearts, bossPreview, recordAnswer, recordFixed, REVIEW_NODE, VECKANS_NODE, runLength, runOver, startReview, startRun, useHint, type Hit, type Outcome, type RunState,
 } from '../platform/rpg/progress';
 import { reviewPlan } from '../platform/learning/skills';
+import { currentList, veckansSkill, wordOfSkill } from '../platform/learning/veckans';
 import { noteRun, type QuestNews } from '../platform/learning/quests';
 import { PRACTICE_LENGTH } from '../platform/rpg/balance';
 import { levelTitle } from '../platform/rpg/balance';
@@ -41,8 +42,13 @@ const pickLine = (lines: string[]) => (lines.length ? lines[Math.floor(Math.rand
 function resumeOrStart(hid: string, areaId: string, node: PathNode, kind: RunState['kind']): RunState | null {
   const pl = playable(areaId)!;
   const ex = getPlay(hid).run;
-  if (kind === 'review') {
-    if (ex && ex.kind === 'review' && ex.areaId === areaId && !runOver(ex)) return ex.results.length > ex.index ? advance(hid, ex) : ex;
+  if (kind === 'review' || kind === 'veckans') {
+    if (ex && ex.kind === kind && ex.areaId === areaId && !runOver(ex)) return ex.results.length > ex.index ? advance(hid, ex) : ex;
+    if (kind === 'veckans') {
+      // Alla veckans ord en gång, i blandad ordning.
+      const words = currentList(hid)?.words ?? [];
+      return words.length ? startReview(hid, pl.def, [...words].sort(() => Math.random() - 0.5).map(veckansSkill), 'veckans') : null;
+    }
     const plan = reviewPlan(hid, areaId, PRACTICE_LENGTH);
     return plan.length ? startReview(hid, pl.def, plan) : null;
   }
@@ -54,7 +60,7 @@ function resumeOrStart(hid: string, areaId: string, node: PathNode, kind: RunSta
   return startRun(hid, pl.def, node, kind);
 }
 
-interface PlayProps { areaId: string; nodeId: string; practice?: boolean; review?: boolean }
+interface PlayProps { areaId: string; nodeId: string; practice?: boolean; review?: boolean; veckans?: boolean }
 
 export function PlayView(props: PlayProps) {
   const g = useGame(props.areaId);
@@ -63,13 +69,13 @@ export function PlayView(props: PlayProps) {
   return <PlayRun {...props} game={g} />;
 }
 
-function PlayRun({ areaId, nodeId, practice = false, review = false, game }: PlayProps & { game: GameModule }) {
+function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = false, game }: PlayProps & { game: GameModule }) {
   dataRev.value;
   const hid = heroId.value;
   const p = hid ? getProfile(hid) : null;
   const pl = playable(areaId);
-  const node = pl && (review ? REVIEW_NODE : findNode(pl.def, nodeId));
-  const kind: RunState['kind'] = review ? 'review' : practice ? 'practice' : node?.type === 'boss' ? 'boss' : 'stage';
+  const node = pl && (review ? REVIEW_NODE : veckans ? VECKANS_NODE : findNode(pl.def, nodeId));
+  const kind: RunState['kind'] = review ? 'review' : veckans ? 'veckans' : practice ? 'practice' : node?.type === 'boss' ? 'boss' : 'stage';
   const [run, setRun] = useState<RunState | null>(() => (p && node ? resumeOrStart(p.id, areaId, node, kind) : null));
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [news, setNews] = useState<QuestNews | null>(null);
@@ -89,7 +95,21 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, game }: Pla
   /* ---------- resultat ---------- */
   if (outcome) {
     return <Result o={outcome} news={news} areaId={areaId} node={node} face={face} practice={practice || review}
-      onAgain={review ? null : () => { setOutcome(null); setNews(null); setBossLine(''); setRun(boss && !practice ? null : startRun(p.id, area, node, kind)); }} />;
+      onAgain={review ? null : () => { setOutcome(null); setNews(null); setBossLine(''); setRun(veckans ? resumeOrStart(p.id, areaId, node, kind) : boss && !practice ? null : startRun(p.id, area, node, kind)); }} />;
+  }
+
+  /* ---------- inga veckans ord ---------- */
+  if (!run && veckans) {
+    return (
+      <Screen class="play result">
+        <div class="result-card">
+          <div class="big-emoji">📝</div>
+          <h1>Inga veckans ord än</h1>
+          <p>Be en vuxen skriva in veckans stavningsord från skolan i Vuxenläge – då kan du öva på dem här.</p>
+          <button class="btn primary" onClick={() => go(`omrade/${areaId}`)}>Tillbaka</button>
+        </div>
+      </Screen>
+    );
   }
 
   /* ---------- ingen dimma att jaga ---------- */
@@ -188,7 +208,7 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, game }: Pla
     <Screen class="play">
       <header class="play-head">
         <div class="play-title">
-          <small>{review ? `🌫️ ${area.title}` : practice ? '🎯 Övningsängen' : `${era!.icon} ${era!.name}`}</small>
+          <small>{review ? `🌫️ ${area.title}` : veckans ? `📝 ${area.title}` : practice ? '🎯 Övningsängen' : `${era!.icon} ${era!.name}`}</small>
           <b>{boss && face && !practice ? face.name : review ? 'Jaga bort dimman' : node.name}</b>
         </div>
         {confirmQuit ? (
@@ -276,6 +296,16 @@ function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome
         <div class="big-emoji">💨</div>
         <h1>{face?.name} vann den här gången</h1>
         <p>Du träffade {o.correct} gånger. Öva lite på Övningsängen och kom tillbaka – du klarar det!</p>
+      </>
+    );
+  } else if (o.kind === 'veckans') {
+    const missed = (o.missed ?? []).map((s) => wordOfSkill(s) ?? s);
+    head = (
+      <>
+        <div class="big-emoji">📝</div>
+        <h1>{missed.length ? 'Veckans ord – bra kämpat!' : 'Alla veckans ord rätt!'}</h1>
+        <p>{o.correct} av {o.total} rätt första gången.</p>
+        <p>{missed.length ? `Öva lite extra på: ${missed.join(', ')}. ${missed.length === 1 ? 'Det' : 'De'} kommer tillbaka imorgon.` : 'Orden kommer tillbaka om några dagar, så att de fastnar till provet – och efter det.'}</p>
       </>
     );
   } else if (o.kind === 'review') {

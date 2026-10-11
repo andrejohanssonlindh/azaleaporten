@@ -7,14 +7,16 @@ import { PLAYABLE, regionProgress } from '../../content/areas';
 import { areaById, fitsGrade } from '../../content/world';
 import { getEvents } from './events';
 import { addDays, dayOf, daysBetween, mistByArea } from './skills';
+import { currentList, VECKANS_AREA } from './veckans';
 
 // Uppdragstavlan: tre uppdrag per dag, gjorda för just den här hjälten.
 //  1. jaga bort dimman någonstans (repetition)
 //  2. öva på det som var svårt sist
 //  3. ta nästa steg (ny bana, ny stjärna eller en boss)
+// Har en vuxen skrivit in veckans ord kommer "öva på veckans ord" först, varje dag den veckan.
 // Alla tre klara = dagens kista, två polletter och en dag till i sviten. En frysdag i veckan räddar sviten om en dag missas.
 
-export type QuestKind = 'dimma' | 'ova' | 'framsteg' | 'klara' | 'ang';
+export type QuestKind = 'dimma' | 'ova' | 'framsteg' | 'klara' | 'ang' | 'veckans';
 
 export interface Quest { kind: QuestKind; label: string; done: boolean; areaId?: string; nodeId?: string }
 
@@ -54,6 +56,8 @@ export function weekOf(day: string): string {
 function makeQuests(hid: string): Quest[] {
   const title = (a: string) => PLAYABLE[a]?.def.title ?? a;
   const out: Quest[] = [];
+
+  if (currentList(hid)) out.push({ kind: 'veckans', areaId: VECKANS_AREA, label: 'Öva på veckans ord från skolan', done: false });
 
   const mist = Object.entries(mistByArea(hid)).filter(([a]) => PLAYABLE[a]).sort((a, b) => b[1] - a[1]);
   if (mist.length) out.push({ kind: 'dimma', areaId: mist[0][0], label: `Jaga bort dimman i ${title(mist[0][0])}`, done: false });
@@ -115,7 +119,8 @@ function matches(q: Quest, r: RunReport): boolean {
     case 'ova': return (r.kind === 'practice' || r.kind === 'stage') && r.areaId === q.areaId && r.nodeId === q.nodeId;
     case 'framsteg': return r.progressed;
     case 'klara': return (r.kind === 'stage' && r.cleared) || r.won;
-    case 'ang': return r.kind === 'practice' || r.kind === 'review';
+    case 'ang': return r.kind === 'practice' || r.kind === 'review' || r.kind === 'veckans';
+    case 'veckans': return r.kind === 'veckans';
   }
 }
 

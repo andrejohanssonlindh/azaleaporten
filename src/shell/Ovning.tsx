@@ -1,4 +1,5 @@
 import { dataRev, go, heroId } from '../state';
+import { VeckansCard } from './Veckans';
 import { getProfile } from '../platform/profiles';
 import { findNode, getPlay } from '../platform/rpg/progress';
 import { PRACTICE_LENGTH } from '../platform/rpg/balance';
@@ -25,6 +26,7 @@ export function Ovning() {
     <Screen class="place">
       <BackBar label="Till ön" to="karta" />
       <div class="place-banner meadow"><span>🎯</span><h1>Övningsängen</h1></div>
+      <VeckansCard hid={p.id} hideEmpty />
       {mist.length > 0 ? (
         <>
           <Mentor text={`Glömskans dimma har lagt sig över ${mist.map(([a]) => playable(a)!.def.title).join(' och ')}. Det betyder att det är dags att repetera – då fastnar kunskapen på riktigt. Fem frågor jagar bort dimman!`} />

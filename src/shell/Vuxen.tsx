@@ -13,6 +13,7 @@ import { CONSOLE_SNIPPET } from '../platform/legacy/snippet';
 
 import { Avatar, Screen } from './ui';
 import { HeroOverview } from './VuxenOversikt';
+import { VeckansEditor } from './Veckans';
 
 const legacy = () => import('../platform/legacy/klockaV01');
 
@@ -52,6 +53,7 @@ function HeroAdmin({ p }: { p: Profile }) {
           {GRADES.map((g) => <option key={g} value={g}>{gradeName(g)}</option>)}
         </select>
       </label>
+      <VeckansEditor p={p} />
       {confirm === null ? (
         <button class="btn small danger" onClick={() => setConfirm('')}>Radera hjälten…</button>
       ) : (

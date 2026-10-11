@@ -3,12 +3,13 @@
 // Nivå 1 passar från åk 1–2, nivå 2 från åk 3–4. Sammansatta ord har '|' mellan delarna.
 // Felstavningarna (sista fältet) behövs där reglerna inte kan räkna ut dem själva, t.ex. småord.
 // Testerna kontrollerar att varje ord passar sin regel och står i sin mening.
+// Regeln 'egen' är veckans ord som en vuxen skrivit in (de finns inte här, se logic.ts).
 
-export type Rule = 'smaord' | 'dubbel' | 'lang' | 'm' | 'ck' | 'ng' | 'j' | 'sj' | 'tj' | 'oa' | 'stor' | 'sammansatt';
+export type Rule = 'smaord' | 'dubbel' | 'lang' | 'm' | 'ck' | 'ng' | 'j' | 'sj' | 'tj' | 'oa' | 'stor' | 'sammansatt' | 'egen';
 
 export type Row = [word: string, sentence: string, band?: 1 | 2, x?: string[]];
 
-export const ORD: Record<Rule, Row[]> = {
+export const ORD: Record<Exclude<Rule, 'egen'>, Row[]> = {
   smaord: [
     ['och', 'Katten och hunden leker i trädgården.', 1, ['å', 'ock']],
     ['jag', 'Nu ska jag bada i sjön.', 1, ['ja']],

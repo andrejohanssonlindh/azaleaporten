@@ -120,3 +120,39 @@ test('utan svensk röst blir diktamen ett val', async ({ page }) => {
   await page.getByRole('button', { name: w, exact: true }).click();
   await expect(page.getByText('Rätt: 1 av 1')).toBeVisible();
 });
+
+test('veckans ord: en vuxen skriver in orden, barnet övar dem', async ({ page }) => {
+  await fakeVoice(page);
+  await newHero(page);
+  await page.goto('./#/vuxen');
+  const q = await page.getByText(/Hur mycket är/).innerText();
+  const [, a, b] = q.match(/(\d+) × (\d+)/)!;
+  await page.getByLabel('Svar').fill(String(Number(a) * Number(b)));
+  await page.getByRole('button', { name: 'Gå in' }).click();
+  await page.getByLabel(/Veckans ord/).fill('hoppa\nsjö, Lund\ntjugo');
+  await expect(page.getByText('4 ord', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Spara veckans ord' }).click();
+  await shot(page, '7-vuxen');
+
+  await page.goto('./#/omrade/stavningstrasket');
+  await expect(page.locator('.veckans-banner')).toContainText('4 ord från skolan');
+  await shot(page, '8-kort');
+  await page.locator('.veckans-banner').getByRole('button', { name: 'Öva!' }).click();
+  for (let i = 0; i < 4; i++) {
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __said: string[] }).__said.length)).toBeGreaterThan(0);
+    const w = (await page.evaluate(() => (window as unknown as { __said: string[] }).__said.at(-1)!)).split('.')[0];
+    if (w === 'sjö') { // fel första gången
+      await type(page, 'schö');
+      await submit(page);
+      await expect(page.locator('.errcard')).toContainText('sj-ljudet');
+    }
+    await type(page, w);
+    await submit(page);
+    await expect(page.locator('.feedback.ok')).toBeVisible();
+    await page.evaluate(() => { (window as unknown as { __said: string[] }).__said.length = 0; });
+    await next(page);
+  }
+  await expect(page.getByRole('heading', { name: 'Veckans ord – bra kämpat!' })).toBeVisible();
+  await expect(page.getByText(/Öva lite extra på: sjö/)).toBeVisible();
+  await shot(page, '9-resultat');
+});

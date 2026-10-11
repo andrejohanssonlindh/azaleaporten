@@ -22,7 +22,7 @@ const reveals = (text: string, answer: string) =>
 
 const FITS: Record<Entry['rule'], RegExp> = {
   smaord: /./, dubbel: /(bb|dd|ff|gg|ll|mm|nn|pp|rr|ss|tt|vv)/, lang: /^[^]*$/, m: /(m$|mm)/, ck: /ck/, ng: /(ng|nk|gn)/,
-  j: /^(hj|dj|lj|gj|g[eiyäö]|j)/, sj: /(sj|skj|stj|sch|ch|sk[eiyäöa]|tion|ge$)/, tj: /(tj|kj|^k[eiyäö])/, oa: /o/, stor: /./, sammansatt: /./,
+  j: /^(hj|dj|lj|gj|g[eiyäö]|j)/, sj: /(sj|skj|stj|sch|ch|sk[eiyäöa]|tion|ge$)/, tj: /(tj|kj|^k[eiyäö])/, oa: /o/, stor: /./, sammansatt: /./, egen: /./,
 };
 
 describe('Stavningsträskets ord', () => {

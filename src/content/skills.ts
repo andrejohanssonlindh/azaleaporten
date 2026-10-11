@@ -55,6 +55,7 @@ const TAL = ['nollans', 'ettans', 'tvåans', 'treans', 'fyrans', 'femmans', 'sex
 export function skillLabel(skill: string): string {
   const [, svTopic, svRest] = /^sv\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
   if (svTopic === 'stav' && STAV[svRest]) return STAV[svRest];
+  if (svTopic === 'veckans') return `veckans ord "${svRest}"`;
   const [, topic, rest] = /^ma\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
   if (topic === 'tid' && TID[rest]) return TID[rest];
   if (topic === 'add' && ADD[rest]) return ADD[rest];

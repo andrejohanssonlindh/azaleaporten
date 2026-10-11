@@ -8,7 +8,7 @@ import { BackBar, Mentor, Screen } from './ui';
 
 // Uppdragstavlan i Azaleabyn: dagens tre uppdrag, sviten och dagens kista.
 
-const ICON: Record<Quest['kind'], string> = { dimma: '🌫️', ova: '🎯', framsteg: '🧗', klara: '⭐', ang: '🌼' };
+const ICON: Record<Quest['kind'], string> = { dimma: '🌫️', ova: '🎯', framsteg: '🧗', klara: '⭐', ang: '🌼', veckans: '📝' };
 
 function target(q: Quest, lastArea: string | undefined): string {
   switch (q.kind) {
@@ -17,6 +17,7 @@ function target(q: Quest, lastArea: string | undefined): string {
     case 'framsteg': return `spela/${q.areaId}/${q.nodeId}`;
     case 'klara': return lastArea ? `omrade/${lastArea}` : 'region/talbergen';
     case 'ang': return 'ovning';
+    case 'veckans': return 'veckans';
   }
 }
 

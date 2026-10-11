@@ -22,7 +22,7 @@ export const AREA: RecordSpec<AreaProgress> = { version: 1, defaults: () => ({ v
 export interface Answer { correct: boolean; ms: number; hint: boolean; fixed?: 'self' | 'shown' }
 
 export interface RunState {
-  kind: 'stage' | 'practice' | 'boss' | 'review';
+  kind: 'stage' | 'practice' | 'boss' | 'review' | 'veckans';
   areaId: string;
   nodeId: string;
   seed: number;
@@ -41,7 +41,7 @@ export interface RunState {
   lastHit?: Hit;
   /** Stigmonster i vanliga banor (saknas i rundor som startade före stigmonstren). */
   mob?: MobState;
-  /** Repetitionsrunda: färdigheten för varje fråga (bestäms när rundan startar). */
+  /** Repetitionsrunda och veckans ord: färdigheten för varje fråga (bestäms när rundan startar). */
   review?: string[];
   /** Områdets kunskaps-XP när rundan startade (för "ny kunskapsnivå" på resultatskärmen). */
   kxp0?: number;
@@ -56,6 +56,10 @@ export interface MobState { k: number; hp: number; maxHp: number; beaten: number
 
 /** Repetitionsrundor hör inte till stigen; de spelas på den här låtsasnoden. */
 export const REVIEW_NODE: StageDef = { type: 'stage', id: 'dimma', name: 'Glömskans dimma', icon: '🌫️', desc: 'Repetition', spec: { mode: '', level: 0 }, thrMs: 0 };
+/** Veckans ord (skolans stavningsord) spelas på en egen låtsasnod. */
+export const VECKANS_NODE: StageDef = { type: 'stage', id: 'veckans', name: 'Veckans ord', icon: '📝', desc: 'Skolans stavningsord', spec: { mode: '', level: 1 }, thrMs: 0 };
+/** Låtsasnoden för en runda som inte hör till stigen, annars undefined. */
+export const sideNode = (kind: RunState['kind']) => (kind === 'review' ? REVIEW_NODE : kind === 'veckans' ? VECKANS_NODE : undefined);
 
 export interface PlayState {
   v: number;
@@ -173,7 +177,7 @@ export function giveKastanjer(hid: string, n: number): number {
 /* ---------- rundor ---------- */
 
 export function runLength(run: RunState): number {
-  if (run.kind === 'review') return run.review?.length ?? PRACTICE_LENGTH;
+  if (run.kind === 'review' || run.kind === 'veckans') return run.review?.length ?? PRACTICE_LENGTH;
   return run.kind === 'practice' ? PRACTICE_LENGTH : run.kind === 'stage' ? RUN_LENGTH : Infinity;
 }
 
@@ -209,8 +213,8 @@ export function startRun(hid: string, area: AreaDef, node: PathNode, kind: RunSt
 }
 
 /** Startar en repetitionsrunda på givna färdigheter (en per fråga). */
-export function startReview(hid: string, area: AreaDef, skills: string[]): RunState {
-  const run: RunState = { kind: 'review', areaId: area.areaId, nodeId: REVIEW_NODE.id, seed: randomSeed(), index: 0, results: [], startedAt: new Date().toISOString(), xp: 0, levelUps: 0, review: skills, kxp0: getArea(hid, area.areaId).xp };
+export function startReview(hid: string, area: AreaDef, skills: string[], kind: 'review' | 'veckans' = 'review'): RunState {
+  const run: RunState = { kind, areaId: area.areaId, nodeId: sideNode(kind)!.id, seed: randomSeed(), index: 0, results: [], startedAt: new Date().toISOString(), xp: 0, levelUps: 0, review: skills, kxp0: getArea(hid, area.areaId).xp };
   const p = getPlay(hid);
   savePlay(hid, { ...p, run });
   return run;
@@ -249,7 +253,7 @@ export function currentQuestion(run: RunState, node: PathNode, game: GameModule)
 export function recordAnswer(hid: string, run: RunState, node: PathNode, a: Answer, skill: string, errTag?: string, skillArea = run.areaId): RunState {
   if (run.results.length > run.index) return run; // redan registrerat (t.ex. efter omladdning)
   const next: RunState = { ...run, results: [...run.results, a] };
-  const base = a.correct ? (run.kind === 'practice' || run.kind === 'review' ? XP.practiceCorrect : XP.correct) * (a.hint ? XP.hintFactor : 1) : 0;
+  const base = a.correct ? (run.kind === 'stage' || run.kind === 'boss' ? XP.correct : XP.practiceCorrect) * (a.hint ? XP.hintFactor : 1) : 0;
   const g = giveXP(hid, run.areaId, base);
   next.xp += g.xp;
   next.levelUps += g.levelUps;
@@ -364,6 +368,8 @@ export interface Outcome {
   mobs?: { beaten: number; blad: number };
   /** Färdigheter som sitter bättre än någonsin (behärskning) och kunskaps-XP de gav. */
   mastery?: { skills: string[]; xp: number };
+  /** Veckans ord: färdigheterna (orden) som blev fel första gången. */
+  missed?: string[];
   /** Områdets kunskap gick upp en eller flera nivåer; titles = nya kunskapstitlar. */
   kunskap?: { level: number; titles: string[] };
 }
@@ -381,7 +387,7 @@ export const nodeIlvl = (area: AreaDef, nodeId: string) => 1 + Math.floor(Math.m
 const areaIlvl = (area: AreaDef, p: AreaProgress) => Math.max(1, ...allNodes(area).filter((n) => nodeDone(p, n)).map((n) => nodeIlvl(area, n.id)));
 
 export function finishRun(hid: string, area: AreaDef, run: RunState, extras: { signature?: { name: string; slot: string; flavor: string } } = {}): Outcome {
-  const node = run.kind === 'review' ? REVIEW_NODE : findNode(area, run.nodeId)!;
+  const node = sideNode(run.kind) ?? findNode(area, run.nodeId)!;
   const correct = run.results.filter((r) => r.correct).length;
   const total = run.results.length;
   const avgMs = total ? run.results.reduce((s, r) => s + r.ms, 0) / total : 0;
@@ -389,7 +395,7 @@ export function finishRun(hid: string, area: AreaDef, run: RunState, extras: { s
   const o: Outcome = { kind: run.kind, correct, total, avgMs, usedHint, cleared: false, firstClear: false, stars: 0, newStars: 0,
     bossWon: false, firstWin: false, xp: run.xp, kastanjer: 0, levelUps: run.levelUps, tired: isTired(hid), gained: {}, chests: [],
     ...(run.mob ? { mobs: { beaten: run.mob.beaten, blad: run.mob.blad } } : {}) };
-  const ilvl = run.kind === 'review' ? areaIlvl(area, getArea(hid, area.areaId)) : nodeIlvl(area, run.nodeId);
+  const ilvl = sideNode(run.kind) ? areaIlvl(area, getArea(hid, area.areaId)) : nodeIlvl(area, run.nodeId);
   let chest: { minRarity: 0 | 1 | 2; boss?: boolean } | null = null;
   const reward = (r: { xp?: number; kastanjer?: number }) => {
     const g = giveXP(hid, run.areaId, r.xp ?? 0);
@@ -416,6 +422,10 @@ export function finishRun(hid: string, area: AreaDef, run: RunState, extras: { s
     if (o.firstClear) chest = { minRarity: stars === 3 ? 1 : 0 };
     else if (o.cleared && (stars === 3 && o.newStars > 0)) chest = { minRarity: 2 };
     else if (Math.random() < (o.cleared ? LOOT.replayClearChance : LOOT.failedRunChance)) chest = { minRarity: 0 };
+  } else if (run.kind === 'veckans') {
+    reward(REWARD.veckansDone);
+    o.missed = run.review!.filter((_, i) => run.results[i] && !run.results[i].correct);
+    if (Math.random() < LOOT.practiceChance) chest = { minRarity: 0 };
   } else if (run.kind === 'review') {
     reward(REWARD.reviewDone);
     if (Math.random() < LOOT.practiceChance) chest = { minRarity: 0 };

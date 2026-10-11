@@ -15,6 +15,7 @@ export interface SQ extends OrdQ { rule: Rule }
 
 export interface Entry { word: string; parts?: string[]; sentence: string; band: 1 | 2; x: string[]; rule: Rule }
 
+/** Reglerna med egna ordlistor ('egen' = veckans ord, som inte har någon lista här). */
 export const RULES = Object.keys(ORD) as Rule[];
 
 export const ENTRIES: Entry[] = (Object.entries(ORD) as [Rule, Row[]][]).flatMap(([rule, rows]) =>
@@ -47,6 +48,7 @@ const RULE_TAGS: Record<Rule, string[]> = {
   smaord: ['talsprak'], dubbel: ['enkel-konsonant'], lang: ['dubbel-konsonant', 'm-regeln'], m: ['m-regeln', 'enkel-konsonant'],
   ck: ['ck', 'enkel-konsonant'], ng: ['ng-ljud'], j: ['j-ljud'], sj: ['sj-ljud'], tj: ['tj-ljud'], oa: ['o-a'],
   stor: ['stor-bokstav', 'liten-bokstav'], sammansatt: ['sarskrivning'],
+  egen: ['enkel-konsonant', 'ck', 'ng-ljud', 'j-ljud', 'sj-ljud', 'tj-ljud', 'm-regeln', 'stor-bokstav', 'liten-bokstav', 'dubbel-konsonant'],
 };
 
 /* ---------- felstavningar ---------- */
@@ -90,22 +92,24 @@ const GEN: Record<string, (w: string, out: Alt[]) => void> = {
 /** Generatorerna i den ordning de prövas: regelns egen först, så att felet får regelns felkod. */
 const ORDER: Record<Rule, string[]> = {
   smaord: [], dubbel: ['enkel'], lang: ['dubbla'], m: ['dubbla', 'enkel'], ck: ['ck', 'enkel'], ng: ['ng'], j: ['j'],
-  sj: ['sj'], tj: ['tj'], oa: [], stor: [], sammansatt: [],
+  sj: ['sj'], tj: ['tj'], oa: [], stor: [], sammansatt: [], egen: ['enkel', 'ck', 'ng', 'j', 'sj', 'tj'],
 };
 const ALL_GENS = Object.keys(GEN);
+
+const isCap = (w: string) => w[0] !== w[0].toLocaleLowerCase('sv');
 
 /** Alla typiska felstavningar av ordet, med felkod. Regelns egna kommer först. */
 export function variants(e: Entry): Alt[] {
   const w = e.word;
   const out: Alt[] = e.x.map((text) => ({ text, err: e.rule === 'smaord' ? 'talsprak' : RULE_TAGS[e.rule][0] }));
-  if (e.rule === 'stor') out.push({ text: (w[0] === w[0].toLocaleUpperCase('sv') ? w[0].toLocaleLowerCase('sv') : w[0].toLocaleUpperCase('sv')) + w.slice(1), err: w[0] === w[0].toLocaleUpperCase('sv') ? 'stor-bokstav' : 'liten-bokstav' });
+  if (e.rule === 'stor' || (e.rule === 'egen' && isCap(w))) out.push({ text: (w[0] === w[0].toLocaleUpperCase('sv') ? w[0].toLocaleLowerCase('sv') : w[0].toLocaleUpperCase('sv')) + w.slice(1), err: w[0] === w[0].toLocaleUpperCase('sv') ? 'stor-bokstav' : 'liten-bokstav' });
   if (e.parts) out.push({ text: e.parts.join(' '), err: 'sarskrivning' }, { text: e.parts.join('-'), err: 'sarskrivning' });
   if (e.rule === 'oa') sub(w, /o/g, ['å'], 'o-a', out);
   const low = w.toLocaleLowerCase('sv');
   for (const g of [...ORDER[e.rule], ...ALL_GENS.filter((x) => !ORDER[e.rule].includes(x))]) {
     const o: Alt[] = [];
     GEN[g](low, o);
-    out.push(...(e.rule === 'stor' && w !== low ? o.map((a) => ({ ...a, text: w[0] + a.text.slice(1) })) : o));
+    out.push(...(w !== low ? o.map((a) => ({ ...a, text: w[0] + a.text.slice(1) })) : o));
   }
   const seen = new Set<string>([w]);
   return out.filter((a) => (seen.has(a.text) ? false : (seen.add(a.text), true)));
@@ -113,9 +117,13 @@ export function variants(e: Entry): Alt[] {
 
 /** De fel alternativ en fråga visar: regelns typiska fel, högst två (bara ett när reglerna ger ett bra). */
 export function distractors(e: Entry, trap?: string): Alt[] {
-  const own = variants(e).filter((a) => RULE_TAGS[e.rule].includes(a.err!) && !same(a.text, e.word, e.rule === 'stor'));
+  const strict = e.rule === 'stor' || (e.rule === 'egen' && isCap(e.word));
+  const own = variants(e).filter((a) => RULE_TAGS[e.rule].includes(a.err!) && !same(a.text, e.word, strict));
   const sorted = trap ? [...own.filter((a) => a.err === trap), ...own.filter((a) => a.err !== trap)] : own;
-  return sorted.slice(0, e.rule === 'lang' || e.rule === 'stor' ? 1 : 2);
+  const out = sorted.slice(0, e.rule === 'lang' || e.rule === 'stor' ? 1 : 2);
+  // Veckans ord som reglerna inte känner igen: ett alternativ med en bokstav för lite.
+  if (!out.length && e.word.length > 1) out.push({ text: e.word.slice(0, -1), err: 'bokstav-saknas' });
+  return out;
 }
 
 /* ---------- frågor ---------- */
@@ -125,7 +133,20 @@ const PROMPT_VAL: Partial<Record<Rule, string>> = {
   sammansatt: 'Ett ord eller två? Välj rätt.',
 };
 
+/** Veckans ord: läget 'ord:<ordet>' är ett ord som en vuxen skrivit in. */
+export const VECKANS_MODE = 'ord:';
+export const ownEntry = (word: string): Entry => ({ word, sentence: '', band: 1, x: [], rule: 'egen' });
+
+function ownQ(word: string, rng: Rng): SQ {
+  const e = ownEntry(word);
+  return {
+    mode: `${VECKANS_MODE}${word}`, level: 1, skill: `sv.veckans.${word}`, rule: 'egen', answer: word, caseStrict: isCap(word),
+    kind: 'skriv', prompt: 'Lyssna och skriv veckans ord.', alts: rng.shuffle([{ text: word }, ...distractors(e)]), say: `${word}. ${word}.`,
+  };
+}
+
 export function makeQ(spec: QuestionSpec, rng: Rng, ctx?: QuestionCtx): SQ {
+  if (spec.mode.startsWith(VECKANS_MODE)) return ownQ(spec.mode.slice(VECKANS_MODE.length), rng);
   const level = Math.max(0, Math.min(3, spec.level));
   const rules = MODES[spec.mode] ?? RULES;
   const band = (e: Entry) => level >= 2 || e.band === 1;
@@ -159,11 +180,12 @@ export function makeQ(spec: QuestionSpec, rng: Rng, ctx?: QuestionCtx): SQ {
 }
 
 export function specsForSkill(skill: string): QuestionSpec[] {
+  if (skill.startsWith('sv.veckans.')) return [{ mode: `${VECKANS_MODE}${skill.slice('sv.veckans.'.length)}`, level: 1 }];
   const rule = skill.split('.')[2] as Rule;
   return RULES.includes(rule) ? [{ mode: rule, level: 0 }, { mode: rule, level: 1 }] : [];
 }
 
-const entryOf = (q: SQ) => ENTRIES.find((e) => e.word === q.answer && e.rule === q.rule)!;
+const entryOf = (q: SQ) => (q.rule === 'egen' ? ownEntry(q.answer) : ENTRIES.find((e) => e.word === q.answer && e.rule === q.rule)!);
 
 /* ---------- diagnos ---------- */
 
@@ -248,11 +270,14 @@ const HINT: Record<Rule, string> = {
   oa: 'Ljudet låter å – men i många ord skrivs ljudet o.',
   stor: 'Namn på personer eller platser får stor bokstav. Dagar, månader, högtider eller språk får liten.',
   sammansatt: 'Två ord kan bli ett nytt ord. Då skrivs de ihop.',
+  egen: 'Säg ordet långsamt, ljud för ljud. Skriv ett ljud i taget.',
 };
 
 export function hint(q: SQ): string {
   const letters = q.answer.replace(/[\s-]/g, '').length;
-  return q.kind === 'skriv' ? `${HINT[q.rule]} Ordet har ${letters} bokstäver.` : HINT[q.rule];
+  // Veckans ord kan vara vilket ord som helst, så ledtråden har en reservformulering.
+  const base = q.rule === 'egen' ? avoid(q.answer, HINT.egen, 'Säg ordet långsamt. Skriv bokstav efter bokstav.') : HINT[q.rule];
+  return q.kind === 'skriv' ? `${base} Ordet har ${letters} bokstäver.` : base;
 }
 
 function tip(q: SQ): string {
@@ -270,6 +295,7 @@ function tip(q: SQ): string {
     case 'oa': return 'o som låter å.';
     case 'stor': return w[0] === w[0].toLocaleUpperCase('sv') ? 'Det är ett namn, så det får stor bokstav.' : 'Dagar, månader, högtider och språk har liten bokstav.';
     case 'sammansatt': return `Två ord blir ett: ${entryOf(q).parts!.join(' + ')}.`;
+    case 'egen': return 'Ett av veckans ord – det kommer tillbaka om några dagar, så att det fastnar.';
   }
 }
 

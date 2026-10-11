@@ -13,6 +13,8 @@ import { BackBar, Screen, Stars } from './ui';
 import { dueSkills } from '../platform/learning/skills';
 import { skillLabel } from '../content/skills';
 import { preloadGame } from './useGame';
+import { VECKANS_AREA } from '../platform/learning/veckans';
+import { VeckansCard } from './Veckans';
 
 // Ett område som en stig genom epoker: banor och bossar i tur och ordning.
 
@@ -62,6 +64,7 @@ export function AreaView({ id }: { id: string }) {
           <button class="btn small primary" onClick={() => go(`repetera/${id}`)}>Jaga bort den</button>
         </section>
       )}
+      {id === VECKANS_AREA && <VeckansCard hid={p.id} />}
       {next && <button class="btn primary big continue" onClick={() => tap(next)}>▶ {next.type === 'boss' ? `Möt ${bossName(id, next, p.grade)}` : `Spela: ${next.name}`}</button>}
 
       {area.eras.map((era) => (

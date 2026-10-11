@@ -4,6 +4,8 @@
 
 ## Done
 
+- **Ordskogen S2 – Veckans ord** (2026-10-11): in Vuxenläge → each hero, a parent types the school's weekly spelling words (one per line or comma-separated, max 20). The child gets a 📝 card in Stavningsträsket and on Övningsängen, a dictation run of all the words (falls back to choice without a Swedish voice), a result that names the missed words, and "Öva på veckans ord" as the first daily quest for 7 days. Every word is its own skill, so old lists come back as mist later. Custom words get the same diagnosis as the swamp's words (dubbelteckning, sj-ljud, stor bokstav …) and their hints/explanations never reveal the word. Tests: `tests/veckans.test.ts`, the last test in `e2e/stavning.spec.ts`.
+
 - **Mastery in kunskap levels** (PLAN §9.4, 2026-10-11): a skill that reaches a higher Leitner box than ever (only possible over days) gives its area 10/15/25/40 kunskap XP for box 2/3/4/5, once each, with no class/gear bonus; errors never take it back (`SkillItem.best`). Shown on the result screen (🧠 Sitter bättre än någonsin…) and as a toast in free practice. Kunskap level 5 and 10 give each area's two titles (`kunskap.titles` in every area's content), shown with the next title in Azaleagården → Kunskaper, which also shows how many skills sit "som berget". Two new wardrobe rewards: 💡 Visdomsljus (15 solid skills) and 🦉 Ugglemanteln (40). Tests: `tests/beharskning.test.ts`, `e2e/beharskning.spec.ts`.
 
 - **Ordskogen S1 – the ord engine and Stavningsträsket** (2026-10-11, plan in PLAN.md §14c):
@@ -108,7 +110,7 @@ Tests: `npm test` (Vitest, 226 tests; `tests/betongbukten.test.ts` covers the ge
 
 ## Next mission
 
-**Ordskogen S2: Veckans ord** – the parent types the school's weekly spelling words in Vuxenläge; they become a stage in Stavningsträsket and a quest from Mästare Kastanj. Then S3 Rimbäcken, S4 Meningssmedjan, S5 Ordklassernas tempel, S6 Berättelsebiblioteket + region boss (PLAN.md §14c). Still to verify on the kids' real devices: a Swedish voice on the Windows PCs (Chrome may not list voices that Edge sees).
+**Ordskogen S3 Rimbäcken**, then S4 Meningssmedjan, S5 Ordklassernas tempel, S6 Berättelsebiblioteket + region boss (PLAN.md §14c). Still to verify on the kids' real devices: a Swedish voice on the Windows PCs (Chrome may not list voices that Edge sees).
 
 Older options:
 

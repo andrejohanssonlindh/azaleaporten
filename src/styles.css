@@ -901,3 +901,8 @@ button.stat.on { border-color: var(--accent); }
 .skill-block { border-bottom: 1px solid var(--line); padding-bottom: 6px; }
 .skill-block .skill-row { border-bottom: none; padding-bottom: 2px; }
 .skill-sub { display: block; color: var(--muted); font-size: 13px; }
+
+/* Veckans ord */
+.veckans-banner { border: 2px solid var(--forest); background: color-mix(in srgb, var(--forest) 10%, var(--card)); }
+.veckans-editor { display: flex; flex-direction: column; gap: 6px; }
+.veckans-editor textarea { font: inherit; padding: 8px 10px; border-radius: 10px; border: 2px solid var(--line); background: var(--bg); color: var(--ink); resize: vertical; }
