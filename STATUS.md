@@ -1,6 +1,6 @@
 # Status – Azaleaporten
 
-*Updated 2026-10-11: Talbergen is complete (six areas + region boss), and the village has all four buildings. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
+*Updated 2026-10-11: Betongbukten (geometri) is complete: seven skateparks + region boss, with a calculator/notes toolbox. Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
 
 ## Done
 
@@ -35,6 +35,17 @@
   - **Bråkbageriet** (`src/games/brak/`): naming fractions from pies/bars, comparing, equivalent fractions, fraction of a number, + and − with the same denominator. Glufsgrisen (`storre-namnare`), Tårtmusen (`adderade-namnare`), Bagarmästarinnan.
   - **Talbergens topp** (`src/games/talbergen.ts`, `src/games/region.tsx`): the region boss (persona slot `talbergen.region`, Professor Pi in the public build) mixes questions from all six games (`mode: '<area>/<mode>'`). It opens on the region page after 3 area Mästare (`regionProgress()` in `src/content/areas.ts`). Mistakes there put mist on the area the question came from (`GameModule.areaOf`).
 - **The village is complete:** Azaleagården, Uppdragstavlan, Smedjan (now with the 🧿 Sköldamulett, which saves the streak for a missed day after the weekly frysdag) and **Biblioteket** (`#/biblioteket`: totals, and per area how sure each skill is plus what has been tricky lately).
+- **Betongbukten complete (geometri)** (`src/games/geometri/`, shared SVG helpers in `draw.tsx`), one drill game per Malmö skatepark, each with 2 monsters and a Mästare (generic personas in `src/content/bosses.ts`):
+  - **Fluffy** (`former/`): name shapes, "is this a …?" for rotated shapes, count corners/sides (incl. inward corners), find all of a kind. Grodan Dubbelhopp (`raknade-start-igen`), Snurrsnigeln (`vriden-form`).
+  - **Svampen** (`symmetri/`): mirror a grid figure (A/B/C: mirror, copy, wrong axis), lines of symmetry, repeating and growing patterns, mirroring in a coordinate grid. Kopiekatten (`flyttade`), Flamingon Snedvik (`diagonal`).
+  - **Oxie** (`langd/`): read a ruler (cm, half cm, mm; not starting at 0), length units, perimeter (incl. L-shapes), missing side. Mätmasken (`lasta-slutet`), Kantkrabban (`bara-tva-sidor`).
+  - **Sibbarp** (`vinklar/`): acute/right/obtuse, compare angles (arm length trap), protractor with two scales, turns ↔ degrees (skate tricks), missing angles (line, triangle, isosceles, around a point, quadrilateral). Bläckfisken Långarm (`langa-ben`), Sälen Bakfram (`fel-skala`).
+  - **Bryggeriet** (`area/`): count squares (incl. halves and a triangle on the grid), rectangle/triangle area, missing side, L-shapes. Kantkrypet (`raknade-omkrets`), Dubbeldraken (`glomde-halvera`).
+  - **Kroksbäck** (`kroppar/`): name solids (2D-name distractors, everyday objects), faces/edges/vertices with hidden edges dashed, cubes in isometric blocks and stairs, box volume, aquarium litres, l/dl/cl/ml/dm³/cm³. Ugglan Framsida (`bara-synliga`), Plusormen (`adderade`).
+  - **Stapelbäddsparken** (`cirklar/`): radius/diameter, circumference and area with π ≈ 3,14 (rounded to one decimal; the calculator's exact π is also accepted via `DrillQ.tol`), half and quarter circles, rolling wheels, circumference → diameter, scale 1:k and k:1. Diameterduvan (`radie-diameter`), Piraten Pi-lös (`glomde-pi`).
+  - **Region boss** `src/games/geometri/betongbukten.ts` (persona slot `betongbukten.region`, Coach Kurva in the public build), 3 park Mästare to unlock.
+  - **Toolbox** (`src/engines/drill/Tools.tsx`): a question with `tools: 'kladd'` gets ✏️ Rita (a scratch canvas, fresh per question), 📝 Anteckna (text notes kept between questions) and 📒 Formler (`DrillGame.notes(q)`); `tools: 'raknare'` adds 🧮 a calculator (expression with precedence, π, x², parentheses, a tape of the last 4 results; keyboard works when it has focus). The open tab is remembered. Only harder stages get tools (circles always; area/volume/scale/perimeter at higher levels), so arithmetic practice elsewhere isn't bypassed.
+  - Engine: `DrillQ.tol` (accepted deviation), `isRight()` in `check.ts`; multiple choice with word labels gets smaller buttons; text parts that aren't operators render as units.
 - **Phase 4, the learning loop** (`src/platform/learning/`):
   - `skills.ts`: a Leitner schedule per skill id (`h:<id>:skills`). Boxes 0–5 = 1, 1, 2, 4, 8, 16 days. Right when due = one box up (at most once a day), wrong = two boxes down and back tomorrow (not today: the child just corrected it). Fed by every first answer in runs, bosses, reviews and free practice. Heroes from before the schedule get it built from the event log; the v0.1 import makes old mistakes due at once.
   - **Glömskans dimma**: on the island map (per region, with a count), on region cards, on the area page (banner with "Jaga bort den"), and on the hero sheet.
@@ -43,13 +54,13 @@
   - **Mästare Kastanj** (`src/shell/Kastanj.tsx`) says how the last run went and what the mist covers, with [Ja, kör!] and [Visa uppdragen]. Skill names live in `src/content/skills.ts`.
   - The event log moved to `src/platform/learning/events.ts`.
 
-Tests: `npm test` (Vitest, 121 tests; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
+Tests: `npm test` (Vitest, 163 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
 
 ## Next mission
 
-Talbergen and the village are done. Options, to pick with the user:
-1. **Vuxenläge, Phase 6**: the skills map (green/yellow/red per skill from `h:<id>:skills`, the most common error tags from the event log), time per day, quests done, install guides, quota and multi-tab guards. Much of it can reuse `src/shell/Biblioteket.tsx`.
-2. **Betongbukten** (geometri, the Malmö skateparks): Fluffy → … → Stapelbäddsparken. Shapes, symmetry, perimeter, angles, area, volume. Needs drawn shapes as Visuals; the drill engine (choices + numbers) fits most of it.
+Talbergen, Betongbukten and the village are done. Options, to pick with the user:
+1. **Lazy-load games per area**: the main JS chunk is now ~126 KB gzipped (budget 150 KB for the app). Do this before adding more content.
+2. **Vuxenläge, Phase 6**: the skills map (green/yellow/red per skill from `h:<id>:skills`, the most common error tags from the event log), time per day, quests done, install guides, quota and multi-tab guards. Much of it can reuse `src/shell/Biblioteket.tsx`.
 3. Svenska/engelska (wordpack engine) – the user put this on hold.
 
 Smaller things:
@@ -66,14 +77,14 @@ Tiokompisbron, Tabellgruvan, Myntmarknaden, Tallinjebron and Bråkbageriet are t
 
 ## Next after that (in PLAN.md order)
 
-- Betongbukten (geometri, the Malmö skateparks): Fluffy → … → Stapelbäddsparken.
 - Ordskogen (svenska) and Västerön (engelska), via a wordpack engine with JSON content.
 - Biblioteket: the child's own statistics (common mistakes per skill).
-- Teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`).
+- Teacher personas in the family pack (`../privat/familjepaket/`, `npm run pack:encrypt`), now also the seven park Mästare and `betongbukten.region`.
 
 ## Known minor things
 
-- Games are bundled into the main chunk (about 82 KB gzipped in total). Lazy-load them per area when the bundle nears the 150 KB budget.
+- Games are bundled into the main chunk (about 126 KB gzipped JS + 9 KB CSS). Lazy-load them per area next (see above).
+- On a phone the calculator sits below the answer box, so the child scrolls between them. Fine for now; a floating panel could come later.
 - Read-aloud of drill questions isn't there yet (the 🔊 button exists only on mentor text).
 - `e2e/loot.spec.ts` failed once (2 "Ta av" buttons after one "Använd"), then passed 3/3 reruns. Possibly a double render in Azaleagården; worth a look if it recurs.
 

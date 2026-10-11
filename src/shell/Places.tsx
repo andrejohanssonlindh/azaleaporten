@@ -103,11 +103,11 @@ export function RegionView({ id }: { id: string }) {
           const name = personaFor(boss.personaId ?? '', gate.value?.pack ?? null, p.grade)?.name ?? boss.name;
           return (
             <button key={def.areaId} class={`region-boss${lock.open ? '' : ' locked'}`}
-              onClick={() => (lock.open ? go(`spela/${def.areaId}/${boss.id}`) : toast(`🔒 Besegra ${lock.need} av bergets Mästare först (${lock.have}/${lock.need}).`))}>
+              onClick={() => (lock.open ? go(`spela/${def.areaId}/${boss.id}`) : toast(`🔒 Besegra ${lock.need} av ${r.name}s Mästare först (${lock.have}/${lock.need}).`))}>
               <span class="area-icon">{lock.open ? boss.icon : '🔒'}</span>
               <span class="area-text">
                 <b>{def.title}: {name}</b>
-                <small>{won ? 'Besegrad! Du kan utmana igen.' : lock.open ? 'Stigen är öppen. Vågar du?' : `Besegra ${lock.need} av bergets Mästare (${lock.have}/${lock.need}).`}</small>
+                <small>{won ? 'Besegrad! Du kan utmana igen.' : lock.open ? 'Stigen är öppen. Vågar du?' : `Besegra ${lock.need} av ${r.name}s Mästare (${lock.have}/${lock.need}).`}</small>
               </span>
             </button>
           );

@@ -29,6 +29,22 @@ const BRAK: Record<string, string> = {
   'jamfor-halv': 'mer eller mindre än en halv', likvardiga: 'likvärdiga bråk', 'del-av': 'del av ett antal',
   addera: 'plus med bråk', subtrahera: 'minus med bråk',
 };
+const GEO: Record<string, string> = {
+  'former-grund': 'cirkel, triangel, kvadrat och rektangel', manghorningar: 'månghörningarna', fyrhorningar: 'fyrhörningarna',
+  'former-vridna': 'former som ligger snett', horn: 'hörn och sidor', 'horn-kluriga': 'hörn på kluriga former', sortera: 'att hitta alla av en form',
+  spegla: 'att spegla figurer', symmetrisk: 'symmetriska figurer', symmetrilinjer: 'symmetrilinjer', 'monster-upprepa': 'mönster som upprepas',
+  'monster-vaxande': 'växande mönster', 'spegla-koordinat': 'spegling i koordinatsystem',
+  linjal: 'att mäta med linjal', 'linjal-mm': 'millimeter på linjalen', langdenheter: 'längdenheter', 'langdenheter-decimal': 'längdenheter med decimaler',
+  omkrets: 'omkrets', 'omkrets-kluriga': 'omkrets på kluriga figurer', 'omkrets-saknad': 'sidan som fattas i omkretsen',
+  'vinkel-namn': 'vinklarnas namn', 'vinkel-jamfor': 'att jämföra vinklar', gradskiva: 'gradskivan', varv: 'varv och grader',
+  'vinklar-linje': 'vinklar längs en linje', 'vinklar-triangel': 'vinklarna i en triangel', 'vinklar-runt': 'vinklar runt en punkt och i fyrhörningar',
+  'area-rutor': 'area i rutor', 'area-halva': 'halva rutor och trianglar på rutat papper', 'area-rektangel': 'rektangelns area',
+  'area-decimal': 'area med decimaltal', 'area-saknad': 'sidan som fattas i arean', 'area-triangel': 'triangelns area', 'area-sammansatt': 'sammansatta figurer',
+  'kroppar-namn': 'kropparnas namn', 'kroppar-vardag': 'kroppar i vardagen', 'kroppar-delar': 'sidoytor, kanter och hörn',
+  'volym-kuber': 'volym i kuber', 'volym-ratblock': 'rätblockets volym', 'volym-liter': 'volym i liter', volymenheter: 'liter, deciliter och milliliter',
+  'radie-diameter': 'radie och diameter', 'cirkel-omkrets': 'cirkelns omkrets', 'cirkel-area': 'cirkelns area', 'cirkel-delar': 'halv- och kvartscirklar',
+  skala: 'skala', 'skala-forstoring': 'förstoring i skala',
+};
 const TAL = ['nollans', 'ettans', 'tvåans', 'treans', 'fyrans', 'femmans', 'sexans', 'sjuans', 'åttans', 'nians', 'tians', 'elvans', 'tolvans'];
 
 export function skillLabel(skill: string): string {
@@ -38,6 +54,7 @@ export function skillLabel(skill: string): string {
   if (topic === 'sub' && SUB[rest]) return SUB[rest];
   if (topic === 'pengar' && PENGAR[rest]) return PENGAR[rest];
   if (topic === 'brak' && BRAK[rest]) return BRAK[rest];
+  if (topic === 'geo' && GEO[rest]) return GEO[rest];
   if (LINJE[`${topic}.${rest}`]) return LINJE[`${topic}.${rest}`];
   if (topic === 'mult' && TAL[Number(rest)]) return `${TAL[Number(rest)]} tabell`;
   if (topic === 'div' && /^\d+$/.test(rest)) return `delat med ${rest}`;

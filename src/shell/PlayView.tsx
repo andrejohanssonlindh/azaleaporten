@@ -12,6 +12,7 @@ import { levelTitle } from '../platform/rpg/balance';
 import type { BossDef, PathNode } from '../platform/rpg/types';
 import { playable, regionProgress } from '../content/areas';
 import { personaFor } from '../content/bosses';
+import { region as regionById } from '../content/world';
 import { leaveToPicker } from '../session';
 import { Portrait, Screen, Stars } from './ui';
 import { ItemCard } from './Loot';
@@ -100,7 +101,7 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
         <div class="result-card">
           <div class="big-emoji">🔒</div>
           <h1>Stigen är stängd</h1>
-          <p>Besegra {lock.need} av bergets Mästare först. Du har besegrat {lock.have}.</p>
+          <p>Besegra {lock.need} av {regionById(area.region!.id)?.name}s Mästare först. Du har besegrat {lock.have}.</p>
           <button class="btn primary" onClick={() => go(back)}>Tillbaka</button>
         </div>
       </Screen>

@@ -199,6 +199,9 @@ const PET_STAT: Record<string, Stat> = {
   'glomd-tia': 'kraft', 'lanade-inte': 'skydd', plus: 'tur', 'noll-ett': 'klurighet', granntabell: 'snabbhet',
   'raknade-antal': 'tur', 'fem-regeln': 'klurighet', teckenfel: 'skydd',
   'storre-namnare': 'kraft', 'adderade-namnare': 'snabbhet',
+  'raknade-start-igen': 'snabbhet', 'vriden-form': 'klurighet', flyttade: 'tur', diagonal: 'skydd', 'lasta-slutet': 'kraft', 'bara-tva-sidor': 'skydd',
+  'langa-ben': 'kraft', 'fel-skala': 'klurighet', 'raknade-omkrets': 'skydd', 'glomde-halvera': 'kraft', 'bara-synliga': 'tur', adderade: 'snabbhet',
+  'radie-diameter': 'snabbhet', 'glomde-pi': 'tur',
 };
 
 /** Ger husdjursföremålet för en tämjd boss (om det inte redan finns). */

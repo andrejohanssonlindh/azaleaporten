@@ -19,13 +19,16 @@ export function parseAnswer(s: string): number | null {
 /** Samma tal (decimaltal jämförs utan avrundningsfel). */
 export const sameNumber = (a: number, b: number) => Math.abs(a - b) < 1e-9;
 
+/** Rätt svar? Inom q.tol om frågan tillåter avrundning. */
+export const isRight = (q: DrillQ, given: number) => Math.abs(given - q.answer) <= (q.tol ?? 1e-9);
+
 /** Tal som svenska barn skriver dem: decimalkomma och riktigt minustecken. */
 export const fmtNum = (n: number) => String(Math.round(n * 1000) / 1000).replace('.', ',').replace('-', '−');
 
 export function diagnoseAny<Q extends DrillQ>(g: DrillGame<Q>, q: Q, given: number): string {
   const tag = g.diagnose(q, given);
   if (tag) return tag;
-  if (Number.isInteger(q.answer) && q.answer >= 10 && given !== q.answer && reversed(given) === q.answer) return 'omvanda-siffror';
+  if (Number.isInteger(q.answer) && Number.isInteger(given) && q.answer >= 10 && given !== q.answer && reversed(given) === q.answer) return 'omvanda-siffror';
   return 'annat';
 }
 

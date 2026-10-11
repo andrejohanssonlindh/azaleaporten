@@ -7,6 +7,13 @@ import { tabellerGame } from '../src/games/tabeller';
 import { pengarGame } from '../src/games/pengar';
 import { tallinjeGame } from '../src/games/tallinje';
 import { brakGame } from '../src/games/brak';
+import { formerGame } from '../src/games/geometri/former';
+import { symmetriGame } from '../src/games/geometri/symmetri';
+import { langdGame } from '../src/games/geometri/langd';
+import { vinklarGame } from '../src/games/geometri/vinklar';
+import { areaGame } from '../src/games/geometri/area';
+import { kropparGame } from '../src/games/geometri/kroppar';
+import { cirklarGame } from '../src/games/geometri/cirklar';
 import { diagnose as diagP, makeQ as makeP, type PQ } from '../src/games/pengar/logic';
 import { diagnose as diagL, makeQ as makeL, type LQ } from '../src/games/tallinje/logic';
 import { diagnose as diagB, makeQ as makeB, type BQ } from '../src/games/brak/logic';
@@ -19,6 +26,9 @@ import { allNodes, type QuestionSpec } from '../src/platform/rpg/types';
 const GAMES: Record<string, DrillGame<DrillQ>> = {
   tiokompis: tiokompisGame as unknown as DrillGame<DrillQ>, tabeller: tabellerGame as unknown as DrillGame<DrillQ>,
   pengar: pengarGame as unknown as DrillGame<DrillQ>, tallinje: tallinjeGame as unknown as DrillGame<DrillQ>, brak: brakGame as unknown as DrillGame<DrillQ>,
+  former: formerGame as unknown as DrillGame<DrillQ>, symmetri: symmetriGame as unknown as DrillGame<DrillQ>, langd: langdGame as unknown as DrillGame<DrillQ>,
+  vinklar: vinklarGame as unknown as DrillGame<DrillQ>, area: areaGame as unknown as DrillGame<DrillQ>, kroppar: kropparGame as unknown as DrillGame<DrillQ>,
+  cirklar: cirklarGame as unknown as DrillGame<DrillQ>,
 };
 
 const blanks = (parts: Part[]) => parts.reduce<number>((s, p) => s + (p === null ? 1 : typeof p === 'object' ? ((p as Frac).n === null ? 1 : 0) + ((p as Frac).d === null ? 1 : 0) : 0), 0);

@@ -40,7 +40,7 @@ export function Ovning() {
       ) : (
         <Mentor text={node
           ? `Ingen dimma i sikte – allt sitter fint! Vill du ändå öva? Senast spelade du "${node.name}" i ${pl!.def.title}. Inga stjärnor här – bara träning.`
-          : 'Här på ängen repeterar vi det du har lärt dig. Spela något först – till exempel i Talbergen – så kan vi öva på det här sedan.'} />
+          : 'Här på ängen repeterar vi det du har lärt dig. Spela något först – till exempel i Talbergen eller Betongbukten – så kan vi öva på det här sedan.'} />
       )}
       {node ? (
         <button class={`btn big continue${mist.length ? '' : ' primary'}`} onClick={() => go(`ovning/${last!.areaId}/${node.id}`)}>🎯 Repetera {node.name} ({PRACTICE_LENGTH} frågor)</button>

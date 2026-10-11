@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { GameModule, QuestionViewProps } from '../../platform/rpg/types';
-import { diagnoseAny, errLabel, explainAny, fmtNum, parseAnswer, sameNumber } from './check';
+import { diagnoseAny, errLabel, explainAny, fmtNum, isRight, parseAnswer, sameNumber } from './check';
+import { Tools } from './Tools';
 import type { DrillGame, DrillQ, Explained, Frac, Part } from './types';
 
 // En drillfråga. Samma flöde som klockfrågorna: öppen → (fel) rätta → klar.
@@ -35,7 +36,7 @@ function Equation(slot: SlotProps) {
         p === null ? <Slot key={i} {...slot} />
           : isFrac(p) ? <FracView key={i} f={p} slot={slot} />
             : typeof p === 'number' ? <span key={i} class="eq-num">{fmtNum(p)}</span>
-              : <span key={i} class={p.length > 2 ? 'eq-unit' : 'eq-op'}>{p}</span>)}
+              : <span key={i} class={/^[+−·/=<>:≈]$/.test(p) ? 'eq-op' : 'eq-unit'}>{p}</span>)}
     </div>
   );
 }
@@ -59,7 +60,7 @@ export function makeDrillView<Q extends DrillQ>(g: DrillGame<Q>) {
     function check(given: number) {
       if (phase === 'done') return;
       setWarn('');
-      const correct = sameNumber(given, q.answer);
+      const correct = isRight(q, given);
       const tag = correct ? undefined : diagnoseAny(g, q, given);
       if (phase === 'open') onAnswer({ correct, ms: Math.round(performance.now() - t0.current), errTag: tag, hint });
       if (correct) { setPhase('done'); return; }
@@ -102,7 +103,7 @@ export function makeDrillView<Q extends DrillQ>(g: DrillGame<Q>) {
           )}
         </form>
         {q.choices && phase !== 'done' && (
-          <div class="drill-choices" role="group" aria-label="Välj svar">
+          <div class={`drill-choices${q.choices.some((c) => c.label.length > 3) ? ' words' : ''}`} role="group" aria-label="Välj svar">
             {q.choices.map((c) => (
               <button key={c.label} type="button" class={`btn drill-choice${wrongChoices.includes(c.value) ? ' wrong' : ''}`}
                 disabled={wrongChoices.includes(c.value)} onClick={() => check(c.value)}>{c.label}</button>
@@ -120,6 +121,7 @@ export function makeDrillView<Q extends DrillQ>(g: DrillGame<Q>) {
         )}
         {phase === 'done' && <p class="explain">{g.solution(q)}</p>}
         {phase === 'done' && <button ref={nextRef} class="btn primary big next-btn" onClick={next}>{nextLabel}</button>}
+        {q.tools && <Tools qKey={raw} calcOn={q.tools === 'raknare'} notes={g.notes?.(q) ?? []} />}
       </div>
     );
   };

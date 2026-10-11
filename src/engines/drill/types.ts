@@ -27,7 +27,14 @@ export interface DrillQ {
   choices?: Choice[];
   /** Svaret kan vara negativt (ger en ±-knapp) eller ha decimaler (decimaltangentbord). */
   keypad?: 'int' | 'signed' | 'decimal';
+  /** Hur mycket svaret får avvika (t.ex. när man räknar med π ≈ 3,14 eller med räknarens π). */
+  tol?: number;
+  /** Verktyg vid frågan: 'kladd' = rita, anteckna och formler; 'raknare' = dessutom en räknare. */
+  tools?: 'kladd' | 'raknare';
 }
+
+/** En rad på formelkortet, t.ex. { name: 'Cirkelns omkrets', text: 'O = π · d' }. */
+export interface Note { name: string; text: string }
 
 export interface Explained { title: string; text: string }
 
@@ -45,6 +52,8 @@ export interface DrillGame<Q extends DrillQ = DrillQ> {
   Visual?: ComponentType<{ q: Q; hint: boolean; done: boolean }>;
   /** Frågeinställningar som brukar ge en viss färdighet. */
   specsForSkill(skill: string): QuestionSpec[];
+  /** Formelkortet som visas bland verktygen (bara för frågor med q.tools). */
+  notes?(q: Q): Note[];
   /** Etiketter för spelets felkoder (bossintro och statistik). */
   errLabels: Record<string, string>;
 }

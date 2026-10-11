@@ -15,6 +15,21 @@ import { TALLINJEBRON } from '../games/tallinje/content';
 import { tallinje } from '../games/tallinje';
 import { BRAKBAGERIET } from '../games/brak/content';
 import { brak } from '../games/brak';
+import { BETONGBUKTENS_TOPP } from '../games/geometri/betongbukten';
+import { FLUFFY } from '../games/geometri/former/content';
+import { former } from '../games/geometri/former';
+import { SVAMPEN } from '../games/geometri/symmetri/content';
+import { symmetri } from '../games/geometri/symmetri';
+import { OXIE } from '../games/geometri/langd/content';
+import { langd } from '../games/geometri/langd';
+import { SIBBARP } from '../games/geometri/vinklar/content';
+import { vinklar } from '../games/geometri/vinklar';
+import { BRYGGERIET } from '../games/geometri/area/content';
+import { area } from '../games/geometri/area';
+import { KROKSBACK } from '../games/geometri/kroppar/content';
+import { kroppar } from '../games/geometri/kroppar';
+import { STAPELBADDSPARKEN } from '../games/geometri/cirklar/content';
+import { cirklar } from '../games/geometri/cirklar';
 
 // Spelbara områden: områdets innehåll + spelet som levererar frågorna.
 const AREAS: Record<string, { def: AreaDef; game: GameModule }> = {
@@ -24,14 +39,22 @@ const AREAS: Record<string, { def: AreaDef; game: GameModule }> = {
   myntmarknaden: { def: MYNTMARKNADEN, game: pengar },
   tallinjebron: { def: TALLINJEBRON, game: tallinje },
   brakbageriet: { def: BRAKBAGERIET, game: brak },
+  fluffy: { def: FLUFFY, game: former },
+  svampen: { def: SVAMPEN, game: symmetri },
+  oxie: { def: OXIE, game: langd },
+  sibbarp: { def: SIBBARP, game: vinklar },
+  bryggeriet: { def: BRYGGERIET, game: area },
+  kroksback: { def: KROKSBACK, game: kroppar },
+  stapelbaddsparken: { def: STAPELBADDSPARKEN, game: cirklar },
 };
 
 // Regionbossar: en blandning av regionens spel.
-const talbergenGames = Object.fromEntries(REGIONS.find((r) => r.id === 'talbergen')!.areas.filter((a) => AREAS[a.id]).map((a) => [a.id, AREAS[a.id].game]));
+const gamesOf = (region: string) => Object.fromEntries(REGIONS.find((r) => r.id === region)!.areas.filter((a) => AREAS[a.id]).map((a) => [a.id, AREAS[a.id].game]));
 
 export const PLAYABLE: Record<string, { def: AreaDef; game: GameModule }> = {
   ...AREAS,
-  talbergen: { def: TALBERGEN_TOPPEN, game: regionGame('talbergen', talbergenGames) },
+  talbergen: { def: TALBERGEN_TOPPEN, game: regionGame('talbergen', gamesOf('talbergen')) },
+  betongbukten: { def: BETONGBUKTENS_TOPP, game: regionGame('betongbukten', gamesOf('betongbukten')) },
 };
 
 export const playable = (areaId: string) => PLAYABLE[areaId];
