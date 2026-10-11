@@ -1,6 +1,8 @@
 import { getHeroState, heroKey, saveHeroState } from '../profiles';
 import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
-import { getArea, giveXP, saveArea, type LogEvent } from '../rpg/progress';
+import { getArea, giveXP, saveArea } from '../rpg/progress';
+import { logEvents, type LogEvent } from '../learning/events';
+import { seedSkills } from '../learning/skills';
 import { TIDSTORNET, V01_STAGE_MAP } from '../../games/klocka/content';
 import { parseAny } from '../../games/klocka/logic/parse';
 import { phraseKind, structs } from '../../games/klocka/logic/language';
@@ -100,14 +102,13 @@ export function importV01(hid: string, from: string, data: V01Player): ImportSum
   saveRecord(heroKey(hid, 'g:klocka'), KLOCKA_GAME, { ...g, skins: [...new Set([...g.skins, ...(camp.skins ?? [])])], skin: camp.skin ?? g.skin });
 
   // Gamla svar blir händelser, så att repetitionen vet vad som var svårt.
-  const EVENTS: RecordSpec<{ v: number; log: LogEvent[] }> = { version: 1, defaults: () => ({ v: 1, log: [] }) };
-  const ev = loadRecord(heroKey(hid, 'events'), EVENTS).value;
   const t = new Date().toISOString();
   const old: LogEvent[] = (data.results ?? []).slice(-1000).map((r) => ({
     t, a: 'tidstornet', n: 'v01', k: skillFromTarget(r), c: !!r.correct, ms: r.timeMs ?? 0,
     ...(r.err ? { e: r.err } : {}), ...(r.hint ? { h: true } : {}),
   }));
-  saveRecord(heroKey(hid, 'events'), EVENTS, { ...ev, log: [...old, ...ev.log].slice(-3000) });
+  logEvents(hid, old, true);
+  seedSkills(hid, old);
   sum.events = old.length;
   return sum;
 }

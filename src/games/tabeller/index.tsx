@@ -1,6 +1,6 @@
 import { drillModule } from '../../engines/drill/DrillView';
 import type { DrillGame } from '../../engines/drill/types';
-import { diagnose, ERR, explain, hint, makeQ, solution, type MQ } from './logic';
+import { diagnose, ERR, explain, hint, makeQ, solution, specsForSkill, type MQ } from './logic';
 
 // Tabellgruvan som frågefabrik.
 
@@ -19,6 +19,6 @@ function Array2D({ q, hint: showHint }: { q: MQ; hint: boolean; done: boolean })
   );
 }
 
-export const tabellerGame: DrillGame<MQ> = { id: 'tabeller', make: makeQ, diagnose, explain, solution, hint, Visual: Array2D, errLabels: ERR };
+export const tabellerGame: DrillGame<MQ> = { id: 'tabeller', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: Array2D, errLabels: ERR };
 
 export const tabeller = drillModule(tabellerGame);

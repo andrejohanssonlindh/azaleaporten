@@ -1,6 +1,6 @@
 import { drillModule } from '../../engines/drill/DrillView';
 import type { DrillGame } from '../../engines/drill/types';
-import { diagnose, ERR, explain, hint, makeQ, solution, type TQ } from './logic';
+import { diagnose, ERR, explain, hint, makeQ, solution, specsForSkill, type TQ } from './logic';
 
 // Tiokompisbron som frågefabrik.
 
@@ -34,6 +34,6 @@ function TenFrames({ q, hint: showHint }: { q: TQ; hint: boolean; done: boolean 
   );
 }
 
-export const tiokompisGame: DrillGame<TQ> = { id: 'tiokompis', make: makeQ, diagnose, explain, solution, hint, Visual: TenFrames, errLabels: ERR };
+export const tiokompisGame: DrillGame<TQ> = { id: 'tiokompis', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: TenFrames, errLabels: ERR };
 
 export const tiokompis = drillModule(tiokompisGame);

@@ -32,6 +32,8 @@ export interface DrillGame<Q extends DrillQ = DrillQ> {
   hint(q: Q): string;
   /** Bild som stöd, t.ex. tiorutor eller prickar. */
   Visual?: ComponentType<{ q: Q; hint: boolean; done: boolean }>;
+  /** Frågeinställningar som brukar ge en viss färdighet. */
+  specsForSkill(skill: string): QuestionSpec[];
   /** Etiketter för spelets felkoder (bossintro och statistik). */
   errLabels: Record<string, string>;
 }

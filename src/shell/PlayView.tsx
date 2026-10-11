@@ -3,8 +3,11 @@ import { chestModal, dataRev, gate, go, heroId, toast, touch } from '../state';
 import { getHeroState, getProfile } from '../platform/profiles';
 import {
   abandonRun, advance, currentQuestion, findNode, finishRun, getPlay, hintsLeft, nextOpenNode, getArea,
-  recordAnswer, recordFixed, runLength, runOver, startRun, useHint, type Outcome, type RunState,
+  recordAnswer, recordFixed, REVIEW_NODE, runLength, runOver, startReview, startRun, useHint, type Outcome, type RunState,
 } from '../platform/rpg/progress';
+import { reviewPlan } from '../platform/learning/skills';
+import { noteRun, type QuestNews } from '../platform/learning/quests';
+import { PRACTICE_LENGTH } from '../platform/rpg/balance';
 import { levelTitle } from '../platform/rpg/balance';
 import type { BossDef, PathNode } from '../platform/rpg/types';
 import { playable } from '../content/areas';
@@ -33,6 +36,11 @@ const pickLine = (lines: string[]) => (lines.length ? lines[Math.floor(Math.rand
 function resumeOrStart(hid: string, areaId: string, node: PathNode, kind: RunState['kind']): RunState | null {
   const pl = playable(areaId)!;
   const ex = getPlay(hid).run;
+  if (kind === 'review') {
+    if (ex && ex.kind === 'review' && ex.areaId === areaId && !runOver(ex)) return ex.results.length > ex.index ? advance(hid, ex) : ex;
+    const plan = reviewPlan(hid, areaId, PRACTICE_LENGTH);
+    return plan.length ? startReview(hid, pl.def, plan) : null;
+  }
   if (ex && ex.areaId === areaId && ex.nodeId === node.id && ex.kind === kind && !runOver(ex)) {
     // Svarade men hann inte trycka Nästa innan omladdning: gå vidare.
     return ex.results.length > ex.index ? advance(hid, ex) : ex;
@@ -41,15 +49,16 @@ function resumeOrStart(hid: string, areaId: string, node: PathNode, kind: RunSta
   return startRun(hid, pl.def, node, kind);
 }
 
-export function PlayView({ areaId, nodeId, practice = false }: { areaId: string; nodeId: string; practice?: boolean }) {
+export function PlayView({ areaId, nodeId, practice = false, review = false }: { areaId: string; nodeId: string; practice?: boolean; review?: boolean }) {
   dataRev.value;
   const hid = heroId.value;
   const p = hid ? getProfile(hid) : null;
   const pl = playable(areaId);
-  const node = pl && findNode(pl.def, nodeId);
-  const kind: RunState['kind'] = practice ? 'practice' : node?.type === 'boss' ? 'boss' : 'stage';
+  const node = pl && (review ? REVIEW_NODE : findNode(pl.def, nodeId));
+  const kind: RunState['kind'] = review ? 'review' : practice ? 'practice' : node?.type === 'boss' ? 'boss' : 'stage';
   const [run, setRun] = useState<RunState | null>(() => (p && node ? resumeOrStart(p.id, areaId, node, kind) : null));
   const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const [news, setNews] = useState<QuestNews | null>(null);
   const [hintIdx, setHintIdx] = useState<number | null>(null);
   const [bossLine, setBossLine] = useState<string>('');
   const [confirmQuit, setConfirmQuit] = useState(false);
@@ -58,13 +67,30 @@ export function PlayView({ areaId, nodeId, practice = false }: { areaId: string;
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   if (!pl || !node) { queueMicrotask(() => go('karta')); return null; }
   const area = pl.def;
-  const era = area.eras.find((e) => e.nodes.some((n) => n.id === node.id))!;
+  const era = area.eras.find((e) => e.nodes.some((n) => n.id === node.id));
   const boss = node.type === 'boss' ? node : null;
   const face = boss ? bossFace(areaId, boss, p.grade) : null;
-  const back = practice ? 'ovning' : `omrade/${areaId}`;
+  const back = practice || review ? 'ovning' : `omrade/${areaId}`;
 
   /* ---------- resultat ---------- */
-  if (outcome) return <Result o={outcome} areaId={areaId} node={node} face={face} practice={practice} onAgain={() => { setOutcome(null); setBossLine(''); setRun(boss && !practice ? null : startRun(p.id, area, node, kind)); }} />;
+  if (outcome) {
+    return <Result o={outcome} news={news} areaId={areaId} node={node} face={face} practice={practice || review}
+      onAgain={review ? null : () => { setOutcome(null); setNews(null); setBossLine(''); setRun(boss && !practice ? null : startRun(p.id, area, node, kind)); }} />;
+  }
+
+  /* ---------- ingen dimma att jaga ---------- */
+  if (!run && review) {
+    return (
+      <Screen class="play result">
+        <div class="result-card">
+          <div class="big-emoji">🌤️</div>
+          <h1>Ingen dimma här!</h1>
+          <p>Allt i {area.title} sitter fint just nu.</p>
+          <button class="btn primary" onClick={() => go('ovning')}>Till Övningsängen</button>
+        </div>
+      </Screen>
+    );
+  }
 
   /* ---------- bossintro ---------- */
   if (!run && boss && face) {
@@ -109,7 +135,13 @@ export function PlayView({ areaId, nodeId, practice = false }: { areaId: string;
   function onDone(fixed?: 'self' | 'shown') {
     let r = run!;
     if (fixed) r = recordFixed(p!.id, r, fixed);
-    if (runOver(r)) { setOutcome(finishRun(p!.id, area, r, { signature: face?.signature })); touch(); return; }
+    if (runOver(r)) {
+      const o = finishRun(p!.id, area, r, { signature: face?.signature });
+      setNews(noteRun(p!.id, { kind: r.kind, areaId, nodeId: node!.id, cleared: o.cleared, won: o.bossWon, progressed: o.firstClear || o.firstWin || o.newStars > 0 }));
+      setOutcome(o);
+      touch();
+      return;
+    }
     setRun(advance(p!.id, r));
     setHintIdx(null);
   }
@@ -119,8 +151,8 @@ export function PlayView({ areaId, nodeId, practice = false }: { areaId: string;
     <Screen class="play">
       <header class="play-head">
         <div class="play-title">
-          <small>{practice ? '🎯 Övningsängen' : `${era.icon} ${era.name}`}</small>
-          <b>{boss && face && !practice ? face.name : node.name}</b>
+          <small>{review ? `🌫️ ${area.title}` : practice ? '🎯 Övningsängen' : `${era!.icon} ${era!.name}`}</small>
+          <b>{boss && face && !practice ? face.name : review ? 'Jaga bort dimman' : node.name}</b>
         </div>
         {confirmQuit ? (
           <span class="row">
@@ -159,7 +191,7 @@ export function PlayView({ areaId, nodeId, practice = false }: { areaId: string;
   );
 }
 
-function Result({ o, areaId, node, face, practice, onAgain }: { o: Outcome; areaId: string; node: PathNode; face: BossFace | null; practice: boolean; onAgain: () => void }) {
+function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome; news: QuestNews | null; areaId: string; node: PathNode; face: BossFace | null; practice: boolean; onAgain: (() => void) | null }) {
   const hid = heroId.value!;
   const pl = playable(areaId)!;
   const next = nextOpenNode(pl.def, getArea(hid, areaId));
@@ -181,6 +213,8 @@ function Result({ o, areaId, node, face, practice, onAgain }: { o: Outcome; area
         <p>Du träffade {o.correct} gånger. Öva lite på Övningsängen och kom tillbaka – du klarar det!</p>
       </>
     );
+  } else if (o.kind === 'review') {
+    head = <><div class="big-emoji">🌤️</div><h1>Dimman har lättat!</h1><p>{o.correct} av {o.total} rätt.{o.correct < o.total ? ' Det som var klurigt kommer tillbaka imorgon, så att det fastnar.' : ''}</p></>;
   } else if (o.kind === 'practice') {
     head = <><div class="big-emoji">🎯</div><h1>Repetition klar!</h1><p>{o.correct} av {o.total} rätt.</p></>;
   } else if (o.cleared) {
@@ -209,16 +243,22 @@ function Result({ o, areaId, node, face, practice, onAgain }: { o: Outcome; area
           {o.gained.title && <span>🏷️ Ny titel: {o.gained.title}</span>}
         </div>
         {o.gained.items?.map((it) => <ItemCard key={it.id} it={it} />)}
-        {o.chests.length > 0 && getInv(hid).chests.some((c) => c.id === o.chests[0].id) && (
-          <button class="chest-found" onClick={() => { chestModal.value = o.chests[0].id; }}>
-            <span class="chest-big small-chest">{o.chests[0].kind === 'boss' ? '💎' : '🧰'}</span>
-            <span><b>Du hittade en skattkista!</b><small>Tryck för att öppna</small></span>
+        {[...o.chests, ...(news?.chest ? [news.chest] : [])].filter((c) => getInv(hid).chests.some((x) => x.id === c.id)).slice(0, 1).map((c) => (
+          <button key={c.id} class="chest-found" onClick={() => { chestModal.value = c.id; }}>
+            <span class="chest-big small-chest">{c.kind === 'boss' ? '💎' : c.kind === 'dag' ? '📜' : '🧰'}</span>
+            <span><b>{c.kind === 'dag' ? 'Dagens kista!' : 'Du hittade en skattkista!'}</b><small>Tryck för att öppna</small></span>
           </button>
+        ))}
+        {news && news.done.length > 0 && (
+          <div class="quest-news">
+            {news.done.map((q) => <p key={q.kind}>📜 Uppdrag klart: {q.label}</p>)}
+            {news.allDone && news.chest && <p><b>Alla dagens uppdrag är klara! 🔥 {news.streak} {news.streak === 1 ? 'dag' : 'dagar'} i rad.</b>{news.usedFreeze ? ' (Frysdagen räddade sviten.)' : ''} Du får dagens kista!</p>}
+          </div>
         )}
         {o.tired && <p class="note">Hjälten är trött för idag – inga fler kastanjer, men allt du lär dig räknas!</p>}
         <div class="row center-row">
           <button class="btn" onClick={() => go(back)}>{practice ? 'Tillbaka' : pl.def.texts.back}</button>
-          <button class="btn" onClick={onAgain}>{o.kind === 'boss' && !o.bossWon ? 'Försök igen' : 'Spela igen'}</button>
+          {onAgain && <button class="btn" onClick={onAgain}>{o.kind === 'boss' && !o.bossWon ? 'Försök igen' : 'Spela igen'}</button>}
           {!practice && next && next.id !== node.id && (o.cleared || o.bossWon) && (
             <button class="btn primary" onClick={() => go(`spela/${areaId}/${next.id}`)}>Vidare: {next.type === 'boss' ? 'Bossen!' : next.name}</button>
           )}

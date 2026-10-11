@@ -450,3 +450,31 @@ button.slot { background: transparent; color: inherit; }
 .tf-dot.tf-x { fill: var(--line); }
 .tf-cross { stroke: var(--bad); stroke-width: 3; stroke-linecap: round; }
 @media (max-width: 380px) { .eq { font-size: 32px; min-width: 0; } .eq-input { font-size: 30px; } }
+
+/* ---------- Glömskans dimma, Övningsängen och Uppdragstavlan ---------- */
+.isle-mist circle { fill: #f1f3f5; opacity: .72; }
+.isle-mist .isle-mist-badge { fill: #495057; opacity: 1; }
+.isle-mist-count { fill: #fff; font-size: 13px; font-weight: 900; font-family: var(--font); }
+@media (prefers-reduced-motion: no-preference) {
+  .isle-mist { animation: mist-drift 6s ease-in-out infinite alternate; }
+  @keyframes mist-drift { from { transform: translateX(-3px); } to { transform: translateX(3px); } }
+}
+.mist-banner, .mist-item { display: flex; align-items: center; gap: 12px; background: color-mix(in srgb, var(--muted) 14%, var(--card)); border: 2px dashed color-mix(in srgb, var(--muted) 45%, transparent); border-radius: 16px; padding: 10px 12px; margin: 10px 0; text-align: left; width: 100%; color: var(--ink); }
+.mist-banner > div, .mist-item > span:last-child { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.mist-banner small, .mist-item small { color: var(--muted); }
+.mist-icon { font-size: 30px; }
+.mist-list { display: flex; flex-direction: column; }
+.mist-item { min-height: 64px; font-size: 17px; }
+.badge-mist { position: absolute; top: 6px; right: 8px; font-size: 12px; font-weight: 800; background: var(--bg2); color: var(--muted); border-radius: 99px; padding: 2px 8px; }
+.skill-mist { font-size: 14px; }
+.mentor-actions { margin-top: 8px; flex-wrap: wrap; }
+.purses { gap: 6px; }
+.place-banner.board { background: linear-gradient(180deg, #e8c48a, #c99a5b); }
+.quests { list-style: none; padding: 0; margin: 12px 0; display: flex; flex-direction: column; gap: 10px; }
+.quest { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 16px; padding: 12px 14px; box-shadow: var(--shadow); min-height: 64px; }
+.quest-icon { font-size: 28px; }
+.quest-label { flex: 1; font-weight: 700; }
+.quest.done .quest-label { color: var(--muted); text-decoration: line-through; }
+.streak-card h2 { margin-bottom: 4px; }
+.quest-news { background: color-mix(in srgb, var(--gold) 12%, var(--card)); border-radius: 14px; padding: 4px 12px; margin: 10px 0; text-align: left; }
+.quest-news p { margin: 6px 0; }

@@ -51,8 +51,8 @@ export function ChestModal() {
       <div class="modal-sheet" role="dialog" aria-modal="true" aria-label="Skattkista">
         {phase !== 'open' && (
           <>
-            <div class={`chest-big${phase === 'shaking' ? ' shaking' : ''}`}>{chest?.kind === 'pionjar' ? '🎁' : chest?.kind === 'boss' ? '💎' : '🧰'}</div>
-            <h2>{chest?.kind === 'pionjar' ? 'Pionjärkistan' : chest?.kind === 'boss' ? 'Bosskista' : 'Skattkista'}</h2>
+            <div class={`chest-big${phase === 'shaking' ? ' shaking' : ''}`}>{chest?.kind === 'pionjar' ? '🎁' : chest?.kind === 'boss' ? '💎' : chest?.kind === 'dag' ? '📜' : '🧰'}</div>
+            <h2>{chest?.kind === 'pionjar' ? 'Pionjärkistan' : chest?.kind === 'boss' ? 'Bosskista' : chest?.kind === 'dag' ? 'Dagens kista' : 'Skattkista'}</h2>
             {chest && <p class="muted">Hittad vid {chest.source}</p>}
             {phase === 'full' && <p class="note warn">Packningen är full! Smält något i Smedjan först.</p>}
             <div class="row center-row">

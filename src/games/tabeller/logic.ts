@@ -71,6 +71,17 @@ export function makeQ(spec: QuestionSpec, rng: Rng): MQ {
   return swap ? build('ganger', level, '·', k, t, 2, `ma.mult.${t}`) : build('ganger', level, '·', t, k, 2, `ma.mult.${t}`);
 }
 
+/** Vilka lägen och nivåer som ger en färdighet (för repetition). ma.mult.7 → sjuans nivå. */
+export function specsForSkill(skill: string): QuestionSpec[] {
+  const m = /^ma\.(mult|div)\.(\d+)$/.exec(skill);
+  if (!m) return [];
+  const n = Number(m[2]);
+  const mode = m[1] === 'mult' ? 'ganger' : 'delat';
+  if (n <= 1) return [{ mode, level: 0, trap: 'noll-ett' }];
+  const level = TABLES.findIndex((t) => t.includes(n));
+  return m[1] === 'mult' ? [{ mode: 'ganger', level }, { mode: 'saknas', level }] : [{ mode, level }];
+}
+
 /* ---------- diagnos ---------- */
 
 /** Den kända faktorn och produkten i en fråga där en faktor fattas. */

@@ -83,6 +83,8 @@ export interface GameModule {
   id: string;
   makeQuestion(spec: QuestionSpec, rng: Rng): unknown;
   skillOf(q: unknown): string;
+  /** Frågeinställningar som brukar ge en viss färdighet (för repetition av just den). */
+  specsForSkill(skill: string): QuestionSpec[];
   /** Kort beskrivning av en felkod (bossintro, statistik). */
   errLabel(tag: string): string | undefined;
   View: ComponentType<QuestionViewProps>;

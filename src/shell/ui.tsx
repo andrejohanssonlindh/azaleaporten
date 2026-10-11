@@ -5,6 +5,7 @@ import { getHeroState } from '../platform/profiles';
 import { applyUpdate, canSpeak, speak, updateReady } from '../platform/device';
 import { hasNewerData } from '../platform/storage/record';
 import { go } from '../state';
+import { streakOf } from '../platform/learning/quests';
 
 export function Avatar({ p, size = 56 }: { p: Pick<Profile, 'animal' | 'color'>; size?: number }) {
   return (
@@ -25,7 +26,10 @@ export function TopBar({ p }: { p: Profile }) {
           <small>{s.title ?? heroClass(p.heroClass).name} · Nivå {s.level}</small>
         </span>
       </button>
-      <span class="purse" title="Kastanjer">🌰 {s.kastanjer}</span>
+      <span class="row purses">
+        {streakOf(p.id) > 0 && <span class="purse" title="Dagar i rad med alla uppdrag klara">🔥 {streakOf(p.id)}</span>}
+        <span class="purse" title="Kastanjer">🌰 {s.kastanjer}</span>
+      </span>
     </header>
   );
 }

@@ -11,6 +11,7 @@ import { Azaleabyn, RegionView } from './shell/Places';
 import { AreaView } from './shell/AreaView';
 import { PlayView } from './shell/PlayView';
 import { Ovning } from './shell/Ovning';
+import { Uppdrag } from './shell/Uppdrag';
 import { LabbView } from './shell/LabbView';
 import { Gard } from './shell/Gard';
 import { ChestModal, Smedjan } from './shell/Loot';
@@ -47,7 +48,9 @@ export function App() {
   // key = sökvägen, så att en ny bana alltid får ett nytt spel-tillstånd
   else if (page === 'spela' && a && b) view = <PlayView key={path} areaId={a} nodeId={b} />;
   else if (page === 'ovning' && a && b) view = <PlayView key={path} areaId={a} nodeId={b} practice />;
+  else if (page === 'repetera' && a) view = <PlayView key={path} areaId={a} nodeId="dimma" review />;
   else if (page === 'ovning') view = <Ovning />;
+  else if (page === 'uppdrag') view = <Uppdrag />;
   else if (page === 'labb' && a) view = <LabbView areaId={a} tab={b ?? ''} />;
   else view = <IslandMap />;
 

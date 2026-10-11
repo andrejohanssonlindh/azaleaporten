@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'preact/hooks';
-import { go } from '../state';
+import { go, heroId } from '../state';
+import { noteAnswer } from '../platform/learning/skills';
 import { FreePractice, Tolkaren } from '../games/klocka/ui/Labb';
 import { playable } from '../content/areas';
 import { randomSeed, rngFrom } from '../platform/rng';
@@ -23,7 +24,10 @@ function FreeStages({ def, game }: { def: AreaDef; game: GameModule }) {
       </div>
       <p class="note">{sel.desc}</p>
       <View key={`${sel.id}-${n}`} q={q} hint={false}
-        onAnswer={(r) => setScore((s) => ({ ok: s.ok + (r.correct ? 1 : 0), all: s.all + 1 }))}
+        onAnswer={(r) => {
+          setScore((s) => ({ ok: s.ok + (r.correct ? 1 : 0), all: s.all + 1 }));
+          if (heroId.value) noteAnswer(heroId.value, def.areaId, game.skillOf(q), r.correct, r.hint, r.errTag);
+        }}
         onDone={() => setN((x) => x + 1)} />
       <p class="note">Rätt: {score.ok} av {score.all}</p>
     </div>
@@ -51,7 +55,7 @@ export function LabbView({ areaId, tab }: { areaId: string; tab: string }) {
         <button role="tab" aria-selected={tab !== 'tolka'} class={tab !== 'tolka' ? 'on' : ''} onClick={() => go(`labb/${areaId}`)}>Öva fritt</button>
         <button role="tab" aria-selected={tab === 'tolka'} class={tab === 'tolka' ? 'on' : ''} onClick={() => go(`labb/${areaId}/tolka`)}>Tolka en tid</button>
       </div>
-      {tab === 'tolka' ? <Tolkaren /> : <FreePractice />}
+      {tab === 'tolka' ? <Tolkaren /> : <FreePractice onResult={(q, r) => { if (heroId.value) noteAnswer(heroId.value, areaId, pl.game.skillOf(q), r.correct, r.hint, r.errTag); }} />}
     </Screen>
   );
 }

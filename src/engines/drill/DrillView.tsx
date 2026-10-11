@@ -90,6 +90,7 @@ export function drillModule<Q extends DrillQ>(g: DrillGame<Q>): GameModule {
     id: g.id,
     makeQuestion: (spec, rng) => g.make(spec, rng),
     skillOf: (q) => (q as Q).skill,
+    specsForSkill: (s) => g.specsForSkill(s),
     errLabel: (tag) => errLabel(g as unknown as DrillGame<DrillQ>, tag),
     View: makeDrillView(g),
   };

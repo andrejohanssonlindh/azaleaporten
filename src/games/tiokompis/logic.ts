@@ -104,6 +104,15 @@ export function makeQ(spec: QuestionSpec, rng: Rng): TQ {
   return build(mode, level, '−', a, b, 1, 'ma.sub.saknad-term');
 }
 
+/** Vilka lägen och nivåer som ger en färdighet (för repetition). */
+export function specsForSkill(skill: string): QuestionSpec[] {
+  if (skill === 'ma.add.saknad-term') return [{ mode: 'saknas', level: 1 }];
+  if (skill === 'ma.sub.saknad-term') return [{ mode: 'saknas', level: 2 }];
+  const out: QuestionSpec[] = [];
+  for (const mode of ['par', 'plus', 'minus'] as const) SKILL[mode].forEach((s, level) => { if (s === skill) out.push({ mode, level }); });
+  return out;
+}
+
 /* ---------- diagnos ---------- */
 
 /** De två talen barnet ser (utom rutan). */

@@ -1,18 +1,19 @@
-import { dataRev, go, heroId, previousVisit, toast } from '../state';
+import { dataRev, go, heroId, toast } from '../state';
 import { getProfile } from '../platform/profiles';
-import { greeting } from '../platform/greeting';
-import { getArea, getPlay, findNode, nodeDone } from '../platform/rpg/progress';
+import { mistByArea } from '../platform/learning/skills';
+import { getArea, nodeDone } from '../platform/rpg/progress';
 import { allNodes } from '../platform/rpg/types';
 import { playable } from '../content/areas';
 import { region as regionById, fitsGrade, type Region } from '../content/world';
 import { leaveToPicker } from '../session';
-import { BackBar, Mentor, Screen, Stars } from './ui';
+import { BackBar, Screen, Stars } from './ui';
+import { KastanjGreeting } from './Kastanj';
 
 // Azaleabyn (byn i mitten av ön) och regionsidorna med sina områden ("grottor").
 
 const BUILDINGS = [
   { id: 'gard', icon: '🏡', name: 'Azaleagården', desc: 'Ditt hem och ditt hjälteblad', to: 'gard' },
-  { id: 'uppdrag', icon: '📜', name: 'Uppdragstavlan', desc: 'Dagens uppdrag', to: null },
+  { id: 'uppdrag', icon: '📜', name: 'Uppdragstavlan', desc: 'Dagens uppdrag', to: 'uppdrag' },
   { id: 'smedjan', icon: '⚒️', name: 'Smedjan', desc: 'Butik, smält och förbättra', to: 'smedjan' },
   { id: 'biblioteket', icon: '📖', name: 'Biblioteket', desc: 'Dina framsteg', to: null },
 ];
@@ -21,14 +22,11 @@ export function Azaleabyn() {
   dataRev.value;
   const p = getProfile(heroId.value!);
   if (!p) { queueMicrotask(leaveToPicker); return null; }
-  const last = getPlay(p.id).last;
-  const la = last && playable(last.areaId);
-  const ln = la && findNode(la.def, last!.nodeId);
   return (
     <Screen class="place">
       <BackBar label="Till ön" to="karta" />
       <div class="place-banner village"><span>🌸</span><h1>Azaleabyn</h1></div>
-      <Mentor text={greeting(p.name, previousVisit.value, ln ? `${ln.name} i ${la!.def.title}` : null)} />
+      <KastanjGreeting p={p} />
       <div class="building-grid">
         {BUILDINGS.map((b) => (
           <button key={b.id} class={`building${b.to ? '' : ' soon'}`} onClick={() => (b.to ? go(b.to) : toast(`${b.icon} ${b.name} öppnar snart!`))}>
@@ -66,6 +64,7 @@ export function RegionView({ id }: { id: string }) {
   const r = regionById(id);
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   if (!r) { queueMicrotask(() => go('karta')); return null; }
+  const mist = mistByArea(p.id);
   return (
     <Screen class="place">
       <BackBar label="Till ön" to="karta" />
@@ -88,6 +87,7 @@ export function RegionView({ id }: { id: string }) {
                 <span class="area-icon">{a.icon}</span>
                 <span class="area-text"><b>{a.name}</b><small>{a.desc}</small>{progress}</span>
                 {a.status === 'soon' && <span class="badge-soon">Snart</span>}
+                {mist[a.id] > 0 && <span class="badge-mist" title="Dags att repetera">🌫️ {mist[a.id]}</span>}
                 {a.status === 'open' && fitsGrade(a, p.grade) && <span class="badge-fit">Passar dig</span>}
               </button>
             );

@@ -8,6 +8,7 @@ import { SLOTS, STATS, type Slot } from '../platform/rpg/items';
 import type { BossDef } from '../platform/rpg/types';
 import { gradeName, heroClass } from '../content/heroes';
 import { PLAYABLE } from '../content/areas';
+import { mistByArea } from '../platform/learning/skills';
 import { leaveToPicker } from '../session';
 import { bossName } from './AreaView';
 import { ItemCard } from './Loot';
@@ -90,12 +91,13 @@ export function Gard() {
 
         <h3>Kunskaper</h3>
         {Object.values(PLAYABLE).map(({ def }) => {
+          const mist = mistByArea(p.id)[def.areaId] ?? 0;
           const k = kunskapLevel(getArea(p.id, def.areaId).xp);
           return (
             <div class="skill-row" key={def.areaId}>
               <span>{def.kunskap.icon} {def.kunskap.name}</span>
               <span class="skill-bar"><span style={{ width: `${(k.into / k.need) * 100}%` }} /></span>
-              <span class="skill-level">Nivå {k.level}</span>
+              <span class="skill-level">Nivå {k.level}{mist > 0 && <span class="skill-mist" title={`${mist} att repetera`}> 🌫️</span>}</span>
             </div>
           );
         })}

@@ -23,6 +23,8 @@ export const REWARD = {
   replayClear: { xp: 8, kastanjer: 2 },
   failedRun: { kastanjer: 1 },
   practiceDone: { kastanjer: 2 },
+  /** Att jaga bort Glömskans dimma ger extra kunskaps-XP. */
+  reviewDone: { xp: 15, kastanjer: 3 },
   bossFirstWin: { xp: 60, kastanjer: 30 },
   mastareFirstWin: { xp: 120, kastanjer: 60 },
   bossRewin: { xp: 12, kastanjer: 4 },

@@ -1,13 +1,14 @@
 import type { ComponentChildren } from 'preact';
-import { dataRev, go, heroId, previousVisit, toast } from '../state';
+import { dataRev, go, heroId, toast } from '../state';
 import { getProfile } from '../platform/profiles';
-import { greeting } from '../platform/greeting';
-import { getArea, getPlay, nextOpenNode, findNode } from '../platform/rpg/progress';
+import { mistByArea } from '../platform/learning/skills';
+import { getArea, getPlay, nextOpenNode } from '../platform/rpg/progress';
 import { playable } from '../content/areas';
-import { fitsGrade, REGIONS } from '../content/world';
+import { areaById, fitsGrade, REGIONS, type RegionId } from '../content/world';
 import { animal } from '../content/heroes';
 import { leaveToPicker } from '../session';
-import { Mentor, Screen, TopBar, UpdateBanner } from './ui';
+import { Screen, TopBar, UpdateBanner } from './ui';
+import { KastanjGreeting } from './Kastanj';
 
 // Ön: startskärmen efter porten. Allt detaljerat ligger ett tryck bort.
 // Reserverade platser (dimman) och småöarna runt om är till för framtida ämnen.
@@ -28,7 +29,20 @@ function Spot({ label, onClick, x, y, children, cls = '' }: { label: string; onC
 
 const fog = () => toast('🌫️ Dimman ligger tät här. Något nytt väntar – snart!');
 
-function Island({ heroEmoji }: { heroEmoji: string }) {
+/** Glömskans dimma över en region på kartan, med antal saker att repetera. */
+const MIST_AT: Record<RegionId, [number, number]> = { talbergen: [236, 140], ordskogen: [160, 282], vasteron: [56, 292], betongbukten: [300, 404] };
+function Mist({ region, n }: { region: RegionId; n: number }) {
+  const [x, y] = MIST_AT[region];
+  return (
+    <g class="isle-mist" pointer-events="none" aria-hidden="true">
+      {[[-22, 4, 20], [0, -6, 24], [22, 4, 19], [6, 12, 18], [-10, 12, 16]].map(([dx, dy, r], i) => <circle key={i} cx={x + dx} cy={y + dy} r={r} />)}
+      <circle class="isle-mist-badge" cx={x + 34} cy={y - 20} r="11" />
+      <text class="isle-mist-count" x={x + 34} y={y - 19} text-anchor="middle" dominant-baseline="central">{n}</text>
+    </g>
+  );
+}
+
+function Island({ heroEmoji, mist }: { heroEmoji: string; mist: Partial<Record<RegionId, number>> }) {
   return (
     <svg class="island" viewBox="0 0 400 520" role="group" aria-label="Karta över ön">
       <defs>
@@ -111,6 +125,8 @@ function Island({ heroEmoji }: { heroEmoji: string }) {
         <text x="240" y="236" font-size="20" text-anchor="middle" class="isle-hero">{heroEmoji}</text>
       </Spot>
 
+      {(Object.entries(mist) as [RegionId, number][]).map(([r, n]) => <Mist key={r} region={r} n={n} />)}
+
       {/* reserverade platser */}
       <g class="isle-fog" role="button" tabIndex={0} aria-label="Dimmiga höglandet" onClick={fog}>
         {[[330, 248, 18], [348, 262, 16], [318, 268, 15], [340, 236, 13]].map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} />)}
@@ -133,9 +149,11 @@ export function IslandMap() {
   const p = getProfile(heroId.value!);
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   const last = getPlay(p.id).last;
-  const lastArea = last && playable(last.areaId);
-  const lastNode = lastArea && findNode(lastArea.def, last!.nodeId);
-  const lastPlace = lastNode ? `${lastNode.name} i ${lastArea!.def.title}` : null;
+  const mist: Partial<Record<RegionId, number>> = {};
+  for (const [a, n] of Object.entries(mistByArea(p.id))) {
+    const r = areaById(a)?.region.id;
+    if (r) mist[r] = (mist[r] ?? 0) + n;
+  }
 
   // Snabbknapp: fortsätt där äventyret pågår – senaste området, annars det första som passar årskursen.
   const cont = continueTarget(p.id, p.grade, last?.areaId);
@@ -143,8 +161,8 @@ export function IslandMap() {
     <Screen class="map">
       <TopBar p={p} />
       <UpdateBanner />
-      <Mentor text={greeting(p.name, previousVisit.value, lastPlace)} compact />
-      <Island heroEmoji={animal(p.animal).emoji} />
+      <KastanjGreeting p={p} compact />
+      <Island heroEmoji={animal(p.animal).emoji} mist={mist} />
       {cont && (
         <button class="btn primary big continue" onClick={() => go(`spela/${cont.areaId}/${cont.node.id}`)}>
           {cont.icon} Fortsätt: {cont.node.name}

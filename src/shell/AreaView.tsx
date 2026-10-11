@@ -9,6 +9,8 @@ import { personaFor } from '../content/bosses';
 import { gate } from '../state';
 import { leaveToPicker } from '../session';
 import { BackBar, Screen, Stars } from './ui';
+import { dueSkills } from '../platform/learning/skills';
+import { skillLabel } from '../content/skills';
 
 // Ett område som en stig genom epoker: banor och bossar i tur och ordning.
 
@@ -28,6 +30,7 @@ export function AreaView({ id }: { id: string }) {
   const prog = getArea(p.id, id);
   const next = nextOpenNode(area, prog);
   const k = kunskapLevel(prog.xp);
+  const due = dueSkills(p.id, id);
   let i = 0;
 
   const tap = (n: PathNode) => {
@@ -45,6 +48,16 @@ export function AreaView({ id }: { id: string }) {
         <h1>{area.title}</h1>
         <p>{area.story}</p>
       </div>
+      {due.length > 0 && (
+        <section class="mist-banner">
+          <span class="mist-icon" aria-hidden="true">🌫️</span>
+          <div>
+            <b>Glömskans dimma ligger här</b>
+            <small>{due.length === 1 ? '1 sak' : `${due.length} saker`} att repetera: {due.slice(0, 3).map((d) => skillLabel(d.skill)).join(', ')}{due.length > 3 ? ' …' : ''}</small>
+          </div>
+          <button class="btn small primary" onClick={() => go(`repetera/${id}`)}>Jaga bort den</button>
+        </section>
+      )}
       {next && <button class="btn primary big continue" onClick={() => tap(next)}>▶ {next.type === 'boss' ? `Möt ${bossName(id, next, p.grade)}` : `Spela: ${next.name}`}</button>}
 
       {area.eras.map((era) => (

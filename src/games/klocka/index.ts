@@ -14,6 +14,12 @@ export const klocka: GameModule = {
     const q = raw as KQ;
     return q.kind === 'between' ? 'ma.tid.emellan' : `ma.tid.${phraseKind(q.s)}`;
   },
+  specsForSkill: (skill) => {
+    const kind = skill.replace('ma.tid.', '');
+    if (kind === 'emellan') return [{ mode: 'between', level: 2 }];
+    const level = ['hel', 'halv', 'kvart'].includes(kind) ? 1 : 2;
+    return (['words', 'clock', 'choice'] as const).map((mode) => ({ mode, level }));
+  },
   errLabel: (tag) => ERR[tag],
   View: QuestionView,
 };

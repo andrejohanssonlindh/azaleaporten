@@ -4,6 +4,7 @@ import { LEVEL_DESC, makeQ, type Level, type Mode } from '../logic/questions';
 import { cap, fmt, periodWord, render, structs } from '../logic/language';
 import { parseAny } from '../logic/parse';
 import { QuestionView } from './QuestionView';
+import type { FirstAnswer } from '../../../platform/rpg/types';
 import { ClockFace } from './ClockFace';
 import { Sky } from './Sky';
 
@@ -14,7 +15,8 @@ const MODES: { id: Mode; label: string }[] = [
   { id: 'choice', label: 'Klocka → ord' }, { id: 'between', label: 'Tid emellan' },
 ];
 
-export function FreePractice() {
+/** onResult: första svaret på varje fråga (plattformen låter det mata repetitionsschemat). */
+export function FreePractice({ onResult }: { onResult?: (q: unknown, r: FirstAnswer) => void } = {}) {
   const [mode, setMode] = useState<Mode>('clock');
   const [level, setLevel] = useState<Level>(1);
   const [n, setN] = useState(0);
@@ -33,7 +35,7 @@ export function FreePractice() {
       </div>
       <p class="note">{LEVEL_DESC[level]}</p>
       <QuestionView key={n + mode + level} q={q} hint={false}
-        onAnswer={(r) => setScore((s) => ({ ok: s.ok + (r.correct ? 1 : 0), all: s.all + 1 }))}
+        onAnswer={(r) => { setScore((s) => ({ ok: s.ok + (r.correct ? 1 : 0), all: s.all + 1 })); onResult?.(q, r); }}
         onDone={() => setN((x) => x + 1)} />
       <p class="note">Rätt: {score.ok} av {score.all}</p>
     </div>
