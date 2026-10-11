@@ -166,7 +166,7 @@ export function questionSpec(run: RunState, node: PathNode, rngNext: () => numbe
   const spec = boss.pool[Math.floor(rngNext() * boss.pool.length)];
   if (run.kind === 'practice') return spec;
   const phase2 = (run.hp ?? 0) <= (run.maxHp ?? 0) / 2;
-  return { ...spec, level: phase2 ? Math.min(3, spec.level + 1) : spec.level, trap: run.index % 2 === 0 ? boss.trap : undefined };
+  return { ...spec, level: phase2 ? spec.level + 1 : spec.level, trap: run.index % 2 === 0 ? boss.trap : undefined };
 }
 
 export function currentQuestion(run: RunState, node: PathNode, game: GameModule): unknown {

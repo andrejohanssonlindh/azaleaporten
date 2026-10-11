@@ -47,7 +47,7 @@ const GANGERSPINDELN: BossDef = {
 
 const GRUVMASTAREN: BossDef = {
   type: 'boss', id: 'gruvmastaren', kind: 'mastare', name: 'Gruvmästaren', icon: '⛏️', title: 'Tabellgruvans Mästare',
-  hp: 12, pool: [{ mode: 'ganger', level: 3 }, { mode: 'delat', level: 3 }, { mode: 'saknas', level: 3 }],
+  hp: 12, pool: [{ mode: 'ganger', level: 4 }, { mode: 'delat', level: 4 }, { mode: 'saknas', level: 4 }],
   // Repliker hämtas från personan – se content/bosses.ts, id 'tabellgruvan.mastare'.
   lines: { entrance: '', defeat: '' },
   titleReward: 'Tabellmästaren',
@@ -81,11 +81,16 @@ export const TABELLGRUVAN: AreaDef = {
         stage('djupa-gomstallen', 'Djupa gömställen', '🔦', 'Vilket tal fattas?', 'saknas', 2, 9000),
         GANGERSPINDELN,
       ] },
+    { id: 'adelstensgrottan', name: 'Ädelstensgrottan', icon: '💍', fact: 'Elvans tabell är lätt en bit: 11 · 3 = 33, 11 · 4 = 44. Tolvan är tian plus tvåan: 12 · 6 = 60 + 12.',
+      nodes: [
+        stage('elvan-och-tolvan', 'Elvan och tolvan', '💍', 'Gånger med 11 och 12', 'ganger', 3, 8000),
+        stage('dela-med-elva-och-tolv', 'Dela med elva och tolv', '🔮', 'Delat med 11 och 12', 'delat', 3, 9000),
+      ] },
     { id: 'skattkammaren', name: 'Skattkammaren', icon: '👑', fact: 'Kan du 7 · 8 = 56 kan du också 8 · 7, 56 / 7 och 56 / 8 – fyra fakta på en gång!',
       nodes: [
-        stage('hela-tabellen', 'Hela tabellen', '👑', 'Alla tabeller blandade', 'ganger', 3, 6000),
-        stage('dela-allt', 'Dela allt', '💰', 'All division blandad', 'delat', 3, 7000),
-        stage('gruvvagnsracet', 'Gruvvagnsracet', '🚃', 'Allt blandat – mot klockan!', 'blandat', 3, 5000),
+        stage('hela-tabellen', 'Hela tabellen', '👑', 'Alla tabeller upp till 12', 'ganger', 4, 6000),
+        stage('dela-allt', 'Dela allt', '💰', 'All division blandad', 'delat', 4, 7000),
+        stage('gruvvagnsracet', 'Gruvvagnsracet', '🚃', 'Allt blandat – mot klockan!', 'blandat', 4, 5000),
       ] },
     { id: 'kristallhallen', name: 'Kristallhallen', icon: '💠', fact: 'Längst ner i gruvan, där kristallerna lyser starkast, väntar Gruvans Mästare.',
       nodes: [GRUVMASTAREN] },

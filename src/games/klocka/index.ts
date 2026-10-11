@@ -8,7 +8,7 @@ import { ERR } from './logic/diagnose';
 
 export const klocka: GameModule = {
   id: 'klocka',
-  makeQuestion: (spec, rng) => makeQ(spec.mode as Mode, spec.level as Level, rng, spec.trap as Trap | undefined),
+  makeQuestion: (spec, rng) => makeQ(spec.mode as Mode, Math.min(3, spec.level) as Level, rng, spec.trap as Trap | undefined),
   /** Färdighets-id (permanenta): ma.tid.emellan, ma.tid.hel, ma.tid.halv, ma.tid.kvart, ma.tid.over, ma.tid.i, ma.tid.over-halv, ma.tid.i-halv */
   skillOf: (raw) => {
     const q = raw as KQ;

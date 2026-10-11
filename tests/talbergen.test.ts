@@ -91,17 +91,22 @@ describe('Tiokompisbron: diagnos av fel', () => {
 
 describe('Tabellgruvan', () => {
   it('alla lägen och nivåer: rätt räknat, delat går jämnt ut, rätt tabell', () => {
-    for (const mode of ['ganger', 'delat', 'saknas', 'blandat']) for (let level = 0; level <= 3; level++) {
+    for (const mode of ['ganger', 'delat', 'saknas', 'blandat']) for (let level = 0; level <= 4; level++) {
       for (const q of each(makeM, mode, level)) {
         expect(q.op === '·' ? q.x * q.y : q.x / q.y).toBe(q.z);
         expect(Number.isInteger(q.z)).toBe(true);
-        expect(q.z).toBeLessThanOrEqual(100);
+        expect(q.z).toBeLessThanOrEqual(144);
         expect(q.answer).toBe([q.x, q.y, q.z][q.blank]);
         expect(q.skill).toMatch(/^ma\.(mult|div)\.(\d+)$/);
       }
     }
     for (const q of each(makeM, 'ganger', 0)) expect([2, 5, 10].some((t) => q.x === t || q.y === t)).toBe(true);
     for (const q of each(makeM, 'ganger', 2).filter((x) => x.skill.match(/\.[6-9]$/))) expect([6, 7, 8, 9].some((t) => q.x === t || q.y === t)).toBe(true);
+    // Tabellerna går upp till 12, och den andra faktorn också.
+    expect(each(makeM, 'ganger', 3).filter((q) => /\.1[12]$/.test(q.skill)).length).toBeGreaterThan(SEEDS * 0.7);
+    expect(each(makeM, 'ganger', 3).some((q) => q.x === 12 && q.y === 12)).toBe(true);
+    expect(each(makeM, 'ganger', 0).some((q) => q.x === 12 || q.y === 12)).toBe(true);
+    expect(each(makeM, 'delat', 4).some((q) => q.y === 11)).toBe(true);
   });
 
   it('bossfällor', () => {
@@ -128,7 +133,7 @@ describe('Tabellgruvan', () => {
   });
 
   it('förklaringar för granne/plus/räknesätt avslöjar inte svaret', () => {
-    for (const mode of ['ganger', 'delat', 'saknas']) for (let level = 0; level <= 3; level++) {
+    for (const mode of ['ganger', 'delat', 'saknas']) for (let level = 0; level <= 4; level++) {
       for (const q of each(makeM, mode, level).slice(0, 100).filter((x) => !x.parts.includes(x.answer))) {
         for (const given of [q.answer + 1, q.answer - 1, q.x + q.y, q.x - q.y, q.z - q.x, q.z - q.y, q.answer + 3, q.answer + 13].filter((v) => v >= 0 && v !== q.answer)) {
           const tag = diagnoseAny(tabellerGame, q, given);

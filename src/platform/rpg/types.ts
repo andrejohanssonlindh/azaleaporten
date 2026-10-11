@@ -5,6 +5,7 @@ import type { Rng } from '../rng';
 // Spelen levererar bara frågor; rundor, bossar, belöningar och loggning ägs av plattformen.
 // Alla id:n här är permanenta.
 
+/** Bossens fas 2 ber om level + 1; spelet klampar själv till sin högsta nivå. */
 export interface QuestionSpec { mode: string; level: number; trap?: string }
 
 export interface StageDef {

@@ -2,7 +2,7 @@ import type { Rng } from '../../platform/rng';
 import type { QuestionSpec } from '../../platform/rpg/types';
 import type { DrillQ, Explained, Part } from '../../engines/drill/types';
 
-// Tabellgruvan: gångertabellerna 0–10, division som omvänd multiplikation och det gömda talet.
+// Tabellgruvan: gångertabellerna 0–12, division som omvänd multiplikation och det gömda talet.
 // En fråga är "x op y = z" där en av x, y, z är rutan. Färdighets-id:n och felkoder är permanenta.
 
 export type Mode = 'ganger' | 'delat' | 'saknas' | 'blandat';
@@ -24,8 +24,10 @@ export const ERR: Record<string, string> = {
   'fel-satt': 'Räknar med fel räknesätt',
 };
 
-/** Tabeller per nivå: 2, 5, 10 → 3, 4 → 6–9 → alla. */
-export const TABLES: number[][] = [[2, 5, 10], [3, 4], [6, 7, 8, 9], [2, 3, 4, 5, 6, 7, 8, 9, 10]];
+/** Tabeller per nivå: 2, 5, 10 → 3, 4 → 6–9 → 11, 12 → alla. Den andra faktorn går alltid upp till 12. */
+export const TABLES: number[][] = [[2, 5, 10], [3, 4], [6, 7, 8, 9], [11, 12], [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]];
+export const MAX_LEVEL = TABLES.length - 1;
+const MAX_FACTOR = 12;
 
 const range = (rng: Rng, lo: number, hi: number) => lo + rng.int(hi - lo + 1);
 
@@ -39,12 +41,12 @@ function build(mode: MQ['mode'], level: number, op: Op, x: number, y: number, bl
 
 /** Tabellen för en fråga: oftast nivåns egna, ibland en tidigare (så att de inte glöms bort). */
 function pickTable(level: number, rng: Rng): number {
-  if (level > 0 && level < 3 && rng.next() < 0.2) return rng.pick(TABLES.slice(0, level).flat());
+  if (level > 0 && level < MAX_LEVEL && rng.next() < 0.2) return rng.pick(TABLES.slice(0, level).flat());
   return rng.pick(TABLES[level]);
 }
 
 function nollEtt(level: number, rng: Rng): MQ {
-  const n = range(rng, 2, 10);
+  const n = range(rng, 2, MAX_FACTOR);
   const r = rng.int(5);
   if (r === 0) return build('ganger', level, '·', n, 0, 2, 'ma.mult.0');
   if (r === 1) return build('ganger', level, '·', 0, n, 2, 'ma.mult.0');
@@ -54,15 +56,15 @@ function nollEtt(level: number, rng: Rng): MQ {
 }
 
 export function makeQ(spec: QuestionSpec, rng: Rng): MQ {
-  const level = Math.min(3, Math.max(0, spec.level));
+  const level = Math.min(MAX_LEVEL, Math.max(0, spec.level));
   if (spec.trap === 'noll-ett') return nollEtt(level, rng);
   let mode = spec.mode as Mode;
   if (spec.trap === 'plus' || spec.trap === 'granntabell') mode = 'ganger';
   if (mode === 'blandat') { const r = rng.next(); mode = r < 0.5 ? 'ganger' : r < 0.8 ? 'delat' : 'saknas'; }
-  if (level === 3 && rng.next() < 0.12) return nollEtt(level, rng);
+  if (level === MAX_LEVEL && rng.next() < 0.12) return nollEtt(level, rng);
 
   const t = spec.trap === 'granntabell' ? rng.pick(TABLES[2]) : pickTable(level, rng);
-  const k = spec.trap ? range(rng, 3, 9) : range(rng, mode === 'ganger' ? 1 : 2, 10);
+  const k = spec.trap ? range(rng, 3, 9) : range(rng, mode === 'ganger' ? 1 : 2, MAX_FACTOR);
   const swap = rng.next() < 0.5;
   if (mode === 'delat') return build('delat', level, '/', t * k, t, 2, `ma.div.${t}`);
   if (mode === 'saknas') return swap ? build('saknas', level, '·', t, k, 1, `ma.mult.${t}`) : build('saknas', level, '·', k, t, 0, `ma.mult.${t}`);
@@ -146,5 +148,6 @@ export function hint(q: MQ): string {
   if (k === 4) return `Dubbla ${t}, och dubbla igen.`;
   if (k === 5) return `Hälften av 10 · ${t}.`;
   if (t === 10) return 'Gånger 10: sätt en nolla efter talet.';
+  if (t > 10) return `10 · ${k} = ${10 * k}. Lägg till ${t - 10} · ${k}.`;
   return `5 · ${t} = ${5 * t}. ${k - 5 === 1 ? `Lägg till en ${t}:a till.` : `Lägg till ${k - 5} ${t}:or till.`}`;
 }
