@@ -18,7 +18,13 @@ export const norm = (s: string) => s.normalize('NFC').trim().replace(/\s+/g, ' '
 export const same = (a: string, b: string, caseStrict = false) =>
   caseStrict ? norm(a) === norm(b) : norm(a).toLocaleLowerCase('sv') === norm(b).toLocaleLowerCase('sv');
 
-export const isRight = (q: OrdQ, given: string) => same(given, q.answer, q.caseStrict);
+const exactNorm = (s: string) => s.normalize('NFC').trim().replace(/\s+/g, ' ');
+
+/** Jämför två svar på frågans sätt: exakt (med skiljetecken och stor bokstav) eller som ord. */
+export const sameAs = (q: OrdQ, a: string, b: string, caseStrict = q.caseStrict) =>
+  q.exact ? exactNorm(a) === exactNorm(b) : same(a, b, caseStrict);
+
+export const isRight = (q: OrdQ, given: string) => [q.answer, ...(q.answers ?? [])].some((a) => sameAs(q, given, a));
 
 /** Ett ord i en mening utan skiljetecken runt om. */
 export const core = (token: string) => token.replace(/^[«"'(]+|[.,!?:;»"')]+$/g, '');
@@ -50,7 +56,7 @@ export const mask = (text: string, word: string) =>
 export const avoid = (word: string, ...texts: string[]) => texts.find((t) => !mentions(t, word)) ?? mask(texts[0], word);
 
 export function diagnoseAny<Q extends OrdQ>(g: OrdGame<Q>, q: Q, given: string): string {
-  const alt = q.alts?.find((a) => a.err && same(a.text, given, true));
+  const alt = q.alts?.find((a) => a.err && sameAs(q, a.text, given, true));
   if (alt?.err) return alt.err;
   return g.diagnose(q, norm(given)) ?? editTag(norm(q.answer), norm(given)) ?? 'annat';
 }

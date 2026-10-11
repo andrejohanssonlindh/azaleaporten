@@ -18,6 +18,8 @@ import { BRYGGERIET } from '../games/geometri/area/content';
 import { KROKSBACK } from '../games/geometri/kroppar/content';
 import { STAPELBADDSPARKEN } from '../games/geometri/cirklar/content';
 import { STAVNINGSTRASKET } from '../games/stavning/content';
+import { RIMBACKEN } from '../games/rim/content';
+import { MENINGSSMEDJAN } from '../games/mening/content';
 
 // Spelbara områden: områdets innehåll (litet, laddas direkt) + spelet som levererar frågorna.
 // Spelkoden laddas först när någon spelar i området, så att startsidan förblir liten.
@@ -38,6 +40,8 @@ const AREAS: Record<string, Playable> = {
   kroksback: { def: KROKSBACK, load: () => import('../games/geometri/kroppar').then((m) => m.kroppar) },
   stapelbaddsparken: { def: STAPELBADDSPARKEN, load: () => import('../games/geometri/cirklar').then((m) => m.cirklar) },
   stavningstrasket: { def: STAVNINGSTRASKET, load: () => import('../games/stavning').then((m) => m.stavning) },
+  rimbacken: { def: RIMBACKEN, load: () => import('../games/rim').then((m) => m.rim) },
+  meningssmedjan: { def: MENINGSSMEDJAN, load: () => import('../games/mening').then((m) => m.mening) },
 };
 
 // Regionbossar: en blandning av regionens spel.

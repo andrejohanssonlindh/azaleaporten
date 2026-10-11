@@ -50,12 +50,22 @@ const STAV: Record<string, string> = {
   ng: 'ng-ljudet', j: 'j-ljudet', sj: 'sj-ljudet', tj: 'tj-ljudet', oa: 'o som låter å',
   stor: 'stor och liten bokstav', sammansatt: 'sammansatta ord',
 };
+const ORD: Record<string, string> = {
+  rim: 'rim', motsats: 'motsatser', synonym: 'synonymer', sammansatt: 'vad sammansatta ord betyder',
+  betydelse: 'ord med flera betydelser', uttryck: 'uttryck',
+};
+const MENING: Record<string, string> = {
+  punkt: 'stor bokstav och punkt', grans: 'var en mening slutar', tecken: 'punkt, frågetecken och utropstecken',
+  ordfoljd: 'ordföljd', samband: 'sambandsord', komma: 'kommatecken', anforing: 'anföring',
+};
 const TAL = ['nollans', 'ettans', 'tvåans', 'treans', 'fyrans', 'femmans', 'sexans', 'sjuans', 'åttans', 'nians', 'tians', 'elvans', 'tolvans'];
 
 export function skillLabel(skill: string): string {
   const [, svTopic, svRest] = /^sv\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
   if (svTopic === 'stav' && STAV[svRest]) return STAV[svRest];
   if (svTopic === 'veckans') return `veckans ord "${svRest}"`;
+  if (svTopic === 'ord' && ORD[svRest]) return ORD[svRest];
+  if (svTopic === 'mening' && MENING[svRest]) return MENING[svRest];
   const [, topic, rest] = /^ma\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
   if (topic === 'tid' && TID[rest]) return TID[rest];
   if (topic === 'add' && ADD[rest]) return ADD[rest];

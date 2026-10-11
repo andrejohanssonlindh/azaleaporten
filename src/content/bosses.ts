@@ -25,6 +25,8 @@ export const BOSS_SLOTS: { id: string; where: string }[] = [
   { id: 'kroksback.mastare', where: 'Kroksbäck – slutboss' },
   { id: 'stapelbaddsparken.mastare', where: 'Stapelbäddsparken – slutboss' },
   { id: 'stavningstrasket.mastare', where: 'Stavningsträsket – slutboss' },
+  { id: 'rimbacken.mastare', where: 'Rimbäcken – slutboss' },
+  { id: 'meningssmedjan.mastare', where: 'Meningssmedjan – slutboss' },
   { id: 'glosviken.mastare', where: 'Glosviken – slutboss' },
 ];
 
@@ -208,6 +210,26 @@ export const GENERIC_PERSONAS: Persona[] = [
     onBossHit: ['Felfritt!', 'Vilken stavning!'],
     defeat: 'Du stavar som en riktig mästare! Ta min bläckfjäder – den darrar aldrig.',
     signatureItem: { name: 'Bläckfjädern', slot: 'vapen', flavor: 'Skriver aldrig ett enda stavfel.' },
+  },
+  {
+    boss: 'rimbacken.mastare', name: 'Skalden Strofa', title: 'Rimbäckens Mästare', portrait: '🎻', color: '#1971c2',
+    entrance: 'Välkommen till mynningen, där bäcken möter havet! Jag diktar, du svarar. Rim och motsats, ord som leker – är du redo för mitt kväde?',
+    phase2: 'Nu blir orden djupare – ett ord kan betyda mer än du tror!',
+    phase3: 'Sista versen: uttryck och ord som bäcken gömt längst ner!',
+    onHeroMiss: ['Lyssna på ordet en gång till!', 'Hm, det rimmar inte riktigt.'],
+    onBossHit: ['Vackert!', 'Det där rimmar på seger!'],
+    defeat: 'Du har ett ordförråd stort som havet! Ta min fiol – den spelar bara vackra ord.',
+    signatureItem: { name: 'Skaldens fiol', slot: 'skold', flavor: 'Spelar en ny melodi för varje ord du lär dig.' },
+  },
+  {
+    boss: 'meningssmedjan.mastare', name: 'Smedmästarinnan Städ', title: 'Meningssmedjans Mästare', portrait: '⚒️', color: '#c92a2a',
+    entrance: 'Välkommen till ässjan! Här smider vi meningar som håller i hundra år. Stor bokstav, rätt ordning, rätt tecken. Hammaren redo?',
+    phase2: 'Nu hamrar vi ihop långa meningar – med komman på rätt ställe!',
+    phase3: 'Sista provet: allt du har lärt dig, i full fart!',
+    onHeroMiss: ['Den meningen sprack! Smid om den.', 'Kolla tecknen en gång till.'],
+    onBossHit: ['Den håller!', 'Mästerligt smitt!'],
+    defeat: 'Dina meningar håller som stål! Ta min hammare – den slår aldrig fel.',
+    signatureItem: { name: 'Mästarinnans hammare', slot: 'vapen', flavor: 'Varje slag sätter ett ord på rätt plats.' },
   },
 ];
 

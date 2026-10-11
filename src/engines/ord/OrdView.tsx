@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { GameModule, QuestionViewProps } from '../../platform/rpg/types';
 import { canSpeak, hasVoice, speak, voices } from '../../platform/speech';
-import { diagnoseAny, errLabel, explainAny, hintFor, isRight, norm, same } from './check';
+import { diagnoseAny, errLabel, explainAny, hintFor, isRight, norm, sameAs } from './check';
 import { isTouch, Tangentbord } from './Tangentbord';
 import type { Explained, OrdGame, OrdKind, OrdQ } from './types';
 
 // En ordfråga. Samma flöde som drill- och klockfrågorna: öppen → (fel) rätta → klar.
-// Bara första svaret räknas; ett fel måste rättas. Ett skrivet ord visas efter tre försök;
-// vid val och markera hittar barnet själv rätt bland det som är kvar.
+// Bara första svaret räknas; ett fel måste rättas. Ett skrivet ord och en byggd mening visas efter
+// tre försök; vid val och markera hittar barnet själv rätt bland det som är kvar.
 
 type Phase = 'open' | 'fixing' | 'done';
 
@@ -21,6 +21,9 @@ function Gap({ sentence, fill }: { sentence: string; fill?: string }) {
     </p>
   );
 }
+
+/** Stor bokstav först i en mening. */
+const capFirst = (s: string) => s.charAt(0).toLocaleUpperCase('sv') + s.slice(1);
 
 const MISS: Explained = { title: 'Leta vidare', text: 'Ordet du tryckte på stämmer. Läs meningen långsamt, ett ord i taget. Vilket ord ser fel ut?' };
 
@@ -36,6 +39,7 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
     const [warn, setWarn] = useState('');
     const [soundHelp, setSoundHelp] = useState(false);
     const [noSound, setNoSound] = useState(false);
+    const [placed, setPlaced] = useState<number[]>([]);
     const t0 = useRef(performance.now());
     const inputRef = useRef<HTMLInputElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null);
@@ -74,25 +78,35 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
       first(correct, tag);
       if (correct) { setPhase('done'); return; }
       if (kind === 'val') setWrong((w) => [...w, given]);
-      else setInput('');
+      else if (kind === 'skriv') setInput('');
       wrongAnswer(explainAny(g, tag!, q, given));
     }
 
     function checkToken(i: number) {
       if (phase === 'done') return;
       const correct = q.targets!.includes(i);
-      const tag = correct ? undefined : (q.missTag ?? 'annat');
+      const tag = correct ? undefined : (q.misses?.[i] ?? q.missTag ?? 'annat');
       first(correct, tag);
       if (correct) { setPhase('done'); return; }
       setWrong((w) => [...w, String(i)]);
-      wrongAnswer(MISS);
+      wrongAnswer(g.explainMiss?.(q, i, tag!) ?? MISS);
+    }
+
+    // ordna: barnet trycker på bitarna i tur och ordning; en lagd bit trycks tillbaka.
+    const built = placed.map((i) => q.tiles![i]).join(' ');
+    function checkOrder() {
+      if (placed.length < (q.tiles?.length ?? 0)) { setWarn('Använd alla bitarna.'); return; }
+      checkText(built);
     }
 
     const wasWrong = tries > 0;
-    const next = () => onDone(wasWrong ? (tries >= 3 && kind === 'skriv' ? 'shown' : 'self') : undefined);
+    const shows = kind === 'skriv' || kind === 'ordna';
+    const next = () => onDone(wasWrong ? (tries >= 3 && shows ? 'shown' : 'self') : undefined);
     const feedback = phase === 'done' ? (wasWrong ? 'Rätt! Nu stämmer det.' : 'Rätt! Bra jobbat!') : phase === 'fixing' ? (tries > 1 ? 'Fortfarande fel' : 'Fel') : '';
     const task = kind === 'val' ? 'Välj ett annat alternativ.' : kind === 'markera' ? 'Leta vidare!'
+      : kind === 'ordna' ? (tries >= 3 ? `Så här blir det: ${capFirst(q.answer)}${q.end ?? ''} Bygg meningen så.` : 'Flytta bitarna och rätta igen.')
       : tries >= 3 ? `Så här stavas ordet: ${q.answer}. Skriv av det för att gå vidare.` : 'Rätta ordet för att gå vidare.';
+    const long = q.alts?.some((a) => (a.label ?? a.text).length > 16);
     const done = phase === 'done';
     const status = (
       <>
@@ -134,11 +148,36 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
               {q.tokens!.map((t, i) => {
                 const hit = done && q.targets!.includes(i);
                 const miss = wrong.includes(String(i));
-                return <button key={i} type="button" class={`ord-token${hit ? ' hit' : ''}${miss ? ' miss' : ''}`} disabled={done || miss} onClick={() => checkToken(i)}>{t}</button>;
+                return (
+                  <button key={i} type="button" class={`ord-token${hit ? (q.mark ? ' hit marked' : ' hit') : ''}${miss ? ' miss' : ''}`} disabled={done || miss} onClick={() => checkToken(i)}>
+                    {t}{hit && q.mark && <b class="ord-mark">{q.mark}</b>}
+                  </button>
+                );
               })}
             </p>
           )
-          : q.sentence && <Gap sentence={q.sentence} fill={done ? q.answer : undefined} />}
+          : kind === 'ordna'
+            ? (
+              <div class="ordna">
+                <p class={`ord-sentence ordna-line${done ? ' done' : ''}`} aria-label="Din mening">
+                  {placed.length
+                    ? placed.map((i, k) => (
+                      <button key={i} type="button" class="ord-token placed" disabled={done} aria-label={`Ta bort ${q.tiles![i]}`}
+                        onClick={() => { setPlaced((p) => p.filter((x) => x !== i)); setWarn(''); }}>{k === 0 ? capFirst(q.tiles![i]) : q.tiles![i]}</button>
+                    ))
+                    : <span class="ordna-empty">Tryck på bitarna i rätt ordning</span>}
+                  <span class="ordna-end">{q.end}</span>
+                </p>
+                {!done && (
+                  <div class="ord-tokens ordna-pool" role="group" aria-label="Bitarna">
+                    {q.tiles!.map((t, i) => (placed.includes(i)
+                      ? <span key={i} class="ord-token ghost" aria-hidden="true">{t}</span>
+                      : <button key={i} type="button" class="ord-token" onClick={() => { setPlaced((p) => [...p, i]); setWarn(''); }}>{t}</button>))}
+                  </div>
+                )}
+              </div>
+            )
+            : q.sentence && <Gap sentence={q.sentence} fill={done ? (q.fill ?? q.answer) : undefined} />}
 
         {/* Vid skriv står rättningen ovanför rutan, så att den syns ovanför tangentbordet på en mobil. */}
         {kind === 'skriv' && status}
@@ -153,11 +192,18 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
           </form>
         )}
 
+        {kind === 'ordna' && !done && (
+          <div class="row center-row"><button type="button" class="btn primary" onClick={checkOrder}>Rätta</button></div>
+        )}
+
         {kind === 'val' && !done && (
-          <div class="drill-choices words" role="group" aria-label="Välj svar">
+          <div class={long ? 'choices' : 'drill-choices words'} role="group" aria-label="Välj svar">
             {q.alts!.map((a) => {
-              const off = wrong.some((w) => same(w, a.text, true));
-              return <button key={a.text} type="button" class={`btn drill-choice ord-choice${off ? ' wrong' : ''}`} disabled={off} onClick={() => checkText(a.text)}>{a.text}</button>;
+              const off = wrong.some((w) => sameAs(q, w, a.text, true));
+              return (
+                <button key={a.text} type="button" class={`${long ? 'choice' : 'btn drill-choice'} ord-choice${off ? ' wrong' : ''}`} disabled={off}
+                  onClick={() => checkText(a.text)}>{a.label ?? a.text}</button>
+              );
             })}
           </div>
         )}

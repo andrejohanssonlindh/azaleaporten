@@ -252,6 +252,7 @@ const PET_STAT: Record<string, Stat> = {
   'langa-ben': 'kraft', 'fel-skala': 'klurighet', 'raknade-omkrets': 'skydd', 'glomde-halvera': 'kraft', 'bara-synliga': 'tur', adderade: 'snabbhet',
   'radie-diameter': 'snabbhet', 'glomde-pi': 'tur',
   'enkel-konsonant': 'kraft', 'sj-ljud': 'klurighet', sarskrivning: 'tur',
+  tvartom: 'snabbhet', bokstavligt: 'visdom', punkt: 'skydd', 'komma-och': 'tur',
 };
 
 /** Ger husdjursföremålet för en tämjd boss (om det inte redan finns). */
