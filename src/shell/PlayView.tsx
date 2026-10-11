@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'preact/hooks';
-import { dataRev, gate, go, heroId, toast, touch } from '../state';
+import { chestModal, dataRev, gate, go, heroId, toast, touch } from '../state';
 import { getHeroState, getProfile } from '../platform/profiles';
 import {
   abandonRun, advance, currentQuestion, findNode, finishRun, getPlay, hintsLeft, nextOpenNode, getArea,
@@ -12,16 +12,18 @@ import { personaFor } from '../content/bosses';
 import { ERR } from '../games/klocka/logic/diagnose';
 import { leaveToPicker } from '../session';
 import { Portrait, Screen, Stars } from './ui';
+import { ItemCard } from './Loot';
+import { getInv } from '../platform/rpg/inventory';
 
 // Spelskärmen: en runda (10 frågor), en repetition (5 frågor) eller en bossstrid.
 
-interface BossFace { name: string; title: string; portrait: string; entrance: string; phase2?: string; onHeroMiss: string[]; onBossHit: string[]; defeat: string }
+interface BossFace { name: string; title: string; portrait: string; entrance: string; phase2?: string; onHeroMiss: string[]; onBossHit: string[]; defeat: string; signature?: { name: string; slot: string; flavor: string } }
 
 function bossFace(areaId: string, b: BossDef, grade: number): BossFace {
   if (b.kind === 'mastare') {
     const per = personaFor(`${areaId}.mastare`, gate.value?.pack ?? null, grade);
     if (per) return { name: per.name, title: per.title, portrait: per.portrait ?? b.icon, entrance: per.entrance, phase2: per.phase2,
-      onHeroMiss: per.onHeroMiss ?? [], onBossHit: per.onBossHit ?? [], defeat: per.defeat };
+      onHeroMiss: per.onHeroMiss ?? [], onBossHit: per.onBossHit ?? [], defeat: per.defeat, signature: per.signatureItem };
   }
   return { name: b.name, title: b.title, portrait: b.icon, entrance: b.lines.entrance, phase2: b.lines.phase2,
     onHeroMiss: b.lines.onHeroMiss ?? [], onBossHit: b.lines.onBossHit ?? [], defeat: b.lines.defeat };
@@ -108,7 +110,7 @@ export function PlayView({ areaId, nodeId, practice = false }: { areaId: string;
   function onDone(fixed?: 'self' | 'shown') {
     let r = run!;
     if (fixed) r = recordFixed(p!.id, r, fixed);
-    if (runOver(r)) { setOutcome(finishRun(p!.id, area, r)); touch(); return; }
+    if (runOver(r)) { setOutcome(finishRun(p!.id, area, r, { signature: face?.signature })); touch(); return; }
     setRun(advance(p!.id, r));
     setHintIdx(null);
   }
@@ -136,6 +138,7 @@ export function PlayView({ areaId, nodeId, practice = false }: { areaId: string;
             <div class="hpbar" aria-label={`Bossen har ${run.hp} av ${run.maxHp} kvar`}><div style={{ width: `${((run.hp ?? 0) / (run.maxHp ?? 1)) * 100}%` }} /></div>
           </div>
           <div class="hearts" aria-label={`${run.hearts} hjärtan kvar`}>{'❤️'.repeat(run.hearts ?? 0)}<span class="hearts-off">{'🖤'.repeat((run.maxHearts ?? 0) - (run.hearts ?? 0))}</span></div>
+          {run.lastHit && answered && <p class={`hit${run.lastHit.crit ? ' crit' : ''}`}>💥 −{run.lastHit.dmg}{run.lastHit.crit ? ' Fullträff!' : ''}</p>}
           {bossLine && <p class="boss-line">"{bossLine}"</p>}
         </div>
       ) : (
@@ -206,6 +209,13 @@ function Result({ o, areaId, node, face, practice, onAgain }: { o: Outcome; area
           {o.gained.mentor && <span>🎓 {o.gained.mentor} blir din mentor!</span>}
           {o.gained.title && <span>🏷️ Ny titel: {o.gained.title}</span>}
         </div>
+        {o.gained.items?.map((it) => <ItemCard key={it.id} it={it} />)}
+        {o.chests.length > 0 && getInv(hid).chests.some((c) => c.id === o.chests[0].id) && (
+          <button class="chest-found" onClick={() => { chestModal.value = o.chests[0].id; }}>
+            <span class="chest-big small-chest">{o.chests[0].kind === 'boss' ? '💎' : '🧰'}</span>
+            <span><b>Du hittade en skattkista!</b><small>Tryck för att öppna</small></span>
+          </button>
+        )}
         {o.tired && <p class="note">Hjälten är trött för idag – inga fler kastanjer, men allt du lär dig räknas!</p>}
         <div class="row center-row">
           <button class="btn" onClick={() => go(back)}>{practice ? 'Tillbaka' : 'Till tornet'}</button>

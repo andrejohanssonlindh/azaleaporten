@@ -13,7 +13,7 @@ import { BackBar, Mentor, Screen, Stars } from './ui';
 const BUILDINGS = [
   { id: 'gard', icon: '🏡', name: 'Azaleagården', desc: 'Ditt hem och ditt hjälteblad', to: 'gard' },
   { id: 'uppdrag', icon: '📜', name: 'Uppdragstavlan', desc: 'Dagens uppdrag', to: null },
-  { id: 'smedjan', icon: '⚒️', name: 'Smedjan', desc: 'Köp, smid och sälj', to: null },
+  { id: 'smedjan', icon: '⚒️', name: 'Smedjan', desc: 'Butik, smält och förbättra', to: 'smedjan' },
   { id: 'biblioteket', icon: '📖', name: 'Biblioteket', desc: 'Dina framsteg', to: null },
 ];
 

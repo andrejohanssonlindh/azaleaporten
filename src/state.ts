@@ -9,6 +9,8 @@ export const heroId = signal<string | null>(null);
 /** Förra besöket för aktiv hjälte (för Mästare Kastanjs hälsning). */
 export const previousVisit = signal<string | null>(null);
 export const dataRev = signal(0);
+/** Id för kistan som öppnas just nu (överlägg), eller null. */
+export const chestModal = signal<string | null>(null);
 export const touch = () => { dataRev.value++; };
 
 /* ---------- hash-router (GitHub Pages saknar SPA-fallback) ---------- */

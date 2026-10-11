@@ -1,7 +1,9 @@
 import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey, saveHeroState } from '../profiles';
 import { randomSeed, rngFrom } from '../rng';
-import { BOSS, CLEAR_MIN, HINTS_PER_DAY, needXP, PRACTICE_LENGTH, REWARD, RUN_LENGTH, TIRED_AFTER_MS, XP } from './balance';
+import { BOSS, BOSS_HP_SCALE, CLEAR_MIN, FAST_MS, HINTS_PER_DAY, LOOT, minHits, needXP, PRACTICE_LENGTH, REWARD, RUN_LENGTH, TIRED_AFTER_MS, XP } from './balance';
+import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, heroStats, useLifePotion, type Chest } from './inventory';
+import type { Item } from './items';
 import { allNodes, type AreaDef, type BossDef, type GameModule, type PathNode, type QuestionSpec, type StageDef } from './types';
 
 // Rundor, bossstrider och belöningar. Allt sparas direkt efter varje svar,
@@ -32,6 +34,9 @@ export interface RunState {
   maxHp?: number;
   hearts?: number;
   maxHearts?: number;
+  /** Satt för bossstrider från fas 3: HP räknas i poäng (träffar × 10) och utrustning påverkar skadan. */
+  hpScale?: number;
+  lastHit?: { dmg: number; crit: boolean };
 }
 
 export interface PlayState {
@@ -94,7 +99,9 @@ export const findNode = (area: AreaDef, id: string) => allNodes(area).find((n) =
 
 export function hintsLeft(hid: string): number {
   const prof = getProfile(hid);
-  return Math.max(0, HINTS_PER_DAY + (prof?.heroClass === 'uppfinnare' ? 1 : 0) - getPlay(hid).hintsUsed);
+  const inv = getInv(hid);
+  const bonus = inv.bonusHints.day === today() ? inv.bonusHints.n : 0;
+  return Math.max(0, HINTS_PER_DAY + (prof?.heroClass === 'uppfinnare' ? 1 : 0) + effects.extraHints(heroStats(hid)) + bonus - getPlay(hid).hintsUsed);
 }
 export function useHint(hid: string): boolean {
   if (hintsLeft(hid) < 1) return false;
@@ -110,7 +117,7 @@ export const isTired = (hid: string) => getPlay(hid).activeMs >= TIRED_AFTER_MS;
 export function giveXP(hid: string, areaId: string, base: number): { xp: number; levelUps: number } {
   if (base <= 0) return { xp: 0, levelUps: 0 };
   const cls = getProfile(hid)?.heroClass;
-  const xp = Math.round(base * (cls === 'trollkarl' ? 1 + XP.trollkarlBonus : 1));
+  const xp = Math.round(base * (1 + (cls === 'trollkarl' ? XP.trollkarlBonus : 0) + effects.xpBonus(heroStats(hid))));
   const s = getHeroState(hid);
   s.xp += xp;
   let levelUps = 0;
@@ -139,8 +146,10 @@ export function startRun(hid: string, area: AreaDef, node: PathNode, kind: RunSt
   const run: RunState = { kind, areaId: area.areaId, nodeId: node.id, seed: randomSeed(), index: 0, results: [], startedAt: new Date().toISOString(), xp: 0, levelUps: 0 };
   if (kind === 'boss' && node.type === 'boss') {
     const cls = getProfile(hid)?.heroClass;
-    const hearts = Math.min(BOSS.maxHearts, BOSS.hearts + (cls === 'riddare' ? BOSS.riddareHearts : 0));
-    Object.assign(run, { hp: node.hp, maxHp: node.hp, hearts, maxHearts: hearts });
+    const potion = useLifePotion(hid) ? 1 : 0;
+    const hearts = Math.min(BOSS.maxHearts, BOSS.hearts + (cls === 'riddare' ? BOSS.riddareHearts : 0) + effects.extraHearts(heroStats(hid)) + potion);
+    const hp = node.hp * BOSS_HP_SCALE;
+    Object.assign(run, { hp, maxHp: hp, hearts, maxHearts: hearts, hpScale: BOSS_HP_SCALE });
     const a = getArea(hid, area.areaId);
     const b = a.bosses[node.id] ?? { defeated: false, attempts: 0, wins: 0 };
     saveArea(hid, area.areaId, { ...a, bosses: { ...a.bosses, [node.id]: { ...b, attempts: b.attempts + 1 } } });
@@ -174,13 +183,30 @@ export function recordAnswer(hid: string, run: RunState, node: PathNode, a: Answ
   next.xp += g.xp;
   next.levelUps += g.levelUps;
   if (run.kind === 'boss') {
-    if (a.correct) next.hp = Math.max(0, (run.hp ?? 0) - 1);
-    else next.hearts = Math.max(0, (run.hearts ?? 0) - 1);
+    if (a.correct) {
+      const hit = bossHit(hid, run, node as BossDef, a.ms);
+      next.hp = Math.max(0, (run.hp ?? 0) - hit.dmg);
+      next.lastHit = hit;
+    } else {
+      next.hearts = Math.max(0, (run.hearts ?? 0) - 1);
+      next.lastHit = undefined;
+    }
   }
   logEvent(hid, { t: new Date().toISOString(), a: run.areaId, n: node.id, k: skill, c: a.correct, ms: a.ms, ...(errTag ? { e: errTag } : {}), ...(a.hint ? { h: true } : {}) });
   const p = getPlay(hid);
   savePlay(hid, { ...p, run: next, activeMs: p.activeMs + Math.min(a.ms, 60_000) });
   return next;
+}
+
+/** Skada för ett rätt svar. Taket gör att ingen utrustning kan vinna med färre än minHits rätta svar. */
+export function bossHit(hid: string, run: RunState, boss: BossDef, ms: number): { dmg: number; crit: boolean } {
+  if (!run.hpScale) return { dmg: 1, crit: false }; // strid påbörjad före fas 3
+  const st = heroStats(hid);
+  const ranger = getProfile(hid)?.heroClass === 'ranger';
+  const crit = Math.random() < effects.critChance(st, ranger);
+  const raw = effects.damage(st) + (ms < FAST_MS ? effects.fastBonus(st) : 0) + (crit ? 5 : 0);
+  const cap = Math.floor((run.maxHp ?? 0) / minHits(boss.kind, boss.hp));
+  return { dmg: Math.min(raw, cap), crit };
 }
 
 /** Barnet rättade sitt fel: liten XP-bonus, och frågan räknas som klar. */
@@ -234,7 +260,8 @@ export interface Outcome {
   kastanjer: number;
   levelUps: number;
   tired: boolean;
-  gained: { pet?: string; mentor?: string; title?: string };
+  gained: { pet?: string; mentor?: string; title?: string; items?: Item[] };
+  chests: Chest[];
 }
 
 export function starsFor(correct: number, total: number, avgMs: number, usedHint: boolean, thrMs: number): number {
@@ -243,14 +270,19 @@ export function starsFor(correct: number, total: number, avgMs: number, usedHint
   return !usedHint && avgMs <= thrMs ? 3 : 2;
 }
 
-export function finishRun(hid: string, area: AreaDef, run: RunState): Outcome {
+/** Föremålsnivå för en nod: stiger längs stigen. */
+export const nodeIlvl = (area: AreaDef, nodeId: string) => 1 + Math.floor(Math.max(0, allNodes(area).findIndex((n) => n.id === nodeId)) / 2);
+
+export function finishRun(hid: string, area: AreaDef, run: RunState, extras: { signature?: { name: string; slot: string; flavor: string } } = {}): Outcome {
   const node = findNode(area, run.nodeId)!;
   const correct = run.results.filter((r) => r.correct).length;
   const total = run.results.length;
   const avgMs = total ? run.results.reduce((s, r) => s + r.ms, 0) / total : 0;
   const usedHint = run.results.some((r) => r.hint);
   const o: Outcome = { kind: run.kind, correct, total, avgMs, usedHint, cleared: false, firstClear: false, stars: 0, newStars: 0,
-    bossWon: false, firstWin: false, xp: run.xp, kastanjer: 0, levelUps: run.levelUps, tired: isTired(hid), gained: {} };
+    bossWon: false, firstWin: false, xp: run.xp, kastanjer: 0, levelUps: run.levelUps, tired: isTired(hid), gained: {}, chests: [] };
+  const ilvl = nodeIlvl(area, run.nodeId);
+  let chest: { minRarity: 0 | 1 | 2; boss?: boolean } | null = null;
   const reward = (r: { xp?: number; kastanjer?: number }) => {
     const g = giveXP(hid, run.areaId, r.xp ?? 0);
     o.xp += g.xp;
@@ -273,8 +305,12 @@ export function finishRun(hid: string, area: AreaDef, run: RunState): Outcome {
     if (o.firstClear) reward({ ...REWARD.firstClear, kastanjer: REWARD.firstClear.kastanjer + REWARD.newStar.kastanjer * Math.max(0, stars - 1) });
     else if (o.cleared) reward({ ...REWARD.replayClear, kastanjer: REWARD.replayClear.kastanjer + REWARD.newStar.kastanjer * o.newStars });
     else reward(REWARD.failedRun);
+    if (o.firstClear) chest = { minRarity: stars === 3 ? 1 : 0 };
+    else if (o.cleared && (stars === 3 && o.newStars > 0)) chest = { minRarity: 2 };
+    else if (Math.random() < (o.cleared ? LOOT.replayClearChance : LOOT.failedRunChance)) chest = { minRarity: 0 };
   } else if (run.kind === 'practice') {
     reward(REWARD.practiceDone);
+    if (Math.random() < LOOT.practiceChance) chest = { minRarity: 0 };
   } else if (run.kind === 'boss' && node.type === 'boss') {
     const bp = a.bosses[node.id] ?? { defeated: false, attempts: 1, wins: 0 };
     o.bossWon = (run.hp ?? 1) <= 0;
@@ -290,10 +326,24 @@ export function finishRun(hid: string, area: AreaDef, run: RunState): Outcome {
       if (node.kind === 'mastare' && !s.mentors.includes(key)) { s.mentors = [...s.mentors, key]; o.gained.mentor = node.name; }
       if (!s.titles.includes(node.titleReward)) { s.titles = [...s.titles, node.titleReward]; s.title = node.titleReward; o.gained.title = node.titleReward; }
       saveHeroState(hid, s);
+      const items: Item[] = [];
+      if (node.kind === 'monster' && node.pet) { const it = givePetItem(hid, key, node.pet, node.trap); if (it) items.push(it); }
+      if (node.kind === 'mastare' && extras.signature) { const it = giveSignatureItem(hid, key, extras.signature); if (it) items.push(it); }
+      if (items.length) o.gained.items = items;
+      chest = { minRarity: 2, boss: true };
     } else if (o.bossWon) {
       // Mindre belöning, och bara en gång per dag och boss.
-      if (bp.lastWinDay !== today()) reward(REWARD.bossRewin);
+      if (bp.lastWinDay !== today()) { reward(REWARD.bossRewin); chest = { minRarity: 1, boss: true }; }
     } else reward(REWARD.bossLoss);
+  }
+
+  // Skattkista: aldrig när hjälten är trött; annars garanterad efter några rundor utan.
+  if (!o.tired) {
+    if (!chest && getInv(hid).pity + 1 >= LOOT.pityRuns) chest = { minRarity: 0 };
+    if (chest) {
+      const c = addChest(hid, { ilvl: ilvl + (chest.boss ? 1 : 0), minRarity: chest.minRarity, kind: chest.boss ? 'boss' : 'vanlig', source: node.name });
+      o.chests.push(c);
+    } else bumpPity(hid);
   }
   const p = getPlay(hid);
   savePlay(hid, { ...p, run: null });

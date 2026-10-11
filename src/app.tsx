@@ -13,6 +13,7 @@ import { PlayView } from './shell/PlayView';
 import { Ovning } from './shell/Ovning';
 import { LabbView } from './shell/LabbView';
 import { Gard } from './shell/Gard';
+import { ChestModal, Smedjan } from './shell/Loot';
 import { Vuxen } from './shell/Vuxen';
 
 let started = false;
@@ -40,6 +41,7 @@ export function App() {
   else if (!heroId.value || page === 'hjaltar') view = <HeroPicker />;
   else if (page === 'gard') view = <Gard />;
   else if (page === 'by') view = <Azaleabyn />;
+  else if (page === 'smedjan') view = <Smedjan />;
   else if (page === 'region' && a) view = <RegionView id={a} />;
   else if (page === 'omrade' && a) view = <AreaView id={a} />;
   // key = sökvägen, så att en ny bana alltid får ett nytt spel-tillstånd
@@ -52,6 +54,7 @@ export function App() {
   return (
     <>
       {view}
+      <ChestModal />
       <div class="toasts" aria-live="polite">
         {toasts.value.map((t) => <div class="toast" key={t.id}>{t.text}</div>)}
       </div>

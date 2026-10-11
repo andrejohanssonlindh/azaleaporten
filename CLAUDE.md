@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Azaleaporten: a free, adventure/RPG-themed practice app (matematik, svenska, engelska) for school kids, hosted on GitHub Pages at `https://andrejohanssonlindh.github.io/azaleaporten/`. No backend: all progress lives in the browser's `localStorage` on each device. UI text, comments and many identifiers are **Swedish**; keep new user-facing text Swedish and child-friendly.
 
-The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phase 1 (platform skeleton) and Phase 2 (Tidstornet, the time-travel clock area) are done; next is Phase 3 (loot, Smedjan, equipment).
+The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phases 1–3 are done (platform, Tidstornet, loot/gear). **Current status and the next mission are in `STATUS.md`. Read it first.**
 
 ## Commands
 
@@ -72,6 +72,12 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
   - a run is saved after every answer, and questions are regenerated deterministically from `seed + index`, so a reload resumes the same question
   - all numbers live in `balance.ts`: no currency per answer, and 30 minutes a day after which no more kastanjer
   - `src/content/areas.ts` registers playable areas (`PLAYABLE`)
+- **Loot** (`src/platform/rpg/items.ts`, `inventory.ts`):
+  - items have a slot, a rarity from 0 (vanlig) to 4 (legendarisk), an item level and seeded stats (kraft, skydd, tur, visdom, snabbhet, klurighet)
+  - chests are stored with a seed when found and opened later, so a reload never rerolls them
+  - stats only affect boss damage (capped by `minHits`), hearts, crits, loot luck, XP % and hints per day
+  - tamed bosses become unique pet items, and a Mästare drops their persona's `signatureItem`
+  - the Smedjan (`#/smedjan`) has a shop, melting into azaleablad, and +1–+5 upgrades
 - **Tidstornet** (`src/games/klocka/`):
   - `logic/` holds the pure Swedish time-language model, the diagnosis of mistakes and the parser, ported from v0.1 and tested over all 720 times
   - `content.ts` holds the eras, stages, monster bosses (tamed → pets) and the final Mästare (persona via `personaFor`)

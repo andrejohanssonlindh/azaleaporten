@@ -49,3 +49,20 @@ export function kunskapLevel(xp: number): { level: number; into: number; need: n
   while (left >= need(level)) { left -= need(level); level++; }
   return { level, into: left, need: need(level) };
 }
+
+/** Skattkistor. Chanserna gäller per avslutad runda/strid; trött hjälte hittar inga kistor. */
+export const LOOT = {
+  capacity: 30,
+  maxCapacity: 60,
+  /** Garanterad kista efter så här många avslutade rundor utan kista. */
+  pityRuns: 3,
+  replayClearChance: 0.35,
+  failedRunChance: 0.1,
+  practiceChance: 0.2,
+};
+
+export const BOSS_HP_SCALE = 10;
+/** Minsta antal rätta svar för att vinna, oavsett utrustning (lärandets integritet). */
+export const minHits = (kind: 'monster' | 'mastare', hp: number) => (kind === 'mastare' ? Math.max(10, hp - 2) : Math.ceil(hp * 0.75));
+/** Snabbt svar i bossstrid (ms) ger extra skada med Snabbhet. */
+export const FAST_MS = 6000;
