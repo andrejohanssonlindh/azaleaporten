@@ -1,6 +1,6 @@
 # Status – Azaleaporten
 
-*Updated 2026-10-11: games are now lazy-loaded per area (main chunk 137 → 82 KB gzipped). Before that, the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
+*Updated 2026-10-11: Vuxenläge (Phase 6) is done: a per-hero overview, quota and multi-tab guards, a backup reminder. Before that, games became lazy-loaded per area (main chunk 137 → 82 KB gzipped), and the gear round after the user's first playtest: a drawn hero figure, Garderoben/Skräddaren, gear that shows in fights (path monsters, boss intro), Arenan as a mini-game prototype, and a tidier Azaleagården. Betongbukten, Talbergen and the village were done before. Live: https://andrejohanssonlindh.github.io/azaleaporten/*
 
 ## Done
 
@@ -56,6 +56,13 @@
 
 - **Lazy-loaded games:** `PLAYABLE[id]` is `{ def, load }`. The area definitions (data only) stay in the main chunk, so the map, quests and mentor work at once; the game code is `import()`ed when it is needed (`loadGame()`, cached; `useGame()` / `<Loading>` in `src/shell/useGame.tsx` show 🌸 while it loads and a "Försök igen" if it fails). A region boss loads all its region's games. The area page preloads its game. Klocka's Tidslabb UI and the v0.1 importer (Vuxenläge) are also loaded on demand; the console snippet lives in `src/platform/legacy/snippet.ts`. The service worker still precaches every chunk, so offline play works after the first visit. Tests get all games with `await loadAllGames()`.
 
+- **Vuxenläge, Phase 6:**
+  - **Hur går det?** (`src/shell/VuxenOversikt.tsx`, numbers from `src/platform/learning/stats.ts`): per hero, minutes/questions/% right the last 7 days; a 14-day bar chart of active time (per answer, at most a minute each, like tiredness); quests today, all-done days and streak; a skills map per area (green = box 4+, yellow = still practising, red = due); the most common error tags per area (labels from the lazily loaded game); the last 5 sessions (a 20-minute gap starts a new one).
+  - Quest history: `QuestState.history` (new field, default `[]`) keeps how many quests were done per past day (max 60), written when a new day's quests are made.
+  - **Full storage:** `kv.set` catches the quota error, runs registered pruners (`addPruner`, lowest prio first: moved-aside corrupt records → older backups, keeping the newest → halving each hero's event log, never below 200 → the last backup) and retries. Progress is never pruned. A toast says when something was cleared; if nothing more can go, `StorageFullError` reaches a global handler in `main.tsx` that tells the child to get an adult.
+  - **Multi-tab guard** (`src/platform/tabs.ts`): the newest tab announces itself on a `BroadcastChannel`, and older tabs replace the whole app with a "Spela här i stället" screen (which reloads to read fresh data and take over).
+  - **Backup reminder:** `Meta.lastExport` (set when the backup is downloaded); after 30 days without one (`backupDue()`), Vuxenläge and the hero picker's Vuxenläge link say so. Vuxenläge also shows whether the app runs installed (`isInstalled()`).
+
 Tests: `npm test` (Vitest, 163 tests; `tests/betongbukten.test.ts` covers the geometry traps, misconceptions and the calculator; `tests/drill-games.test.ts` checks every drill game the same way) and `npm run e2e` (Playwright, run them with `--global-timeout=180000` so a stuck test can't hang the terminal).
 
 - **Gear round (after the user's playtest notes):**
@@ -68,9 +75,10 @@ Tests: `npm test` (Vitest, 163 tests; `tests/betongbukten.test.ts` covers the ge
 
 ## Next mission
 
-Talbergen, Betongbukten and the village are done, and games are lazy-loaded (see below). Options, to pick with the user:
-1. **Vuxenläge, Phase 6**: the skills map (green/yellow/red per skill from `h:<id>:skills`, the most common error tags from the event log), time per day, quests done, install guides, quota and multi-tab guards. Much of it can reuse `src/shell/Biblioteket.tsx`.
-2. Svenska/engelska (wordpack engine) – the user put this on hold.
+Talbergen, Betongbukten, the village and Vuxenläge are done, and games are lazy-loaded (see below). Options, to pick with the user:
+1. Svenska/engelska (wordpack engine) – the user put this on hold.
+2. Read-aloud of drill questions (PLAN §12: read-aloud on every instruction; only mentor text has 🔊 today).
+3. The mastery component of kunskap levels (PLAN §9.4).
 
 Smaller things:
 - Arenan is a prototype: the user wants more mini-games later that the kids play with their characters, paid with tokens. Ideas: a second game type, tokens as quest rewards, rematches of beaten opponents.

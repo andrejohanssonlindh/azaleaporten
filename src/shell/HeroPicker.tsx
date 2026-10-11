@@ -1,5 +1,5 @@
 import { dataRev, gate, go } from '../state';
-import { getHeroState, listHeroes } from '../platform/profiles';
+import { backupDue, getHeroState, listHeroes } from '../platform/profiles';
 import { gradeName, heroClass } from '../content/heroes';
 import { selectHero } from '../session';
 import { Avatar, Screen, UpdateBanner } from './ui';
@@ -33,7 +33,7 @@ export function HeroPicker() {
         </button>
       </div>
       <footer class="picker-foot">
-        <button class="link" onClick={() => go('vuxen')}>Vuxenläge</button>
+        <button class="link" onClick={() => go('vuxen')}>Vuxenläge{backupDue() ? ' · 💾 dags för en säkerhetskopia' : ''}</button>
       </footer>
     </Screen>
   );

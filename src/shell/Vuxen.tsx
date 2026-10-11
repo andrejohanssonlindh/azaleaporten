@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { dataRev, gate, go, heroId, toast, touch } from '../state';
-import { cleanName, deleteHero, getProfile, listHeroes, saveProfile, type Profile } from '../platform/profiles';
+import { backupDue, cleanName, deleteHero, getMeta, getProfile, listHeroes, markExported, saveProfile, type Profile } from '../platform/profiles';
 import { exportAll, importReplace, isDeviceExport, listBackups, restoreBackup } from '../platform/storage/backup';
 import { kv } from '../platform/storage/kv';
 import { initGate, lockGate } from '../platform/gate/gate';
-import { requestPersistentStorage, storageInfo } from '../platform/device';
+import { isInstalled, requestPersistentStorage, storageInfo } from '../platform/device';
 import { GRADES, gradeName } from '../content/heroes';
 import { selectHero } from '../session';
 import type { V01Player } from '../platform/legacy/klockaV01';
 import { CONSOLE_SNIPPET } from '../platform/legacy/snippet';
 
-const legacy = () => import('../platform/legacy/klockaV01');
 import { Avatar, Screen } from './ui';
+import { HeroOverview } from './VuxenOversikt';
+
+const legacy = () => import('../platform/legacy/klockaV01');
 
 function AdultCheck({ onPass }: { onPass: () => void }) {
   const [a, b] = useMemo(() => [12 + Math.floor(Math.random() * 8), 12 + Math.floor(Math.random() * 8)], []);
@@ -127,6 +129,7 @@ export function Vuxen() {
   const g = gate.value!;
   const heroes = listHeroes();
   const backups = listBackups();
+  const meta = getMeta();
 
   async function importFile(file: File) {
     try {
@@ -147,6 +150,13 @@ export function Vuxen() {
         <button class="btn" onClick={() => go(heroId.value && getProfile(heroId.value) ? 'karta' : 'hjaltar')}>← Tillbaka</button>
       </header>
       <h1 class="page-title">Vuxenläge</h1>
+
+      {heroes.length > 0 && (
+        <section>
+          <h2>Hur går det?</h2>
+          {heroes.map((p) => <HeroOverview key={p.id} hid={p.id} />)}
+        </section>
+      )}
 
       <section class="card">
         <h2>Hjältar på den här enheten</h2>
@@ -170,8 +180,10 @@ export function Vuxen() {
       <section class="card">
         <h2>Säkerhetskopia och flytt</h2>
         <p>All data finns bara på den här enheten. Spara en kopia ibland, och använd den för att flytta hjältarna till en annan enhet.</p>
+        <p>Senaste nedladdade kopia: <b>{meta.lastExport ? new Date(meta.lastExport).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' }) : 'ingen än'}</b></p>
+        {backupDue() && <p class="note warn">💾 Det är dags att spara en ny säkerhetskopia (vi påminner efter 30 dagar).</p>}
         <div class="row">
-          <button class="btn primary small" onClick={() => download(`azaleaporten-${new Date().toISOString().slice(0, 10)}.json`, exportAll())}>Ladda ner säkerhetskopia</button>
+          <button class="btn primary small" onClick={() => { download(`azaleaporten-${new Date().toISOString().slice(0, 10)}.json`, exportAll()); markExported(); touch(); }}>Ladda ner säkerhetskopia</button>
           <label class="btn small file-btn">Återställ från fil…
             <input type="file" accept="application/json,.json" onChange={(e) => { const f = e.currentTarget.files?.[0]; if (f) importFile(f); e.currentTarget.value = ''; }} />
           </label>
@@ -205,7 +217,9 @@ export function Vuxen() {
             Be om beständig lagring
           </button>
         )}
+        <p class="note">Om minnet blir fullt rensas först gamla automatiska säkerhetskopior och sedan den äldsta statistiken. Framsteg, stjärnor och saker rensas aldrig.</p>
         <h3>Installera som app (rekommenderas)</h3>
+        {isInstalled() && <p class="note">✓ Appen är installerad på den här enheten.</p>}
         <ul class="install">
           <li><b>iPad/iPhone (Safari):</b> Dela-knappen → "Lägg till på hemskärmen". Viktigt – annars kan Safari rensa sparad data efter en vecka utan besök.</li>
           <li><b>Android (Chrome):</b> menyn ⋮ → "Installera app" / "Lägg till på startskärmen".</li>

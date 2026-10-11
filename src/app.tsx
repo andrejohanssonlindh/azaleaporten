@@ -19,6 +19,8 @@ import { ChestModal, Smedjan } from './shell/Loot';
 import { Vuxen } from './shell/Vuxen';
 import { Skraddaren } from './shell/Skraddaren';
 import { Arenan } from './shell/Arenan';
+import { pausedByOtherTab, takeOverTab } from './platform/tabs';
+import { Mentor, Screen } from './shell/ui';
 
 let started = false;
 async function start() {
@@ -36,6 +38,17 @@ export function App() {
   const g = gate.value;
   const [page, a, b] = route.value;
   const path = route.value.join('/');
+
+  // En annan flik har tagit över: visa bara det här, så att inget i den här fliken kan skriva över.
+  if (pausedByOtherTab.value) {
+    return (
+      <Screen class="place">
+        <Mentor text="Azaleaporten öppnades i en annan flik eller ett annat fönster. Där fortsätter äventyret, så den här fliken vilar.">
+          <button class="btn primary" onClick={takeOverTab}>Spela här i stället</button>
+        </Mentor>
+      </Screen>
+    );
+  }
 
   let view;
   if (!g) view = <div class="splash" aria-busy="true">🌸</div>;

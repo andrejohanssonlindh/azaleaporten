@@ -24,6 +24,15 @@ export async function storageInfo(): Promise<{ persisted: boolean; usedKB: numbe
   }
 }
 
+/** true om appen körs installerad (från hemskärmen), inte i en vanlig webbläsarflik. */
+export function isInstalled(): boolean {
+  try {
+    return matchMedia('(display-mode: standalone)').matches || (navigator as { standalone?: boolean }).standalone === true;
+  } catch {
+    return false;
+  }
+}
+
 /** true när en ny version är nedladdad och väntar. Visas bara på kartan/hjälteväljaren, aldrig mitt i en runda. */
 export const updateReady = signal(false);
 let doUpdate: ((reload?: boolean) => Promise<void>) | null = null;

@@ -707,3 +707,35 @@ button.stat.on { border-color: var(--accent); }
   @keyframes hurt { 30% { transform: translateX(-6px); opacity: .5; } 60% { opacity: 1; } }
   @keyframes pop { from { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.2); } }
 }
+
+/* ---------- Vuxenläge: översikt per hjälte ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.plain { list-style: none; padding: 0; margin: 0 0 8px; }
+.plain li { margin: 4px 0; }
+.overview > :not(summary):last-child { margin-bottom: 14px; }
+.overview summary { gap: 10px; }
+.time-chart { margin: 14px 0 0; }
+.time-chart figcaption { font-weight: 700; margin-bottom: 8px; }
+.time-chart figcaption small { font-weight: 400; color: var(--muted); }
+.tc-plot { display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; height: 120px; border-bottom: 1px solid var(--line); padding-bottom: 0; }
+.tc-col { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; outline-offset: 1px; }
+.tc-bar { width: 100%; max-width: 22px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 0; }
+.tc-day { position: absolute; bottom: -20px; font-size: 11px; color: var(--muted); }
+.tc-day.today { color: var(--ink); font-weight: 800; }
+.tc-col:hover .tc-bar, .tc-col:focus-visible .tc-bar { background: var(--accent-2); }
+.tc-col[data-tip]:hover::after, .tc-col[data-tip]:focus-visible::after {
+  content: attr(data-tip); position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); z-index: 2;
+  background: var(--ink); color: var(--card); font-size: 12px; padding: 3px 7px; border-radius: 6px; white-space: nowrap; pointer-events: none;
+}
+.tc-col:first-child[data-tip]::after { left: 0; transform: none; }
+.tc-col:last-child[data-tip]::after { left: auto; right: 0; transform: none; }
+.time-chart .note { margin-top: 26px; }
+.skillmap-legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.skillmap-area { margin: 10px 0; }
+.skillmap-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.skill-chip { display: inline-flex; gap: 4px; align-items: center; font-size: 13px; padding: 3px 9px; border-radius: 999px; border: 1.5px solid; color: var(--ink); }
+.skill-chip.gron { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, var(--card)); }
+.skill-chip.gul { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 14%, var(--card)); }
+.skill-chip.rod { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--card)); }
+.session-list li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+.session-list li:last-child { border-bottom: 0; }

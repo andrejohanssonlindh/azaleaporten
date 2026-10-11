@@ -12,6 +12,8 @@ export interface Meta {
   heroes: string[];
   lastHero: string | null;
   createdAt: string;
+  /** Senaste gången en säkerhetskopia laddades ner i Vuxenläge. */
+  lastExport: string | null;
 }
 
 export interface Settings {
@@ -63,7 +65,7 @@ const now = () => new Date().toISOString();
 
 export const META: RecordSpec<Meta> = {
   version: 1,
-  defaults: () => ({ v: 1, deviceId: uuid(), heroes: [], lastHero: null, createdAt: now() }),
+  defaults: () => ({ v: 1, deviceId: uuid(), heroes: [], lastHero: null, createdAt: now(), lastExport: null }),
 };
 
 export const PROFILE: RecordSpec<Profile> = {
@@ -88,6 +90,19 @@ export function getMeta(): Meta {
 }
 
 function saveMeta(m: Meta) { saveRecord('meta', META, m); }
+
+export const BACKUP_REMINDER_DAYS = 30;
+
+export function markExported(at = new Date()) { saveMeta({ ...getMeta(), lastExport: at.toISOString() }); }
+
+/** Dags att påminna om en säkerhetskopia: det finns hjältar, och det har gått 30 dagar sedan förra kopian
+ *  (eller sedan enheten började användas, om ingen kopia har tagits). */
+export function backupDue(now = new Date()): boolean {
+  const m = getMeta();
+  if (!m.heroes.length) return false;
+  const since = Date.parse(m.lastExport ?? m.createdAt);
+  return !Number.isFinite(since) || now.getTime() - since >= BACKUP_REMINDER_DAYS * 86_400_000;
+}
 
 export function listHeroes(): Profile[] {
   return getMeta().heroes

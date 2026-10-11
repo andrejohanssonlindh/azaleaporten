@@ -1,4 +1,4 @@
-import { kv } from './kv';
+import { addPruner, kv } from './kv';
 
 // Ögonblicksbilder av all sparad data. Tas automatiskt innan någon migrering körs
 // och innan import/radering. De tre senaste behålls.
@@ -39,6 +39,18 @@ function collect(): Record<string, unknown> {
 export function listBackups(): string[] {
   return kv.keys(BACKUP);
 }
+
+// Full lagring: först får äldre backuper gå (den senaste behålls), och allra sist även den senaste.
+addPruner(1, () => {
+  const old = listBackups().slice(0, -1);
+  for (const k of old) kv.remove(k);
+  return old.length > 0;
+});
+addPruner(9, () => {
+  const all = listBackups();
+  for (const k of all) kv.remove(k);
+  return all.length > 0;
+});
 
 /** Tar en backup. Kastar om det inte går (t.ex. full lagring) – då ska anroparen avstå från att ändra data. */
 export function snapshot(reason: string): string {

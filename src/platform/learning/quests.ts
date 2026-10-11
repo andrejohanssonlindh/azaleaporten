@@ -29,14 +29,20 @@ export interface QuestState {
   /** Måndagen i veckan då frysdagen senast användes. */
   freezeWeek: string | null;
   best: number;
+  /** Tidigare dagar: hur många uppdrag som blev klara (för Vuxenläge). Senaste sist, högst HISTORY_CAP. */
+  history: { day: string; done: number; of: number }[];
 }
 
 export const QUESTS: RecordSpec<QuestState> = {
   version: 1,
-  defaults: () => ({ v: 1, day: '', list: [], chest: false, streak: 0, streakDay: null, freezeWeek: null, best: 0 }),
+  defaults: () => ({ v: 1, day: '', list: [], chest: false, streak: 0, streakDay: null, freezeWeek: null, best: 0, history: [] }),
 };
 
 const key = (hid: string) => heroKey(hid, 'quests');
+const HISTORY_CAP = 60;
+
+/** Uppdragen utan att skapa dagens (Vuxenläge ska bara titta, inte ändra). */
+export const peekQuests = (hid: string) => loadRecord(key(hid), QUESTS).value;
 
 /** Måndagen i dagens vecka. */
 export function weekOf(day: string): string {
@@ -74,7 +80,8 @@ function makeQuests(hid: string): Quest[] {
 export function getQuests(hid: string, day = dayOf()): QuestState {
   const r = loadRecord(key(hid), QUESTS).value;
   if (r.day === day) return r;
-  const next = { ...r, day, list: makeQuests(hid), chest: false };
+  const history = r.day && r.list.length ? [...r.history, { day: r.day, done: r.list.filter((q) => q.done).length, of: r.list.length }].slice(-HISTORY_CAP) : r.history;
+  const next = { ...r, day, list: makeQuests(hid), chest: false, history };
   saveRecord(key(hid), QUESTS, next);
   return next;
 }

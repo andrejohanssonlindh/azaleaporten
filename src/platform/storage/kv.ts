@@ -44,6 +44,42 @@ let backend: Backend = detect();
 /** Endast för tester. */
 export function setBackend(b: Backend) { backend = b; }
 
+/* ---------- full lagring ---------- */
+// Moduler som har data som kan offras registrerar en rensare: den tar bort lite och svarar true om något
+// frigjordes. Rensarna körs i prioritetsordning (lägst först). Framsteg (stjärnor, XP, saker) rensas aldrig.
+
+type Pruner = { prio: number; run: () => boolean };
+const pruners: Pruner[] = [];
+const freedListeners: (() => void)[] = [];
+let pruning = false;
+
+export function addPruner(prio: number, run: () => boolean) {
+  pruners.push({ prio, run });
+  pruners.sort((a, b) => a.prio - b.prio);
+}
+
+/** Anropas när plats har frigjorts (för att kunna tala om det). */
+export function onSpaceFreed(fn: () => void) { freedListeners.push(fn); }
+
+function freeSpace(): boolean {
+  pruning = true;
+  try {
+    for (const p of pruners) {
+      try { if (p.run()) return true; } catch { /* nästa rensare */ }
+    }
+    return false;
+  } finally {
+    pruning = false;
+  }
+}
+
+// Trasiga poster som flyttats undan är det första som får gå.
+addPruner(0, () => {
+  const bad = kv.keys('corrupt:');
+  for (const k of bad) kv.remove(k);
+  return bad.length > 0;
+});
+
 function isQuota(e: unknown) {
   return e instanceof DOMException && (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014);
 }
@@ -62,13 +98,22 @@ export const kv = {
     }
   },
 
+  /** Sparar. Är lagringen full frigörs plats (se addPruner) och försöket görs om; först när inget mer
+   *  kan rensas kastas StorageFullError. */
   set(key: string, value: unknown): void {
-    try {
-      backend.setItem(PREFIX + key, JSON.stringify(value));
-    } catch (e) {
-      if (isQuota(e)) throw new StorageFullError();
-      throw e;
+    const raw = JSON.stringify(value);
+    let freed = false;
+    for (;;) {
+      try {
+        backend.setItem(PREFIX + key, raw);
+        break;
+      } catch (e) {
+        if (!isQuota(e)) throw e;
+        if (pruning || !freeSpace()) throw new StorageFullError();
+        freed = true;
+      }
     }
+    if (freed) for (const fn of freedListeners) fn();
   },
 
   remove(key: string): void { backend.removeItem(PREFIX + key); },
