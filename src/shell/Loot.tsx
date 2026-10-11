@@ -104,7 +104,7 @@ export function Smedjan() {
                 onClick={() => { if (buy(p.id, x.id, today())) { toast(`${x.icon} ${x.name} köpt!`); touch(); } else toast('Det gick inte just nu.'); }}>{x.cost} 🌰</button>
             </div>
           ))}
-          <p class="note">Du har {inv.potions.liv} livsdryck{inv.potions.liv === 1 ? '' : 'er'} · Packning {inv.items.length}/{inv.capacity}</p>
+          <p class="note">Du har {inv.potions.liv} livsdryck{inv.potions.liv === 1 ? '' : 'er'} · {inv.potions.skold ?? 0} sköldamulett{(inv.potions.skold ?? 0) === 1 ? '' : 'er'} · Packning {inv.items.length}/{inv.capacity}</p>
         </section>
       )}
 

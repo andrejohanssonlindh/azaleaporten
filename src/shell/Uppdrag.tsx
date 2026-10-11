@@ -1,6 +1,7 @@
 import { dataRev, go, heroId } from '../state';
 import { getProfile } from '../platform/profiles';
 import { getPlay } from '../platform/rpg/progress';
+import { getInv } from '../platform/rpg/inventory';
 import { currentStreak, getQuests, type Quest } from '../platform/learning/quests';
 import { leaveToPicker } from '../session';
 import { BackBar, Mentor, Screen } from './ui';
@@ -24,7 +25,8 @@ export function Uppdrag() {
   const p = getProfile(heroId.value!);
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   const st = getQuests(p.id);
-  const streak = currentStreak(st);
+  const amulets = getInv(p.id).potions.skold ?? 0;
+  const streak = currentStreak(st, undefined, amulets);
   const left = st.list.filter((q) => !q.done).length;
   const lastArea = getPlay(p.id).last?.areaId;
   const say = st.chest
@@ -52,6 +54,7 @@ export function Uppdrag() {
         <p class="muted">
           Klara alla tre uppdragen en dag för att hålla sviten vid liv.
           {streak.freezeLeft ? ' Du har en frysdag kvar den här veckan: missar du en dag räddar den sviten.' : ' Veckans frysdag är använd.'}
+          {amulets > 0 && ` Du har ${amulets} sköldamulett${amulets === 1 ? '' : 'er'} 🧿 som skyddar sviten.`}
           {st.best > 1 && ` Ditt rekord: ${st.best} dagar.`}
         </p>
       </section>

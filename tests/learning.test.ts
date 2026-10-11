@@ -2,16 +2,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createHero, type NewHero } from '../src/platform/profiles';
 import {
-  advance, currentQuestion, findNode, finishRun, questionForSkill, recordAnswer, REVIEW_NODE, runOver, startReview, startRun,
+  advance, currentQuestion, findNode, finishRun, getArea, questionForSkill, saveArea, recordAnswer, REVIEW_NODE, runOver, startReview, startRun,
 } from '../src/platform/rpg/progress';
 import { addDays, dayOf, dueSkills, getSkills, mistByArea, reviewPlan, seedSkills, step, TOP_BOX } from '../src/platform/learning/skills';
 import { currentStreak, getQuests, noteRun, weekOf } from '../src/platform/learning/quests';
 import { logEvents } from '../src/platform/learning/events';
-import { getInv } from '../src/platform/rpg/inventory';
+import { getInv, saveInv } from '../src/platform/rpg/inventory';
 import { importV01, parseV01Paste } from '../src/platform/legacy/klockaV01';
 import { greeting } from '../src/platform/greeting';
 import { skillLabel } from '../src/content/skills';
-import { PLAYABLE } from '../src/content/areas';
+import { PLAYABLE, regionProgress } from '../src/content/areas';
 import { rngFrom } from '../src/platform/rng';
 import { allNodes, type AreaDef, type PathNode, type StageDef } from '../src/platform/rpg/types';
 import { freshStorage } from './helpers';
@@ -193,6 +193,24 @@ describe('Uppdragstavlan', () => {
     expect(getQuests(hid).best).toBe(3);
   });
 
+  it('sköldamuletter räddar sviten när frysdagen inte räcker', () => {
+    const hid = hero();
+    const doAll = () => {
+      for (const q of getQuests(hid).list) noteRun(hid, { kind: q.kind === 'dimma' ? 'review' : q.kind === 'ang' ? 'practice' : 'stage', areaId: q.areaId ?? 'x', nodeId: q.nodeId ?? 'x', cleared: true, won: false, progressed: true });
+    };
+    doAll();
+    const inv = getInv(hid);
+    saveInv(hid, { ...inv, potions: { ...inv.potions, skold: 1 } });
+    setDay(3); // två missade dagar: frysdagen + en amulett
+    expect(currentStreak(getQuests(hid), dayOf(), 1).n).toBe(1);
+    expect(currentStreak(getQuests(hid), dayOf(), 0).n).toBe(0);
+    const news = (() => { let n; for (const q of getQuests(hid).list) n = noteRun(hid, { kind: q.kind === 'dimma' ? 'review' : q.kind === 'ang' ? 'practice' : 'stage', areaId: q.areaId ?? 'x', nodeId: q.nodeId ?? 'x', cleared: true, won: false, progressed: true }); return n!; })();
+    expect(news.streak).toBe(2);
+    expect(news.usedFreeze).toBe(true);
+    expect(news.usedAmulets).toBe(1);
+    expect(getInv(hid).potions.skold).toBe(0);
+  });
+
   it('en riktig runda bockar av rätt uppdrag', () => {
     const hid = hero();
     const tio = area('tiokompisbron');
@@ -217,5 +235,35 @@ describe('Mästare Kastanj', () => {
     expect(g).toContain('fick 9 av 10');
     expect(g).toContain('"fem i halv" (och 2 till) i Tidstornet');
     expect(g).toContain('jaga bort');
+  });
+});
+
+describe('Talbergens regionboss', () => {
+  it('öppnar efter tre Mästare, blandar spel och lägger dimman i rätt område', () => {
+    const hid = hero();
+    const top = PLAYABLE.talbergen;
+    expect(regionProgress(hid, top.def)).toMatchObject({ have: 0, need: 3, open: false });
+    for (const a of ['tiokompisbron', 'tabellgruvan', 'myntmarknaden']) {
+      const def = area(a);
+      const m = allNodes(def).find((n) => n.type === 'boss' && n.kind === 'mastare')!;
+      const s = getArea(hid, a);
+      saveArea(hid, a, { ...s, bosses: { ...s.bosses, [m.id]: { defeated: true, attempts: 1, wins: 1 } } });
+    }
+    expect(regionProgress(hid, top.def).open).toBe(true);
+
+    const boss = top.def.eras[0].nodes[0];
+    let run = startRun(hid, top.def, boss);
+    const areas = new Set<string>();
+    for (let i = 0; i < 12; i++) {
+      const q = currentQuestion(run, boss, top.game);
+      areas.add(top.game.areaOf!(q));
+      run = recordAnswer(hid, run, boss, { correct: false, ms: 1000, hint: false }, top.game.skillOf(q), undefined, top.game.areaOf!(q));
+      if (runOver(run)) run = startRun(hid, top.def, boss); else run = advance(hid, run);
+    }
+    expect(areas.size).toBeGreaterThan(2);
+    setDay(1);
+    const mist = mistByArea(hid);
+    expect(mist.talbergen).toBeUndefined();
+    expect(Object.keys(mist).every((a) => areas.has(a))).toBe(true);
   });
 });

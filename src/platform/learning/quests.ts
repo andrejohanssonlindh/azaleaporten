@@ -1,8 +1,8 @@
 import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey } from '../profiles';
-import { addChest, type Chest } from '../rpg/inventory';
+import { addChest, getInv, saveInv, type Chest } from '../rpg/inventory';
 import { findNode, getArea, getPlay, nextOpenNode, type RunState } from '../rpg/progress';
-import { PLAYABLE } from '../../content/areas';
+import { PLAYABLE, regionProgress } from '../../content/areas';
 import { areaById, fitsGrade } from '../../content/world';
 import { getEvents } from './events';
 import { addDays, dayOf, daysBetween, mistByArea } from './skills';
@@ -61,7 +61,7 @@ function makeQuests(hid: string): Quest[] {
   const grade = getProfile(hid)?.grade ?? 0;
   const fits = Object.keys(PLAYABLE).filter((a) => { const w = areaById(a); return w && fitsGrade(w.area, grade); });
   const areas = [...(last && PLAYABLE[last] ? [last] : []), ...fits, ...Object.keys(PLAYABLE)];
-  for (const a of areas) {
+  for (const a of areas.filter((x) => regionProgress(hid, PLAYABLE[x].def).open)) {
     const n = nextOpenNode(PLAYABLE[a].def, getArea(hid, a));
     if (n) { out.push({ kind: 'framsteg', areaId: a, nodeId: n.id, label: `Ta nästa steg: ${n.type === 'boss' ? `besegra ${n.name}` : `klara ${n.name}`} i ${title(a)}`, done: false }); break; }
   }
@@ -79,17 +79,23 @@ export function getQuests(hid: string, day = dayOf()): QuestState {
   return next;
 }
 
-/** Sviten som den ser ut idag (0 om den har brutits). */
-export function currentStreak(r: QuestState, day = dayOf()): { n: number; freezeLeft: boolean } {
+/**
+ * Sviten som den ser ut idag (0 om den har brutits). Missade dagar räddas först av veckans frysdag,
+ * sedan av sköldamuletter (amulets = hur många hjälten har).
+ */
+export function currentStreak(r: QuestState, day = dayOf(), amulets = 0): { n: number; freezeLeft: boolean; missed: number } {
   const freezeLeft = r.freezeWeek !== weekOf(day);
-  if (!r.streakDay) return { n: 0, freezeLeft };
-  const gap = daysBetween(r.streakDay, day);
-  const alive = gap <= 1 || (gap === 2 && freezeLeft);
-  return { n: alive ? r.streak : 0, freezeLeft };
+  if (!r.streakDay) return { n: 0, freezeLeft, missed: 0 };
+  // Idag räknas inte som missad (den kan fortfarande klaras).
+  const missed = Math.max(0, daysBetween(r.streakDay, day) - 1);
+  const alive = missed <= (freezeLeft ? 1 : 0) + amulets;
+  return { n: alive ? r.streak : 0, freezeLeft, missed };
 }
 
+const amuletsOf = (hid: string) => getInv(hid).potions.skold ?? 0;
+
 /** Sviten utan att skapa dagens uppdrag (för topplisten på kartan). */
-export const streakOf = (hid: string) => currentStreak(loadRecord(key(hid), QUESTS).value).n;
+export const streakOf = (hid: string) => currentStreak(loadRecord(key(hid), QUESTS).value, dayOf(), amuletsOf(hid)).n;
 
 export interface RunReport { kind: RunState['kind']; areaId: string; nodeId: string; cleared: boolean; won: boolean; progressed: boolean }
 
@@ -103,7 +109,7 @@ function matches(q: Quest, r: RunReport): boolean {
   }
 }
 
-export interface QuestNews { done: Quest[]; allDone: boolean; chest: Chest | null; streak: number; usedFreeze: boolean }
+export interface QuestNews { done: Quest[]; allDone: boolean; chest: Chest | null; streak: number; usedFreeze: boolean; usedAmulets: number }
 
 /** Bockar av uppdrag efter en avslutad runda. Kistan sparas innan den visas (som all loot). */
 export function noteRun(hid: string, r: RunReport, day = dayOf()): QuestNews {
@@ -115,16 +121,28 @@ export function noteRun(hid: string, r: RunReport, day = dayOf()): QuestNews {
     done.push(d);
     return d;
   });
-  const news: QuestNews = { done, allDone: list.length > 0 && list.every((q) => q.done), chest: null, streak: currentStreak(st, day).n, usedFreeze: false };
+  const news: QuestNews = { done, allDone: list.length > 0 && list.every((q) => q.done), chest: null, streak: currentStreak(st, day, amuletsOf(hid)).n, usedFreeze: false, usedAmulets: 0 };
   let next: QuestState = { ...st, list };
   if (news.allDone && !st.chest) {
     const lvl = getHeroState(hid).level;
     news.chest = addChest(hid, { ilvl: Math.max(1, Math.min(10, Math.ceil(lvl / 2))), minRarity: 1, kind: 'dag', source: 'Dagens uppdrag' });
-    const gap = st.streakDay ? daysBetween(st.streakDay, day) : Infinity;
     let { streak, freezeWeek } = st;
-    if (gap === 1) streak++;
-    else if (gap === 2 && st.freezeWeek !== weekOf(day)) { streak++; freezeWeek = weekOf(day); news.usedFreeze = true; }
-    else if (gap !== 0) streak = 1;
+    if (!st.streakDay) streak = 1;
+    else if (st.streakDay !== day) {
+      let missed = Math.max(0, daysBetween(st.streakDay, day) - 1);
+      const amulets = amuletsOf(hid);
+      const canSave = missed <= (st.freezeWeek !== weekOf(day) ? 1 : 0) + amulets;
+      if (!canSave) streak = 1;
+      else {
+        if (missed > 0 && st.freezeWeek !== weekOf(day)) { missed--; freezeWeek = weekOf(day); news.usedFreeze = true; }
+        if (missed > 0) {
+          const inv = getInv(hid);
+          saveInv(hid, { ...inv, potions: { ...inv.potions, skold: amulets - missed } });
+          news.usedAmulets = missed;
+        }
+        streak++;
+      }
+    }
     next = { ...next, chest: true, streak, streakDay: day, freezeWeek, best: Math.max(st.best, streak) };
     news.streak = streak;
   }

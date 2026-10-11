@@ -16,7 +16,7 @@ import { skillLabel } from '../content/skills';
 
 export function bossName(areaId: string, b: BossDef, grade: number): string {
   if (b.kind !== 'mastare') return b.name;
-  return personaFor(`${areaId}.mastare`, gate.value?.pack ?? null, grade)?.name ?? b.name;
+  return personaFor(b.personaId ?? `${areaId}.mastare`, gate.value?.pack ?? null, grade)?.name ?? b.name;
 }
 
 export function AreaView({ id }: { id: string }) {
@@ -25,6 +25,7 @@ export function AreaView({ id }: { id: string }) {
   const pl = playable(id);
   const info = areaById(id);
   if (!p) { queueMicrotask(leaveToPicker); return null; }
+  if (pl?.def.region) { queueMicrotask(() => go(`region/${pl.def.region!.id}`)); return null; }
   if (!pl || !info) { queueMicrotask(() => go('karta')); return null; }
   const area = pl.def;
   const prog = getArea(p.id, id);

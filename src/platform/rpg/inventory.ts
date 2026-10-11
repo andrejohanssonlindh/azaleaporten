@@ -25,7 +25,8 @@ export interface Inventory {
   /** Avslutade rundor sedan senaste kistan (garanterad kista efter LOOT.pityRuns). */
   pity: number;
   capacity: number;
-  potions: { liv: number };
+  /** skold = Sköldamuletter: var och en räddar sviten en missad dag (saknas i äldre sparningar). */
+  potions: { liv: number; skold?: number };
   bonusHints: { day: string; n: number };
 }
 
@@ -166,6 +167,7 @@ export const SHOP = [
   { id: 'ledtrad', icon: '💡', name: 'Ledtrådsdryck', cost: 15, desc: 'En extra ledtråd idag.' },
   { id: 'liv', icon: '🧪', name: 'Livsdryck', cost: 25, desc: '+1 hjärta i nästa bossstrid.' },
   { id: 'packning', icon: '🎒', name: 'Större packning', cost: 60, desc: '+5 platser i packningen.' },
+  { id: 'skold', icon: '🧿', name: 'Sköldamulett', cost: 40, desc: 'Skyddar din svit en dag du inte hinner spela.' },
 ] as const;
 
 export function buy(hid: string, id: (typeof SHOP)[number]['id'], today: string): boolean {
@@ -177,7 +179,8 @@ export function buy(hid: string, id: (typeof SHOP)[number]['id'], today: string)
   const inv = getInv(hid);
   if (id === 'kista') { addChest(hid, { ilvl: Math.max(1, Math.min(10, s.level)), minRarity: 0, kind: 'kopt', source: 'Smedjan' }); return true; }
   if (id === 'ledtrad') saveInv(hid, { ...inv, bonusHints: { day: today, n: (inv.bonusHints.day === today ? inv.bonusHints.n : 0) + 1 } });
-  if (id === 'liv') saveInv(hid, { ...inv, potions: { liv: inv.potions.liv + 1 } });
+  if (id === 'liv') saveInv(hid, { ...inv, potions: { ...inv.potions, liv: inv.potions.liv + 1 } });
+  if (id === 'skold') saveInv(hid, { ...inv, potions: { ...inv.potions, skold: (inv.potions.skold ?? 0) + 1 } });
   if (id === 'packning') saveInv(hid, { ...inv, capacity: inv.capacity + 5 });
   return true;
 }
@@ -185,7 +188,7 @@ export function buy(hid: string, id: (typeof SHOP)[number]['id'], today: string)
 export function useLifePotion(hid: string): boolean {
   const inv = getInv(hid);
   if (inv.potions.liv < 1) return false;
-  saveInv(hid, { ...inv, potions: { liv: inv.potions.liv - 1 } });
+  saveInv(hid, { ...inv, potions: { ...inv.potions, liv: inv.potions.liv - 1 } });
   return true;
 }
 

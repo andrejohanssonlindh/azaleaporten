@@ -10,7 +10,7 @@ import { noteRun, type QuestNews } from '../platform/learning/quests';
 import { PRACTICE_LENGTH } from '../platform/rpg/balance';
 import { levelTitle } from '../platform/rpg/balance';
 import type { BossDef, PathNode } from '../platform/rpg/types';
-import { playable } from '../content/areas';
+import { playable, regionProgress } from '../content/areas';
 import { personaFor } from '../content/bosses';
 import { leaveToPicker } from '../session';
 import { Portrait, Screen, Stars } from './ui';
@@ -23,7 +23,7 @@ interface BossFace { name: string; title: string; portrait: string; entrance: st
 
 function bossFace(areaId: string, b: BossDef, grade: number): BossFace {
   if (b.kind === 'mastare') {
-    const per = personaFor(`${areaId}.mastare`, gate.value?.pack ?? null, grade);
+    const per = personaFor(b.personaId ?? `${areaId}.mastare`, gate.value?.pack ?? null, grade);
     if (per) return { name: per.name, title: per.title, portrait: per.portrait ?? b.icon, entrance: per.entrance, phase2: per.phase2,
       onHeroMiss: per.onHeroMiss ?? [], onBossHit: per.onBossHit ?? [], defeat: per.defeat, signature: per.signatureItem };
   }
@@ -70,7 +70,7 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
   const era = area.eras.find((e) => e.nodes.some((n) => n.id === node.id));
   const boss = node.type === 'boss' ? node : null;
   const face = boss ? bossFace(areaId, boss, p.grade) : null;
-  const back = practice || review ? 'ovning' : `omrade/${areaId}`;
+  const back = practice || review ? 'ovning' : area.region ? `region/${area.region.id}` : `omrade/${areaId}`;
 
   /* ---------- resultat ---------- */
   if (outcome) {
@@ -87,6 +87,21 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
           <h1>Ingen dimma här!</h1>
           <p>Allt i {area.title} sitter fint just nu.</p>
           <button class="btn primary" onClick={() => go('ovning')}>Till Övningsängen</button>
+        </div>
+      </Screen>
+    );
+  }
+
+  /* ---------- regionbossen är låst tills tillräckligt många Mästare är besegrade ---------- */
+  const lock = regionProgress(p.id, area);
+  if (!run && !lock.open) {
+    return (
+      <Screen class="play result">
+        <div class="result-card">
+          <div class="big-emoji">🔒</div>
+          <h1>Stigen är stängd</h1>
+          <p>Besegra {lock.need} av bergets Mästare först. Du har besegrat {lock.have}.</p>
+          <button class="btn primary" onClick={() => go(back)}>Tillbaka</button>
         </div>
       </Screen>
     );
@@ -122,7 +137,7 @@ export function PlayView({ areaId, nodeId, practice = false, review = false }: {
 
   function onAnswer(r: { correct: boolean; ms: number; errTag?: string; hint: boolean }) {
     const before = run!;
-    const next = recordAnswer(p!.id, before, node!, { correct: r.correct, ms: r.ms, hint: r.hint }, pl!.game.skillOf(q), r.errTag);
+    const next = recordAnswer(p!.id, before, node!, { correct: r.correct, ms: r.ms, hint: r.hint }, pl!.game.skillOf(q), r.errTag, pl!.game.areaOf?.(q));
     if (next.levelUps > before.levelUps) toast(`⭐ Ny nivå: ${getHeroState(p!.id).level}!`);
     if (face && boss) {
       const half = (next.maxHp ?? 0) / 2;
@@ -196,7 +211,7 @@ function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome
   const pl = playable(areaId)!;
   const next = nextOpenNode(pl.def, getArea(hid, areaId));
   const hs = getHeroState(hid);
-  const back = practice ? 'ovning' : `omrade/${areaId}`;
+  const back = practice ? 'ovning' : pl.def.region ? `region/${pl.def.region.id}` : `omrade/${areaId}`;
 
   let head;
   if (o.kind === 'boss') {
@@ -252,7 +267,7 @@ function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome
         {news && news.done.length > 0 && (
           <div class="quest-news">
             {news.done.map((q) => <p key={q.kind}>📜 Uppdrag klart: {q.label}</p>)}
-            {news.allDone && news.chest && <p><b>Alla dagens uppdrag är klara! 🔥 {news.streak} {news.streak === 1 ? 'dag' : 'dagar'} i rad.</b>{news.usedFreeze ? ' (Frysdagen räddade sviten.)' : ''} Du får dagens kista!</p>}
+            {news.allDone && news.chest && <p><b>Alla dagens uppdrag är klara! 🔥 {news.streak} {news.streak === 1 ? 'dag' : 'dagar'} i rad.</b>{news.usedFreeze ? ' (Frysdagen räddade sviten.)' : ''}{news.usedAmulets ? ` (${news.usedAmulets === 1 ? 'En sköldamulett' : `${news.usedAmulets} sköldamuletter`} räddade sviten.)` : ''} Du får dagens kista!</p>}
           </div>
         )}
         {o.tired && <p class="note">Hjälten är trött för idag – inga fler kastanjer, men allt du lär dig räknas!</p>}

@@ -43,6 +43,8 @@ export interface BossDef {
   lines: BossLines;
   pet?: { name: string; icon: string };
   titleReward: string;
+  /** Personans boss-plats om den inte är '<område>.mastare', t.ex. 'talbergen.region'. */
+  personaId?: string;
 }
 
 export type PathNode = StageDef | BossDef;
@@ -62,6 +64,8 @@ export interface AreaDef {
   /** Kunskapen på hjältebladet som området tränar. */
   kunskap: { name: string; icon: string };
   story: string;
+  /** En regions slutboss: inget eget område på kartan, utan en kort stig på regionsidan. */
+  region?: { id: string; mastareNeeded: number };
   /** Ord på resultatskärmen, i områdets tema. */
   texts: { cleared: string; notYet: string; back: string };
   eras: EraDef[];
@@ -85,6 +89,8 @@ export interface GameModule {
   skillOf(q: unknown): string;
   /** Frågeinställningar som brukar ge en viss färdighet (för repetition av just den). */
   specsForSkill(skill: string): QuestionSpec[];
+  /** Området en fråga egentligen hör till (för en regionboss som blandar spel). Dimman hamnar där. */
+  areaOf?(q: unknown): string;
   /** Kort beskrivning av en felkod (bossintro, statistik). */
   errLabel(tag: string): string | undefined;
   View: ComponentType<QuestionViewProps>;

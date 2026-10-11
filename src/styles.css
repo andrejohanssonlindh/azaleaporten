@@ -523,3 +523,31 @@ button.slot { background: transparent; color: inherit; }
 .groups { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 0 auto 12px; max-width: 420px; }
 .group { border: 2px dashed var(--line); border-radius: 12px; padding: 4px 6px; font-size: 18px; letter-spacing: -2px; opacity: .55; }
 .group.take { border-color: var(--accent); opacity: 1; }
+.region-boss { display: flex; align-items: center; gap: 10px; width: calc(100% - 24px); margin: 0 12px 14px; text-align: left; padding: 12px; border-radius: 14px; border: 3px solid var(--gold); background: color-mix(in srgb, var(--gold) 12%, var(--bg)); min-height: 68px; }
+.region-boss.locked { border-style: dashed; opacity: .85; }
+.region-boss .area-text small { color: var(--muted); }
+/* Biblioteket */
+.place-banner.library { background: linear-gradient(180deg, #8c6bd1, #5f3dc4); }
+.stat-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+.stat-tile { background: var(--card); border-radius: 14px; padding: 10px 6px; text-align: center; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+.stat-tile b { font-size: 24px; font-weight: 900; }
+.stat-tile small { color: var(--muted); font-size: 13px; }
+.shelf { margin: 10px 0; padding: 0; overflow: hidden; }
+.shelf summary { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; min-height: 56px; list-style: none; }
+.shelf summary::-webkit-details-marker { display: none; }
+.shelf summary::after { content: '›'; margin-left: auto; font-size: 24px; color: var(--muted); transition: transform .2s; }
+.shelf[open] summary::after { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .shelf summary::after { transition: none; } }
+.shelf-icon { font-size: 28px; }
+.shelf-title { display: flex; flex-direction: column; }
+.shelf-title small { color: var(--muted); }
+.shelf > :not(summary) { margin-left: 14px; margin-right: 14px; }
+.shelf > .row { margin-bottom: 14px; }
+.skill-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.skill-item { display: flex; flex-direction: column; padding: 8px 12px; border-radius: 12px; border-left: 6px solid var(--line); background: var(--bg); }
+.skill-item small { color: var(--muted); }
+.skill-item.safe { border-left-color: var(--ok); }
+.skill-item.near { border-left-color: var(--gold); }
+.skill-item.practice { border-left-color: var(--accent-2); }
+.skill-item.mist { border-left-color: var(--muted); border-left-style: dashed; }
+.tricky { font-size: 15px; }

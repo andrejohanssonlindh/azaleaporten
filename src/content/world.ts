@@ -27,7 +27,7 @@ export interface Region {
 export const REGIONS: Region[] = [
   {
     id: 'talbergen', name: 'Talbergen', subject: 'Matematik', icon: '⛰️',
-    tagline: 'Höga toppar av tal och tid. Över forsen går Tiokompisbron, djupt i berget ligger Tabellgruvan och högst upp står Tidstornet.',
+    tagline: 'Höga toppar av tal och tid. Vid foten ligger marknaden och bageriet, broarna går över forsen, gruvan ligger djupt i berget – och högst upp står Tidstornet.',
     sky: ['#4f9fe0', '#cde9f8', '#6a7f5a'],
     areas: [
       { id: 'tidstornet', name: 'Tidstornet', icon: '🕰️', desc: 'Res genom tiden och läs klockor.', grades: [1, 5], status: 'open' },

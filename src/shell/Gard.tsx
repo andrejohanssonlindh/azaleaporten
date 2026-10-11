@@ -90,7 +90,7 @@ export function Gard() {
         </div>
 
         <h3>Kunskaper</h3>
-        {Object.values(PLAYABLE).map(({ def }) => {
+        {Object.values(PLAYABLE).filter(({ def }) => !def.region).map(({ def }) => {
           const mist = mistByArea(p.id)[def.areaId] ?? 0;
           const k = kunskapLevel(getArea(p.id, def.areaId).xp);
           return (

@@ -2,8 +2,10 @@ import { dataRev, go, heroId, toast } from '../state';
 import { getProfile } from '../platform/profiles';
 import { mistByArea } from '../platform/learning/skills';
 import { getArea, nodeDone } from '../platform/rpg/progress';
+import { personaFor } from '../content/bosses';
+import { gate } from '../state';
 import { allNodes } from '../platform/rpg/types';
-import { playable } from '../content/areas';
+import { PLAYABLE, playable, regionProgress } from '../content/areas';
 import { region as regionById, fitsGrade, type Region } from '../content/world';
 import { leaveToPicker } from '../session';
 import { BackBar, Screen, Stars } from './ui';
@@ -15,7 +17,7 @@ const BUILDINGS = [
   { id: 'gard', icon: '🏡', name: 'Azaleagården', desc: 'Ditt hem och ditt hjälteblad', to: 'gard' },
   { id: 'uppdrag', icon: '📜', name: 'Uppdragstavlan', desc: 'Dagens uppdrag', to: 'uppdrag' },
   { id: 'smedjan', icon: '⚒️', name: 'Smedjan', desc: 'Butik, smält och förbättra', to: 'smedjan' },
-  { id: 'biblioteket', icon: '📖', name: 'Biblioteket', desc: 'Dina framsteg', to: null },
+  { id: 'biblioteket', icon: '📖', name: 'Biblioteket', desc: 'Dina framsteg', to: 'biblioteket' },
 ];
 
 export function Azaleabyn() {
@@ -93,6 +95,23 @@ export function RegionView({ id }: { id: string }) {
             );
           })}
         </div>
+        {Object.values(PLAYABLE).filter(({ def }) => def.region?.id === r.id).map(({ def }) => {
+          const boss = def.eras[0].nodes[0];
+          if (boss.type !== 'boss') return null;
+          const lock = regionProgress(p.id, def);
+          const won = getArea(p.id, def.areaId).bosses[boss.id]?.defeated;
+          const name = personaFor(boss.personaId ?? '', gate.value?.pack ?? null, p.grade)?.name ?? boss.name;
+          return (
+            <button key={def.areaId} class={`region-boss${lock.open ? '' : ' locked'}`}
+              onClick={() => (lock.open ? go(`spela/${def.areaId}/${boss.id}`) : toast(`🔒 Besegra ${lock.need} av bergets Mästare först (${lock.have}/${lock.need}).`))}>
+              <span class="area-icon">{lock.open ? boss.icon : '🔒'}</span>
+              <span class="area-text">
+                <b>{def.title}: {name}</b>
+                <small>{won ? 'Besegrad! Du kan utmana igen.' : lock.open ? 'Stigen är öppen. Vågar du?' : `Besegra ${lock.need} av bergets Mästare (${lock.have}/${lock.need}).`}</small>
+              </span>
+            </button>
+          );
+        })}
       </section>
     </Screen>
   );

@@ -193,7 +193,7 @@ export function currentQuestion(run: RunState, node: PathNode, game: GameModule)
 }
 
 /** Registrerar första svaret på aktuell fråga. */
-export function recordAnswer(hid: string, run: RunState, node: PathNode, a: Answer, skill: string, errTag?: string): RunState {
+export function recordAnswer(hid: string, run: RunState, node: PathNode, a: Answer, skill: string, errTag?: string, skillArea = run.areaId): RunState {
   if (run.results.length > run.index) return run; // redan registrerat (t.ex. efter omladdning)
   const next: RunState = { ...run, results: [...run.results, a] };
   const base = a.correct ? (run.kind === 'practice' || run.kind === 'review' ? XP.practiceCorrect : XP.correct) * (a.hint ? XP.hintFactor : 1) : 0;
@@ -210,7 +210,7 @@ export function recordAnswer(hid: string, run: RunState, node: PathNode, a: Answ
       next.lastHit = undefined;
     }
   }
-  noteAnswer(hid, run.areaId, skill, a.correct, a.hint, errTag);
+  noteAnswer(hid, skillArea, skill, a.correct, a.hint, errTag);
   logEvents(hid, [{ t: new Date().toISOString(), a: run.areaId, n: node.id, k: skill, c: a.correct, ms: a.ms, ...(errTag ? { e: errTag } : {}), ...(a.hint ? { h: true } : {}) }]);
   const p = getPlay(hid);
   savePlay(hid, { ...p, run: next, activeMs: p.activeMs + Math.min(a.ms, 60_000) });

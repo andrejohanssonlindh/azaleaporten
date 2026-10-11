@@ -12,6 +12,7 @@ import { AreaView } from './shell/AreaView';
 import { PlayView } from './shell/PlayView';
 import { Ovning } from './shell/Ovning';
 import { Uppdrag } from './shell/Uppdrag';
+import { Biblioteket } from './shell/Biblioteket';
 import { LabbView } from './shell/LabbView';
 import { Gard } from './shell/Gard';
 import { ChestModal, Smedjan } from './shell/Loot';
@@ -51,6 +52,7 @@ export function App() {
   else if (page === 'repetera' && a) view = <PlayView key={path} areaId={a} nodeId="dimma" review />;
   else if (page === 'ovning') view = <Ovning />;
   else if (page === 'uppdrag') view = <Uppdrag />;
+  else if (page === 'biblioteket') view = <Biblioteket />;
   else if (page === 'labb' && a) view = <LabbView key={a} areaId={a} tab={b ?? ''} />;
   else view = <IslandMap />;
 
