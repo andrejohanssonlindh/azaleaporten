@@ -13,7 +13,19 @@ export const ANIMALS = [
   { id: 'enhorning', emoji: '🦄', name: 'Enhörning' },
   { id: 'groda', emoji: '🐸', name: 'Groda' },
   { id: 'pingvin', emoji: '🐧', name: 'Pingvin' },
+  // Djur som låses upp (samma villkor som Garderoben) och byts till i Skräddarens Förvandling.
+  { id: 'tiger', emoji: '🐯', name: 'Tiger', unlock: { kind: 'niva', n: 3 } },
+  { id: 'apa', emoji: '🐵', name: 'Apa', unlock: { kind: 'svit', n: 3 } },
+  { id: 'flamingo', emoji: '🦩', name: 'Flamingo', unlock: { kind: 'storm', n: 2 } },
+  { id: 'haj', emoji: '🦈', name: 'Haj', unlock: { kind: 'arena', n: 3 } },
+  { id: 'blackfisk', emoji: '🐙', name: 'Bläckfisk', unlock: { kind: 'grotta', n: 5 } },
+  { id: 'skoldpadda', emoji: '🐢', name: 'Sköldpadda', unlock: { kind: 'sitter', n: 10 } },
+  { id: 'dinosaurie', emoji: '🦖', name: 'Dinosaurie', unlock: { kind: 'mastare', n: 1 } },
+  { id: 'val', emoji: '🐳', name: 'Val', unlock: { kind: 'niva', n: 8 } },
 ] as const;
+
+/** Djuren man kan välja när man skapar en hjälte. */
+export const START_ANIMALS = ANIMALS.filter((a) => !('unlock' in a));
 
 export const COLORS = [
   { id: 'azalea', hex: '#e64980', name: 'Azalearosa' },

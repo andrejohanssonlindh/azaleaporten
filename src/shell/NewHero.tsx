@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks';
-import { ANIMALS, CLASSES, COLORS, GRADES, gradeName, heroClass, type AnimalId, type ClassId, type ColorId } from '../content/heroes';
+import { START_ANIMALS, CLASSES, COLORS, GRADES, gradeName, heroClass, type AnimalId, type ClassId, type ColorId } from '../content/heroes';
 import { cleanName, createHero, listHeroes, NAME_MAX, nameTaken } from '../platform/profiles';
 import { requestPersistentStorage } from '../platform/device';
 import { go, touch } from '../state';
@@ -51,7 +51,7 @@ export function NewHero() {
         <>
           <h1 class="page-title">Välj ditt djur</h1>
           <div class="choice-grid animals">
-            {ANIMALS.map((a) => (
+            {START_ANIMALS.map((a) => (
               <button key={a.id} class={`pick${animal === a.id ? ' on' : ''}`} onClick={() => setAnimal(a.id)} aria-pressed={animal === a.id}>
                 <span class="pick-emoji">{a.emoji}</span><small>{a.name}</small>
               </button>

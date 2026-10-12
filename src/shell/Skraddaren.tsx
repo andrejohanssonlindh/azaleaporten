@@ -1,6 +1,8 @@
 import { useState } from 'preact/hooks';
 import { dataRev, heroId, toast, touch } from '../state';
-import { getHeroState, getProfile } from '../platform/profiles';
+import { getHeroState, getProfile, NAME_MAX, type Profile } from '../platform/profiles';
+import { animalOpen, changeAnimal, changeClass, changeName, FORVANDLING } from '../platform/rpg/forvandling';
+import { ANIMALS, CLASSES, type AnimalId, type ClassId } from '../content/heroes';
 import { buyCosmetic, COSMETICS, getWardrobe, LOOK_SLOTS, owns, unlockText, wear, type Cosmetic } from '../platform/rpg/wardrobe';
 import { leaveToPicker } from '../session';
 import { HeroFigure } from './HeroFigure';
@@ -53,6 +55,67 @@ export function Skraddaren() {
           })}
         </section>
       ))}
+
+      <Forvandling p={p} kastanjer={s.kastanjer} />
     </Screen>
+  );
+}
+
+/** Byt djur, klass eller namn. Dyrt, och djuren utan lås finns från början. */
+function Forvandling({ p, kastanjer }: { p: Profile; kastanjer: number }) {
+  const [djur, setDjur] = useState<AnimalId | null>(null);
+  const [klass, setKlass] = useState<ClassId | null>(null);
+  const [namn, setNamn] = useState('');
+  const NAME_MSG = { tomt: 'Skriv ett namn.', samma: 'Det är redan ditt namn.', upptaget: 'Det namnet har redan en annan hjälte.', kastanjer: 'Du har inte råd än.' };
+  return (
+    <section class="card forvandling">
+      <h2>🪄 Förvandling</h2>
+      <p class="note">Ångrar du ditt val? Här kan du byta – men det kostar en hel del kastanjer.</p>
+
+      <h3>Byt djur · {FORVANDLING.djur} 🌰</h3>
+      <div class="choice-grid animals">
+        {ANIMALS.map((a) => {
+          const open = animalOpen(p.id, a.id);
+          return (
+            <button key={a.id} class={`pick${(djur ?? p.animal) === a.id ? ' on' : ''}${open ? '' : ' locked'}`} aria-pressed={(djur ?? p.animal) === a.id}
+              onClick={() => (open ? setDjur(a.id) : toast(`🔒 ${a.name}: ${'unlock' in a ? unlockText(a.unlock) : ''}`))}>
+              <span class="pick-emoji">{open ? a.emoji : '🔒'}</span><small>{a.name}</small>
+            </button>
+          );
+        })}
+      </div>
+      {djur && djur !== p.animal && (
+        <button class="btn primary" disabled={kastanjer < FORVANDLING.djur}
+          onClick={() => { if (changeAnimal(p.id, djur)) { toast(`🪄 Du är nu en ${ANIMALS.find((a) => a.id === djur)!.name.toLowerCase()}!`); setDjur(null); touch(); } }}>
+          Bli {ANIMALS.find((a) => a.id === djur)!.emoji} för {FORVANDLING.djur} 🌰
+        </button>
+      )}
+
+      <h3>Byt klass · {FORVANDLING.klass} 🌰</h3>
+      <div class="class-list">
+        {CLASSES.map((c) => (
+          <button key={c.id} class={`class-card${(klass ?? p.heroClass) === c.id ? ' on' : ''}`} aria-pressed={(klass ?? p.heroClass) === c.id} onClick={() => setKlass(c.id)}>
+            <span class="class-emoji">{c.emoji}</span>
+            <span class="class-text"><b>{c.name}</b><span class="perk">{c.perk}</span></span>
+          </button>
+        ))}
+      </div>
+      {klass && klass !== p.heroClass && (
+        <button class="btn primary" disabled={kastanjer < FORVANDLING.klass}
+          onClick={() => { if (changeClass(p.id, klass)) { toast(`🪄 Du är nu ${CLASSES.find((c) => c.id === klass)!.name.toLowerCase()}!`); setKlass(null); touch(); } }}>
+          Bli {CLASSES.find((c) => c.id === klass)!.name.toLowerCase()} för {FORVANDLING.klass} 🌰
+        </button>
+      )}
+
+      <h3>Byt namn · {FORVANDLING.namn} 🌰</h3>
+      <form class="row" onSubmit={(e) => {
+        e.preventDefault();
+        const r = changeName(p.id, namn);
+        if (r === 'ok') { toast('🪄 Nytt namn!'); setNamn(''); touch(); } else toast(NAME_MSG[r]);
+      }}>
+        <input value={namn} maxLength={NAME_MAX} autocomplete="off" aria-label="Nytt namn" placeholder={p.name} onInput={(e) => setNamn(e.currentTarget.value)} />
+        <button class="btn primary" disabled={kastanjer < FORVANDLING.namn || !namn.trim()}>Byt</button>
+      </form>
+    </section>
   );
 }
