@@ -20,7 +20,7 @@ test('Dimstormen: en pollett, spring runt, välj en kraft, avsluta och få blad'
       equipped: { vapen: 'v1', skold: 's1', husdjur: 'p1' },
     }));
   });
-  await page.goto('./#/by');
+  await page.goto('./#/spelon');
   await page.getByRole('button', { name: /Dimstormen/ }).click();
   await expect(page.getByText('Svärd', { exact: true })).toBeVisible();
   await expect(page.getByText('Trollbok', { exact: true })).toBeVisible();

@@ -12,7 +12,7 @@ test('Arenan: stegen, en pollett, röda banor, hoppa och slå', async ({ page })
     const k = `azaleaporten:h:${id}:hero`;
     localStorage.setItem(k, JSON.stringify({ ...JSON.parse(localStorage.getItem(k)!), polletter: 1, arena: { rank: 2, wins: 2 } }));
   });
-  await page.goto('./#/by');
+  await page.goto('./#/spelon');
   await page.getByRole('button', { name: /Arenan/ }).click();
   await expect(page.locator('.duel-rung', { hasText: 'Krabban Klo' })).toBeEnabled();
   await expect(page.locator('.duel-rung', { hasText: 'Trollungen' })).toBeDisabled();

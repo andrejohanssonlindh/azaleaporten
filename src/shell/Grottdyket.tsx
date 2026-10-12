@@ -57,7 +57,7 @@ export function Grottdyket() {
   const lo = caveLoadout(p.id);
   return (
     <Screen class="place cave-place">
-      <BackBar label="Azaleabyn" to="by" right={<Purse hid={p.id} />} />
+      <BackBar label="Spelön" to="spelon" right={<Purse hid={p.id} />} />
       <div class="place-banner cave-banner"><span>⛏️</span><h1>Grottdyket</h1></div>
 
       {result && (

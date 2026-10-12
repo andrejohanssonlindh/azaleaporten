@@ -52,7 +52,7 @@ export function Arenan() {
   const allBeaten = s.arena.rank >= OPPONENTS.length;
   return (
     <Screen class="place arena">
-      <BackBar label="Azaleabyn" to="by" right={<Purse hid={p.id} />} />
+      <BackBar label="Spelön" to="spelon" right={<Purse hid={p.id} />} />
       <div class="place-banner arena-banner"><span>🏟️</span><h1>Arenan</h1></div>
 
       {result && (

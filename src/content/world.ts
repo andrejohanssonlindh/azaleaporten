@@ -11,7 +11,7 @@ export interface Area {
   status: 'open' | 'soon';
 }
 
-export type RegionId = 'talbergen' | 'ordskogen' | 'vasteron' | 'betongbukten';
+export type RegionId = 'talbergen' | 'ordskogen' | 'vasteron' | 'betongbukten' | 'roboton';
 
 export interface Region {
   id: RegionId;
@@ -72,6 +72,19 @@ export const REGIONS: Region[] = [
       { id: 'glosviken', name: 'Glosviken', icon: '⚓', desc: 'Engelska ord med bild och ljud.', grades: [1, 6], status: 'soon' },
       { id: 'hamnen', name: 'Hamnen', icon: '🚢', desc: 'Lyssna och välj rätt.', grades: [1, 5], status: 'soon' },
       { id: 'big-ben-tornet', name: 'Big Ben-tornet', icon: '🕰️', desc: 'Klockan på engelska.', grades: [3, 6], status: 'soon' },
+    ],
+  },
+  {
+    // Planerad: först logik och instruktioner utan kod, sedan enkel Python. Delområdena är inte bestämda i detalj än.
+    id: 'roboton', name: 'Robotön', subject: 'Programmering', icon: '🤖',
+    tagline: 'En ö full av robotar som bara gör exakt det man säger. Lär dem tänka – steg för steg!',
+    sky: ['#364fc7', '#a5d8ff', '#868e96'],
+    areas: [
+      { id: 'logikslingan', name: 'Logikslingan', icon: '🧩', desc: 'Logiska pussel: vad hör ihop och vad kommer sedan?', grades: [1, 4], status: 'soon' },
+      { id: 'kodstigen', name: 'Kodstigen', icon: '🧭', desc: 'Styr roboten steg för steg.', grades: [1, 4], status: 'soon' },
+      { id: 'loopverkstaden', name: 'Loopverkstaden', icon: '🔁', desc: 'Gör samma sak många gånger: loopar.', grades: [2, 5], status: 'soon' },
+      { id: 'buggjakten', name: 'Buggjakten', icon: '🐞', desc: 'Hitta felet i robotens instruktioner.', grades: [2, 6], status: 'soon' },
+      { id: 'pythonhamnen', name: 'Pythonhamnen', icon: '🐍', desc: 'Dina första rader Python.', grades: [4, 6], status: 'soon' },
     ],
   },
 ];

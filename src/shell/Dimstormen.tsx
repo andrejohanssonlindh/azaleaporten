@@ -64,7 +64,7 @@ export function Dimstormen() {
   const lo = stormLoadout(p.id);
   return (
     <Screen class="place storm-place">
-      <BackBar label="Azaleabyn" to="by" right={<Purse hid={p.id} />} />
+      <BackBar label="Spelön" to="spelon" right={<Purse hid={p.id} />} />
       <div class="place-banner storm-banner"><span>🌪️</span><h1>Dimstormen</h1></div>
 
       {result && (

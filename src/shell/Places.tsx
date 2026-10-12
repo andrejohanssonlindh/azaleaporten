@@ -19,9 +19,6 @@ const BUILDINGS = [
   { id: 'uppdrag', icon: '📜', name: 'Uppdragstavlan', desc: 'Dagens uppdrag', to: 'uppdrag' },
   { id: 'smedjan', icon: '⚒️', name: 'Smedjan', desc: 'Butik, smält och förbättra', to: 'smedjan' },
   { id: 'skraddaren', icon: '🧵', name: 'Skräddaren', desc: 'Kläder och utseende', to: 'skraddaren' },
-  { id: 'dimstormen', icon: '🌪️', name: 'Dimstormen', desc: 'Stå emot monstren ur dimman', to: 'dimstormen' },
-  { id: 'grottdyket', icon: '⛏️', name: 'Grottdyket', desc: 'Hur djupt vågar du gå?', to: 'grottdyket' },
-  { id: 'arenan', icon: '🏟️', name: 'Arenan', desc: 'Bossduellen: hoppa, blockera, slå', to: 'arenan' },
   { id: 'biblioteket', icon: '📖', name: 'Biblioteket', desc: 'Dina framsteg', to: 'biblioteket' },
 ];
 

@@ -20,7 +20,7 @@ test('Grottdyket: en pollett, gå med tryck och tangenter, lämna och få hälft
       equipped: { vapen: 'v1', skold: 's1' },
     }));
   });
-  await page.goto('./#/by');
+  await page.goto('./#/spelon');
   await page.getByRole('button', { name: /Grottdyket/ }).click();
   await expect(page.getByText('Båge', { exact: true })).toBeVisible();
   await expect(page.getByText('Lykta', { exact: true })).toBeVisible();

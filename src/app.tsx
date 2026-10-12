@@ -19,6 +19,7 @@ import { ChestModal, Smedjan } from './shell/Loot';
 import { Vuxen } from './shell/Vuxen';
 import { Skraddaren } from './shell/Skraddaren';
 import { Arenan } from './shell/Arenan';
+import { Spelon } from './shell/Spelon';
 import { Dimstormen } from './shell/Dimstormen';
 import { Grottdyket } from './shell/Grottdyket';
 import { pausedByOtherTab, takeOverTab } from './platform/tabs';
@@ -62,6 +63,7 @@ export function App() {
   else if (page === 'by') view = <Azaleabyn />;
   else if (page === 'smedjan') view = <Smedjan />;
   else if (page === 'skraddaren') view = <Skraddaren />;
+  else if (page === 'spelon') view = <Spelon />;
   else if (page === 'arenan') view = <Arenan />;
   else if (page === 'dimstormen') view = <Dimstormen />;
   else if (page === 'grottdyket') view = <Grottdyket />;

@@ -11,7 +11,7 @@ import { Screen, TopBar, UpdateBanner } from './ui';
 import { KastanjGreeting } from './Kastanj';
 
 // Ön: startskärmen efter porten. Allt detaljerat ligger ett tryck bort.
-// Reserverade platser (dimman) och småöarna runt om är till för framtida ämnen.
+// Reserverade platser (dimman) är till för framtida ämnen. Spelön har minispelen, Robotön (programmering) kommer.
 
 function Spot({ label, onClick, x, y, children, cls = '' }: { label: string; onClick: () => void; x: number; y: number; children: ComponentChildren; cls?: string }) {
   const w = label.length * 7.4 + 22;
@@ -30,7 +30,7 @@ function Spot({ label, onClick, x, y, children, cls = '' }: { label: string; onC
 const fog = () => toast('🌫️ Dimman ligger tät här. Något nytt väntar – snart!');
 
 /** Glömskans dimma över en region på kartan, med antal saker att repetera. */
-const MIST_AT: Record<RegionId, [number, number]> = { talbergen: [236, 140], ordskogen: [160, 282], vasteron: [56, 292], betongbukten: [300, 404] };
+const MIST_AT: Record<RegionId, [number, number]> = { talbergen: [236, 140], ordskogen: [160, 282], vasteron: [56, 292], betongbukten: [300, 404], roboton: [362, 452] };
 function Mist({ region, n }: { region: RegionId; n: number }) {
   const [x, y] = MIST_AT[region];
   return (
@@ -56,13 +56,26 @@ function Island({ heroEmoji, mist }: { heroEmoji: string; mist: Partial<Record<R
         ))}
       </g>
 
-      {/* framtida småöar */}
-      <g class="isle-future" onClick={fog} role="button" tabIndex={0} aria-label="Okänd ö">
-        <ellipse cx="350" cy="58" rx="32" ry="18" /><text x="350" y="59" text-anchor="middle" dominant-baseline="central">?</text>
-      </g>
-      <g class="isle-future" onClick={fog} role="button" tabIndex={0} aria-label="Okänd ö">
-        <ellipse cx="365" cy="478" rx="24" ry="15" /><text x="365" y="479" text-anchor="middle" dominant-baseline="central">?</text>
-      </g>
+      {/* båtrutter till Spelön och Robotön */}
+      <path d="M318 96 Q336 82 340 66" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="4 6" />
+      <path d="M346 400 Q364 430 362 462" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="4 6" />
+
+      {/* Spelön: minispelen */}
+      <Spot label="Spelön" x={300} y={30} onClick={() => go('spelon')}>
+        <ellipse cx="350" cy="46" rx="36" ry="18" fill="#f4e3b5" />
+        <ellipse cx="350" cy="44" rx="29" ry="13" fill="#94d82d" />
+        <circle cx="342" cy="30" r="13" fill="none" stroke="#e64980" stroke-width="2.5" />
+        {[0, 1, 2, 3].map((i) => <path key={i} d={`M342 30 L${342 + 13 * Math.cos((i * Math.PI) / 4)} ${30 + 13 * Math.sin((i * Math.PI) / 4)} M342 30 L${342 - 13 * Math.cos((i * Math.PI) / 4)} ${30 - 13 * Math.sin((i * Math.PI) / 4)}`} stroke="#e64980" stroke-width="1.2" />)}
+        <path d="M336 50 L342 30 L348 50" stroke="#8d6e4a" stroke-width="2" fill="none" />
+        <path d="M356 50 L364 36 L372 50 Z" fill="#ffd43b" stroke="#e8590c" stroke-width="1" />
+      </Spot>
+
+      {/* Robotön: programmering (kommer snart) */}
+      <Spot label="Robotön" x={350} y={506} onClick={() => go('region/roboton')}>
+        <ellipse cx="364" cy="482" rx="30" ry="15" fill="#f4e3b5" />
+        <ellipse cx="364" cy="480" rx="23" ry="10" fill="#ced4da" />
+        <text x="364" y="478" font-size="18" text-anchor="middle" dominant-baseline="central">🤖</text>
+      </Spot>
 
       {/* båtrutt till Västerön */}
       <path d="M112 330 Q85 330 72 310" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="4 6" />
