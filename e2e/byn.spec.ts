@@ -38,3 +38,21 @@ test('Talbergens regionboss är låst tills tre Mästare är besegrade', async (
   await expect(page.locator('.hpbar')).toBeVisible();
   await shot(page, '3-regionboss');
 });
+
+test('Hämta senaste versionen: samma version säger det, en ny version laddar om sidan', async ({ page }) => {
+  await newHero(page);
+  await page.goto('./#/by');
+  await page.getByRole('button', { name: /Hämta senaste versionen/ }).click();
+  await expect(page.getByText('Du har redan den senaste versionen.')).toBeVisible();
+
+  await page.route('**/version.json*', (r) => r.fulfill({ json: { version: 'en-nyare' } }));
+  const reloaded = page.waitForEvent('framenavigated');
+  await page.getByRole('button', { name: /Hämta senaste versionen/ }).click();
+  await reloaded;
+  await expect(page.getByRole('heading', { name: 'Azaleabyn' })).toBeVisible();
+  await expect.poll(() => page.url()).not.toContain('v=');
+
+  await page.route('**/version.json*', (r) => r.abort());
+  await page.getByRole('button', { name: /Hämta senaste versionen/ }).click();
+  await expect(page.getByText(/Det går inte att nå internet/)).toBeVisible();
+});

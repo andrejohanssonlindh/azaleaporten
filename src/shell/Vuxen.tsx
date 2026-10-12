@@ -11,7 +11,7 @@ import { selectHero } from '../session';
 import type { V01Player } from '../platform/legacy/klockaV01';
 import { CONSOLE_SNIPPET } from '../platform/legacy/snippet';
 
-import { Avatar, Screen } from './ui';
+import { Avatar, Screen, UpdateCheck } from './ui';
 import { HeroOverview } from './VuxenOversikt';
 import { VeckansEditor } from './Veckans';
 import { download, today } from './fil';
@@ -266,7 +266,7 @@ export function Vuxen() {
         <LegacyImport heroes={heroes} />
       </section>
 
-      <p class="version">Version {__APP_VERSION__}</p>
+      <UpdateCheck />
     </Screen>
   );
 }

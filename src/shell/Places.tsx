@@ -9,7 +9,7 @@ import { allNodes } from '../platform/rpg/types';
 import { PLAYABLE, playable, regionProgress } from '../content/areas';
 import { region as regionById, fitsGrade, type Region } from '../content/world';
 import { leaveToPicker } from '../session';
-import { BackBar, Mentor, Screen, Stars } from './ui';
+import { BackBar, Mentor, Screen, Stars, UpdateCheck } from './ui';
 import { KastanjGreeting } from './Kastanj';
 import { ErrandCard } from './Uppdrag';
 
@@ -61,6 +61,7 @@ export function Azaleabyn() {
           </button>
         ))}
       </div>
+      <UpdateCheck />
     </Screen>
   );
 }

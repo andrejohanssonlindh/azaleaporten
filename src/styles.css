@@ -959,3 +959,5 @@ button.stat.on { border-color: var(--accent); }
 .pirat-inside { fill: #5c3d1e; }
 .pirat-table rect { fill: #8b5a2b; }
 .pirat-table .pirat-skirt { fill: #c92a2a; opacity: .85; }
+.update-check { text-align: center; }
+.update-check .row { justify-content: center; }

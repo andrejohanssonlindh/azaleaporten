@@ -1,8 +1,9 @@
 import type { ComponentChildren } from 'preact';
+import { useState } from 'preact/hooks';
 import { animal, color, heroClass } from '../content/heroes';
 import type { Profile } from '../platform/profiles';
 import { getHeroState } from '../platform/profiles';
-import { applyUpdate, canSpeak, speak, updateReady } from '../platform/device';
+import { applyUpdate, canSpeak, forceUpdate, latestVersion, speak, updateReady } from '../platform/device';
 import { hasNewerData } from '../platform/storage/record';
 import { go } from '../state';
 import { streakOf } from '../platform/learning/quests';
@@ -50,6 +51,36 @@ export function UpdateBanner() {
       <span>✨ En ny version av Azaleaporten finns!</span>
       <button class="btn small primary" onClick={applyUpdate}>Uppdatera</button>
     </div>
+  );
+}
+
+/** "Hämta senaste versionen": frågar webben vilken version som finns och tvingar fram den.
+ *  Fungerar även när "Uppdatera"-rutan inte gör något, och i mobilen där man inte kan ladda om sidan. */
+export function UpdateCheck() {
+  const [st, setSt] = useState<'idle' | 'checking' | 'same' | 'offline' | 'updating'>('idle');
+  const run = async (always: boolean) => {
+    setSt('checking');
+    const latest = await latestVersion();
+    if (latest == null) { setSt('offline'); return; }
+    if (latest === __APP_VERSION__ && !always) { setSt('same'); return; }
+    setSt('updating');
+    if ((await forceUpdate()) === 'offline') setSt('offline');
+  };
+  return (
+    <section class="card update-check">
+      <div class="row">
+        <button class="btn small" disabled={st === 'checking' || st === 'updating'} onClick={() => run(false)}>🔄 Hämta senaste versionen</button>
+        {st === 'same' && <button class="btn small" onClick={() => run(true)}>Ladda om ändå</button>}
+      </div>
+      <p class="note" role="status">
+        {st === 'idle' && 'Har det kommit något nytt? Tryck här, så hämtas det.'}
+        {st === 'checking' && 'Kollar …'}
+        {st === 'same' && '✓ Du har redan den senaste versionen.'}
+        {st === 'offline' && 'Det går inte att nå internet just nu. Försök igen sen!'}
+        {st === 'updating' && 'Hämtar den nya versionen …'}
+      </p>
+      <p class="version">Version {__APP_VERSION__}</p>
+    </section>
   );
 }
 
