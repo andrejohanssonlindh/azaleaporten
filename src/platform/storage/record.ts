@@ -34,6 +34,9 @@ let backupTakenThisSession = false;
 /** true om någon post var sparad av en nyare version av appen. */
 export function hasNewerData() { return newerDataSeen; }
 
+/** Glömmer att poster under `prefix` var skrivskyddade, t.ex. när de just har ersatts av en hämtad hjälte. */
+export function forgetReadOnly(prefix: string) { for (const k of [...readOnlyKeys]) if (k.startsWith(prefix)) readOnlyKeys.delete(k); }
+
 /** Endast för tester. */
 export function _resetRecordState() { readOnlyKeys.clear(); newerDataSeen = false; backupTakenThisSession = false; }
 
@@ -89,9 +92,14 @@ export function loadRecord<T extends Versioned>(key: string, spec: RecordSpec<T>
   }
 }
 
+const savedListeners: ((key: string) => void)[] = [];
+/** Anropas efter varje lyckad saveRecord (profiles.ts noterar när en hjälte senast ändrades). */
+export function onRecordSaved(fn: (key: string) => void) { savedListeners.push(fn); }
+
 /** Sparar posten. Returnerar false (och sparar inget) om posten är skrivskyddad. */
 export function saveRecord<T extends Versioned>(key: string, spec: RecordSpec<T>, value: T): boolean {
   if (readOnlyKeys.has(key)) return false;
   kv.set(key, { ...value, v: spec.version });
+  for (const fn of savedListeners) fn(key);
   return true;
 }

@@ -4,6 +4,7 @@
 
 ## Done
 
+- **Hero files** (2026-10-12): a kid can save their hero in a file ("💾 Spara din hjälte" in Azaleagården) and load it back ("📂 Hämta hjälte" in the hero picker, and "Har du redan en hjälte i en fil?" on the new-hero screen, since a fresh device skips the picker). Vuxenläge has a save button per hero and a load button next to the whole-device restore. The hero keeps its UUID across devices; loading over an existing hero asks first, and warns if the hero here changed after the file was saved (new record `h:<id>:andrad`). A snapshot is always taken first. Built as the first step towards cloud saves: `heroBundle.ts` is pure (bundle → validate → compare → apply), so a sync can reuse it with fetch instead of files. Tests: `tests/hjaltefil.test.ts`, `e2e/hjaltefil.spec.ts`.
 - **Read-aloud of drill questions** (2026-10-12): every drill question (all of Talbergen and Betongbukten) has a 🔊 button when the device has a Swedish voice. `spoken(q)` in `src/engines/drill/check.ts` turns the question into Swedish: operators ("plus", "delat med", "är lika med"), units ("kronor", "kvadratcentimeter"), fractions ("tre fjärdedelar", "hur många femtedelar"), negative numbers, symbols inside the prompt text, and the choices. Numbers drawn only in the picture (`Visual`, e.g. prices on goods) are not read. Test: `tests/uppläsning.test.ts` (every question of every drill area reads without symbols or leftovers).
 - The m-rule texts in Stavningsträsket now say "nästan inga ord slutar på två m" (lamm, damm).
 

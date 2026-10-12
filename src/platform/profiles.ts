@@ -1,5 +1,5 @@
 import { kv } from './storage/kv';
-import { loadRecord, saveRecord, type RecordSpec } from './storage/record';
+import { loadRecord, onRecordSaved, saveRecord, type RecordSpec } from './storage/record';
 import { snapshot } from './storage/backup';
 import type { AnimalId, ClassId, ColorId } from '../content/heroes';
 
@@ -32,6 +32,8 @@ export interface Profile {
   grade: number;
   createdAt: string;
   lastActiveAt: string | null;
+  /** Senaste gången hjälten sparades i en hjältefil (heroBundle.ts). */
+  lastSavedAt: string | null;
   settings: Settings;
 }
 
@@ -80,7 +82,7 @@ export const PROFILE: RecordSpec<Profile> = {
   version: 1,
   defaults: () => ({
     v: 1, id: '', name: '', animal: 'rav', color: 'azalea', heroClass: 'riddare', grade: 3,
-    createdAt: now(), lastActiveAt: null, settings: { readAloud: false, bigText: false, sound: true },
+    createdAt: now(), lastActiveAt: null, lastSavedAt: null, settings: { readAloud: false, bigText: false, sound: true },
   }),
 };
 
@@ -91,6 +93,21 @@ export const HERO: RecordSpec<HeroState> = {
 
 export const heroKey = (id: string, part: string) => `h:${id}:${part}`;
 
+// När hjältens framsteg senast ändrades (vilken post som helst under h:<id>: utom profilen, som skrivs
+// varje gång hjälten väljs). Behövs för att se om en hjältefil är äldre än hjälten på enheten, och
+// senare för att synka med ett moln.
+interface Changed { v: number; at: string }
+const CHANGED: RecordSpec<Changed> = { version: 1, defaults: () => ({ v: 1, at: '' }) };
+onRecordSaved((key) => {
+  const m = /^h:([^:]+):(.+)$/.exec(key);
+  if (m && m[2] !== 'andrad' && m[2] !== 'profile') saveRecord(heroKey(m[1], 'andrad'), CHANGED, { v: 1, at: now() });
+});
+
+/** Senaste ändringen av hjältens data, eller null för hjältar sparade innan det noterades. */
+export function heroChangedAt(id: string): string | null {
+  return loadRecord(heroKey(id, 'andrad'), CHANGED).value.at || null;
+}
+
 export function getMeta(): Meta {
   const m = loadRecord('meta', META);
   if (!m.exists) saveRecord('meta', META, m.value);
@@ -98,6 +115,9 @@ export function getMeta(): Meta {
 }
 
 function saveMeta(m: Meta) { saveRecord('meta', META, m); }
+
+/** Byter listan med hjältar på enheten (används när en hjälte hämtas från en fil). */
+export function saveMetaHeroes(heroes: string[]) { saveMeta({ ...getMeta(), heroes }); }
 
 export const BACKUP_REMINDER_DAYS = 30;
 

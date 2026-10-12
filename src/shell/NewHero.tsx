@@ -5,6 +5,7 @@ import { requestPersistentStorage } from '../platform/device';
 import { go, touch } from '../state';
 import { selectHero } from '../session';
 import { Avatar, Screen } from './ui';
+import { HamtaHjalte, playLoaded } from './HjalteFil';
 
 const STEPS = ['namn', 'djur', 'farg', 'klass', 'arskurs', 'klar'] as const;
 
@@ -44,6 +45,10 @@ export function NewHero() {
             onInput={(e) => setName(e.currentTarget.value)} placeholder="Skriv ditt namn" />
           {nameTaken(name) && <p class="note warn">Det finns redan en hjälte som heter {clean} här. Det går bra, men kanske lägga till något?</p>}
           <p class="note">Ditt namn sparas bara på den här enheten.</p>
+          <div class="row center-row load-hero">
+            <span class="muted">Har du redan en hjälte i en fil?</span>
+            <HamtaHjalte onDone={playLoaded} />
+          </div>
         </form>
       )}
 

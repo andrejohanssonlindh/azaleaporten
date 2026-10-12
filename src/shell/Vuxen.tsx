@@ -14,6 +14,9 @@ import { CONSOLE_SNIPPET } from '../platform/legacy/snippet';
 import { Avatar, Screen } from './ui';
 import { HeroOverview } from './VuxenOversikt';
 import { VeckansEditor } from './Veckans';
+import { download, today } from './fil';
+import { HamtaHjalte, saveHeroFile } from './HjalteFil';
+import { readBundle } from '../platform/storage/heroBundle';
 
 const legacy = () => import('../platform/legacy/klockaV01');
 
@@ -54,6 +57,7 @@ function HeroAdmin({ p }: { p: Profile }) {
         </select>
       </label>
       <VeckansEditor p={p} />
+      <button class="btn small" onClick={() => { saveHeroFile(p.id); toast(`${p.name} är sparad i en fil`); }}>💾 Spara hjältens fil</button>
       {confirm === null ? (
         <button class="btn small danger" onClick={() => setConfirm('')}>Radera hjälten…</button>
       ) : (
@@ -134,15 +138,6 @@ function Upplasning() {
   );
 }
 
-function download(filename: string, data: unknown) {
-  const blob = new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
-}
-
 export function Vuxen() {
   dataRev.value;
   const [ok, setOk] = useState(false);
@@ -158,7 +153,7 @@ export function Vuxen() {
   async function importFile(file: File) {
     try {
       const data = JSON.parse(await file.text());
-      if (!isDeviceExport(data)) { toast('Det där är ingen Azaleaporten-fil.'); return; }
+      if (!isDeviceExport(data)) { toast(readBundle(data) ? 'Det är en hjältefil. Använd "Hämta hjälte från fil…".' : 'Det där är ingen Azaleaporten-fil.'); return; }
       importReplace(data);
       selectHero(null);
       touch();
@@ -207,12 +202,13 @@ export function Vuxen() {
         <p>Senaste nedladdade kopia: <b>{meta.lastExport ? new Date(meta.lastExport).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' }) : 'ingen än'}</b></p>
         {backupDue() && <p class="note warn">💾 Det är dags att spara en ny säkerhetskopia (vi påminner efter 30 dagar).</p>}
         <div class="row">
-          <button class="btn primary small" onClick={() => { download(`azaleaporten-${new Date().toISOString().slice(0, 10)}.json`, exportAll()); markExported(); touch(); }}>Ladda ner säkerhetskopia</button>
+          <button class="btn primary small" onClick={() => { download(`azaleaporten-${today()}.json`, exportAll()); markExported(); touch(); }}>Ladda ner säkerhetskopia</button>
           <label class="btn small file-btn">Återställ från fil…
             <input type="file" accept="application/json,.json" onChange={(e) => { const f = e.currentTarget.files?.[0]; if (f) importFile(f); e.currentTarget.value = ''; }} />
           </label>
+          <HamtaHjalte />
         </div>
-        <p class="note">Återställning ersätter hjältarna på enheten. En automatisk säkerhetskopia tas först.</p>
+        <p class="note">Säkerhetskopian gäller alla hjältar, och återställning ersätter alla hjältar på enheten. En hjältefil (sparas i Azaleagården eller här under varje hjälte) gäller bara en hjälte. En automatisk säkerhetskopia tas alltid först.</p>
         {backups.length > 0 && (
           <>
             <h3>Automatiska säkerhetskopior</h3>

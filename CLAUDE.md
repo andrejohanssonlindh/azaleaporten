@@ -49,6 +49,7 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
   - `h:<uuid>:profile` (name, animal, color, heroClass, grade, settings)
   - `h:<uuid>:hero` (xp, level, kastanjer, blad, tips already shown, tokens, arena rank, storm steg, cave depth…)
   - `h:<uuid>:inventory` (items, equipped, chests), `h:<uuid>:wardrobe` (cosmetics owned/worn)
+  - `h:<uuid>:andrad` (when the hero's progress last changed; bumped by every `saveRecord` under `h:<id>:` except `profile`, via `onRecordSaved`)
   - `gate` (unlock key; excluded from backups and exports)
   - `backup:<iso>` (automatic snapshots, the last 3 are kept)
 
@@ -105,6 +106,7 @@ Pushing to `main` runs `.github/workflows/deploy.yml`: test → build → deploy
 - **Region bosses:** an `AreaDef` with `region` (not on the map; shown on the region page, locked until `mastareNeeded` area Mästare are beaten) whose game is `regionGame()` (`src/games/region.tsx`) mixing the region's games via `mode: '<area>/<mode>'`. A boss can point at another persona slot with `personaId`.
 - **Importing old progress:** `src/platform/legacy/klockaV01.ts` imports the old file's `localStorage` (via a console snippet, `legacy/snippet.ts`, pasted into Vuxenläge). Vuxenläge loads the importer on demand because it pulls in klocka's language model. The fixture is `tests/fixtures/storage/legacy-klocka-v01.json`.
 - **Vuxenläge** (`#/vuxen`, behind a multiplication check): a per-hero overview (`VuxenOversikt.tsx`, pure stats in `src/platform/learning/stats.ts`), hero admin, gate, backup/restore with a 30-day reminder (`backupDue()`), storage and install guides, the v0.1 import.
+- **Hero files** (`src/platform/storage/heroBundle.ts`, UI in `src/shell/HjalteFil.tsx`): one hero as a portable bundle (`format: 'azaleaporten-hjalte'`, all `h:<id>:*` records as-is with their `v`, plus `savedAt`, `changedAt`, `deviceId`). Kids save it in Azaleagården and load it from the hero picker or the new-hero screen (a fresh device skips the picker); Vuxenläge has both per hero. `compareBundle()` warns when the hero here changed after the file was saved; `applyBundle()` snapshots first, replaces all the hero's records and adds it to `meta`. The functions are pure (no files/DOM) on purpose: they are the unit a future cloud sync sends and receives. All per-hero data must stay under `h:<id>:` for this to work.
 - **Storage guards:** when storage is full, `kv.set` runs pruners registered with `addPruner()` and retries (corrupt copies, then older backups, then old event-log entries; never progress). Only one tab plays at a time (`src/platform/tabs.ts`); older tabs pause.
 - **PWA:** `vite-plugin-pwa` with `registerType: 'prompt'`. `UpdateBanner` is shown only on calm screens (map, picker), never mid-exercise.
 - **Tests:**

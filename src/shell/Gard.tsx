@@ -15,6 +15,7 @@ import { bossName } from './AreaView';
 import { ItemCard } from './Loot';
 import { HeroFigure } from './HeroFigure';
 import { BackBar, Screen } from './ui';
+import { SparaHjalte } from './HjalteFil';
 
 // Azaleagården: hjältens hem. Flikar: Hjälten (figur, egenskaper, utrustning och packning),
 // Garderoben (utseende) och Kunskaper (kunskaper, titlar, mentorer).
@@ -72,6 +73,8 @@ export function Gard({ tab: initial }: { tab?: string }) {
       {tab === 'hjalten' && <HeroTab hid={p.id} />}
       {tab === 'garderob' && <WardrobeTab hid={p.id} />}
       {tab === 'kunskaper' && <SkillsTab hid={p.id} />}
+
+      <SparaHjalte hid={p.id} />
 
       <footer class="map-foot"><button class="link" onClick={leaveToPicker}>Byt hjälte</button></footer>
     </Screen>

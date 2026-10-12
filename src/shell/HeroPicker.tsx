@@ -3,6 +3,7 @@ import { backupDue, getHeroState, listHeroes } from '../platform/profiles';
 import { gradeName, heroClass } from '../content/heroes';
 import { selectHero } from '../session';
 import { Avatar, Screen, UpdateBanner } from './ui';
+import { HamtaHjalte, playLoaded } from './HjalteFil';
 
 export function HeroPicker() {
   dataRev.value;
@@ -31,6 +32,7 @@ export function HeroPicker() {
           <span class="plus" aria-hidden="true">＋</span>
           <b>Ny hjälte</b>
         </button>
+        <HamtaHjalte card onDone={playLoaded} />
       </div>
       <footer class="picker-foot">
         <button class="link" onClick={() => go('vuxen')}>Vuxenläge{backupDue() ? ' · 💾 dags för en säkerhetskopia' : ''}</button>
