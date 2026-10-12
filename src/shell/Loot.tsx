@@ -58,7 +58,7 @@ export function ChestModal() {
         {phase !== 'open' && (
           <>
             <div class={`chest-big${phase === 'shaking' ? ' shaking' : ''}`}>{chest?.kind === 'pionjar' || chest?.kind === 'spel' ? '🎁' : chest?.kind === 'boss' ? '💎' : chest?.kind === 'dag' ? '📜' : '🧰'}</div>
-            <h2>{chest?.kind === 'pionjar' ? 'Pionjärkistan' : chest?.kind === 'boss' ? 'Bosskista' : chest?.kind === 'dag' ? 'Dagens kista' : chest?.kind === 'spel' ? 'Spelöns skattkista' : 'Skattkista'}</h2>
+            <h2>{chest?.kind === 'pionjar' ? 'Pionjärkistan' : chest?.kind === 'boss' ? 'Bosskista' : chest?.kind === 'dag' ? 'Dagens kista' : chest?.kind === 'spel' ? 'Spelöns skattkista' : chest?.kind === 'vecka' ? 'Veckokista' : chest?.kind === 'uppdrag' ? 'Uppdragskista' : 'Skattkista'}</h2>
             {chest && <p class="muted">Hittad vid {chest.source}</p>}
             {phase === 'full' && <p class="note warn">Packningen är full! Smält något i Smedjan först.</p>}
             <div class="row center-row">

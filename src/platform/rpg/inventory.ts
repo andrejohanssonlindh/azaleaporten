@@ -13,7 +13,7 @@ export interface Chest {
   seed: number;
   ilvl: number;
   minRarity: Rarity;
-  kind: 'vanlig' | 'boss' | 'pionjar' | 'kopt' | 'dag' | 'spel';
+  kind: 'vanlig' | 'boss' | 'pionjar' | 'kopt' | 'dag' | 'spel' | 'vecka' | 'uppdrag';
   source: string;
   at: string;
 }

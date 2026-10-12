@@ -118,6 +118,16 @@ Tests: `npm test` (Vitest, 275 tests; `tests/betongbukten.test.ts` covers the ge
   - **One token = an evening:** start at the next opponent or any beaten one, then keep going (25 % life back between fights) until a loss or "Gå hem nöjd". Each win is saved immediately: a first win moves the ladder and pays 1 + rung/2 🌸, a rematch 1 🌸, +1 for no damage taken.
   - Controls: buttons, swipes (left/right/down, tap = hit) or keys (←/→, ↓ block, ↑/space hit, E superslag).
 
+- **Playtest round 2 (2026-10-12):**
+  - **Stats scale with hero level:** `statScale(level)` (×1 at level 1, ×2 at 10) divides gear stats before effects (`effectiveStats()`); the Gård shows raw points, `statExplain` gives next steps in raw points.
+  - **Weapon groups** (`rpg/vapen.ts`): närstrid > magi > avstånd > närstrid. Bosses (`BossDef.group`, else hashed from the id) and path monsters (`STIGMONSTER[].group`) have a group; right weapon +3 damage, wrong weapon loses gear bonus but never drops below base 10. Shown in the boss intro, mob strip and item cards. Mini-games are unchanged.
+  - **Spelön** (`#/spelon`): the three mini-games moved off Azaleabyn to their own island on the map. **Robotön** (programmering) is a `soon` region with planned areas.
+  - **Spelnycklar** (`HeroState.nycklar`, `rpg/nycklar.ts`, `KEYS`): 8 % per stage run, 30 % per boss win, max 5. A key starts a treasure run: 🎁 on cave floors, in storm waves 2/4 and from the giant, after each Arena win (max 3). Treasure chests (`kind: 'spel'`) give rarity ≥ 1 items or chest-only cosmetics (`Cosmetic.kista`). Four mini-game titles (`SPEL_TITLAR`).
+  - **Förvandling** in Skräddaren (`rpg/forvandling.ts`): change animal 100, class 200, name 150 🌰. Eight unlockable animals (`ANIMALS[].unlock`, new heroes pick from `START_ANIMALS`). Names max 12 chars (`NAME_MAX`).
+  - **Cosmetics:** ~50 new, sharing drawings via `Cosmetic.form` (+ `emoji` for auras). Flashy ones (blixtar, glitterregn, regnbåge, disco …) cost 140–220.
+  - **Quests** (`learning/storuppdrag.ts`, record `h:<id>:storuppdrag`): Uppdragstavlan has tabs Idag / Veckan / Äventyr. Weekly: 3 of `WEEK_KINDS` per week (15 🌰 + veckokista each, a key for all three). Chains (`CHAINS`): 4 steps each, claimed by the child, last step = title (+ a `Cosmetic.uppdrag` look for three). Errands (`content/arenden.ts`): one villager at a time in Azaleabyn, 3 cleared runs in an area, skippable. `PlayView` calls `noteBig()` after `noteRun()`.
+  - Tidstornet levels 0–7 (one new thing per level), Fluffy's sortera simplified, long patterns show the skipped places.
+
 ## Next mission
 
 **Ordskogen S5 Ordklassernas tempel**, then S6 Berättelsebiblioteket + region boss Ordskogens hjärta (PLAN.md §14c). The ord engine now has `ordna` and per-word `markera` tags, which S5 (mark the word classes) can reuse. Still to verify on the kids' real devices: a Swedish voice on the Windows PCs (Chrome may not list voices that Edge sees).

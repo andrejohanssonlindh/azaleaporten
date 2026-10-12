@@ -20,6 +20,8 @@ export interface Cosmetic {
   unlock?: Unlock;
   /** Finns bara i skattkistor från Spelön. */
   kista?: boolean;
+  /** Belöning för sista steget i ett äventyrsuppdrag (storuppdrag.ts). */
+  uppdrag?: boolean;
   /** Vilken ritning HeroFigure använder (annars id:t). Låter flera plagg dela form men ha egna färger. */
   form?: string;
   /** Glitter: tecknet som gnistrar runt hjälten. */
@@ -127,6 +129,11 @@ export const COSMETICS: Cosmetic[] = [
   { id: 'aura.guldregn', slot: 'aura', name: 'Guldregn', icon: '🪙', kista: true, form: 'regn', color: '#fab005', color2: '#fff3bf' },
   { id: 'aura.regnbagsblixt', slot: 'aura', name: 'Regnbågsblixtar', icon: '🌈', kista: true, form: 'blixt', emoji: '🌈', color: '#f783ac' },
   { id: 'bg.rymden', slot: 'bakgrund', name: 'Rymden', icon: '🪐', kista: true, form: 'rymd', color: '#0b0b2b', color2: '#ffa94d' },
+
+  // Belöningar från äventyrsuppdragens sista steg.
+  { id: 'hatt.lagerkrans', slot: 'hatt', name: 'Lagerkransen', icon: '🏅', uppdrag: true, form: 'blomkrans', color: '#2f9e44', color2: '#fab005' },
+  { id: 'aura.stjarnregn', slot: 'aura', name: 'Stjärnregn', icon: '🌠', uppdrag: true, form: 'regn', color: '#ffe066', color2: '#ffffff' },
+  { id: 'mantel.tamjare', slot: 'mantel', name: 'Tämjarvingar', icon: '🐲', uppdrag: true, form: 'drakvingar', color: '#7048e8', color2: '#e599f7' },
 ];
 
 export const cosmetic = (id: string | undefined) => COSMETICS.find((c) => c.id === id);

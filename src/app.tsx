@@ -75,7 +75,7 @@ export function App() {
   else if (page === 'repetera' && a) view = <PlayView key={path} areaId={a} nodeId="dimma" review />;
   else if (page === 'veckans') view = <PlayView key={path} areaId="stavningstrasket" nodeId="veckans" veckans />;
   else if (page === 'ovning') view = <Ovning />;
-  else if (page === 'uppdrag') view = <Uppdrag />;
+  else if (page === 'uppdrag') view = <Uppdrag key={a ?? ''} tab={a} />;
   else if (page === 'biblioteket') view = <Biblioteket />;
   else if (page === 'labb' && a) view = <LabbView key={a} areaId={a} tab={b ?? ''} />;
   else view = <IslandMap />;

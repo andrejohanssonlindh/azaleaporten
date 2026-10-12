@@ -9,6 +9,7 @@ import {
 import { reviewPlan } from '../platform/learning/skills';
 import { currentList, veckansSkill, wordOfSkill } from '../platform/learning/veckans';
 import { noteRun, type QuestNews } from '../platform/learning/quests';
+import { noteBig, WEEK_KINDS, type BigNews } from '../platform/learning/storuppdrag';
 import { PRACTICE_LENGTH } from '../platform/rpg/balance';
 import { levelTitle } from '../platform/rpg/balance';
 import { skillLabel } from '../content/skills';
@@ -80,6 +81,7 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
   const [run, setRun] = useState<RunState | null>(() => (p && node ? resumeOrStart(p.id, areaId, node, kind) : null));
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [news, setNews] = useState<QuestNews | null>(null);
+  const [big, setBig] = useState<BigNews | null>(null);
   const [hintIdx, setHintIdx] = useState<number | null>(null);
   const [bossLine, setBossLine] = useState<string>('');
   const [confirmQuit, setConfirmQuit] = useState(false);
@@ -95,8 +97,8 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
 
   /* ---------- resultat ---------- */
   if (outcome) {
-    return <Result o={outcome} news={news} areaId={areaId} node={node} face={face} practice={practice || review}
-      onAgain={review ? null : () => { setOutcome(null); setNews(null); setBossLine(''); setRun(veckans ? resumeOrStart(p.id, areaId, node, kind) : boss && !practice ? null : startRun(p.id, area, node, kind)); }} />;
+    return <Result o={outcome} news={news} big={big} areaId={areaId} node={node} face={face} practice={practice || review}
+      onAgain={review ? null : () => { setOutcome(null); setNews(null); setBig(null); setBossLine(''); setRun(veckans ? resumeOrStart(p.id, areaId, node, kind) : boss && !practice ? null : startRun(p.id, area, node, kind)); }} />;
   }
 
   /* ---------- inga veckans ord ---------- */
@@ -200,7 +202,10 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
     if (fixed) r = recordFixed(p!.id, r, fixed);
     if (runOver(r)) {
       const o = finishRun(p!.id, area, r, { signature: face?.signature });
-      setNews(noteRun(p!.id, { kind: r.kind, areaId, nodeId: node!.id, cleared: o.cleared, won: o.bossWon, progressed: o.firstClear || o.firstWin || o.newStars > 0 }));
+      const report = { kind: r.kind, areaId, nodeId: node!.id, cleared: o.cleared, won: o.bossWon, progressed: o.firstClear || o.firstWin || o.newStars > 0 };
+      const qn = noteRun(p!.id, report);
+      setNews(qn);
+      setBig(noteBig(p!.id, { ...report, correct: o.correct, total: o.total, mobs: o.mobs?.beaten ?? 0, dayDone: qn.allDone && !!qn.chest }));
       setOutcome(o);
       touch();
       return;
@@ -282,7 +287,7 @@ function MobStrip({ hid, run, answered }: { hid: string; run: RunState; answered
   );
 }
 
-function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome; news: QuestNews | null; areaId: string; node: PathNode; face: BossFace | null; practice: boolean; onAgain: (() => void) | null }) {
+function Result({ o, news, big, areaId, node, face, practice, onAgain }: { o: Outcome; news: QuestNews | null; big: BigNews | null; areaId: string; node: PathNode; face: BossFace | null; practice: boolean; onAgain: (() => void) | null }) {
   const hid = heroId.value!;
   const pl = playable(areaId)!;
   const next = nextOpenNode(pl.def, getArea(hid, areaId));
@@ -349,16 +354,23 @@ function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome
           {o.gained.title && <span>🏷️ Ny titel: {o.gained.title}</span>}
         </div>
         {o.gained.items?.map((it) => <ItemCard key={it.id} it={it} />)}
-        {[...o.chests, ...(news?.chest ? [news.chest] : [])].filter((c) => getInv(hid).chests.some((x) => x.id === c.id)).slice(0, 1).map((c) => (
+        {[...o.chests, ...(news?.chest ? [news.chest] : []), ...(big?.chests ?? [])].filter((c) => getInv(hid).chests.some((x) => x.id === c.id)).slice(0, 1).map((c) => (
           <button key={c.id} class="chest-found" onClick={() => { chestModal.value = c.id; }}>
-            <span class="chest-big small-chest">{c.kind === 'boss' ? '💎' : c.kind === 'dag' ? '📜' : '🧰'}</span>
-            <span><b>{c.kind === 'dag' ? 'Dagens kista!' : 'Du hittade en skattkista!'}</b><small>Tryck för att öppna</small></span>
+            <span class="chest-big small-chest">{c.kind === 'boss' ? '💎' : c.kind === 'dag' || c.kind === 'vecka' || c.kind === 'uppdrag' ? '📜' : '🧰'}</span>
+            <span><b>{c.kind === 'dag' ? 'Dagens kista!' : c.kind === 'vecka' ? 'En veckokista!' : c.kind === 'uppdrag' ? 'En uppdragskista!' : 'Du hittade en skattkista!'}</b><small>Tryck för att öppna</small></span>
           </button>
         ))}
         {news && news.done.length > 0 && (
           <div class="quest-news">
             {news.done.map((q) => <p key={q.kind}>📜 Uppdrag klart: {q.label}</p>)}
             {news.allDone && news.chest && <p><b>Alla dagens uppdrag är klara! 🔥 {news.streak} {news.streak === 1 ? 'dag' : 'dagar'} i rad.</b>{news.usedFreeze ? ' (Frysdagen räddade sviten.)' : ''}{news.usedAmulets ? ` (${news.usedAmulets === 1 ? 'En sköldamulett' : `${news.usedAmulets} sköldamuletter`} räddade sviten.)` : ''} Du får dagens kista{news.tokens ? ` och ${news.tokens === 1 ? 'en pollett' : `${news.tokens} polletter`} 🎟️` : ''}!</p>}
+          </div>
+        )}
+        {big && (big.weekly.length > 0 || big.weekBonus || big.errandDone) && (
+          <div class="quest-news">
+            {big.weekly.map((q) => <p key={q.kind}>{WEEK_KINDS[q.kind].icon} Veckans utmaning klar: {WEEK_KINDS[q.kind].label(q.goal)}! +15 🌰 och en veckokista.</p>)}
+            {big.weekBonus && <p><b>Alla veckans utmaningar klara! Du får en spelnyckel 🗝️.</b></p>}
+            {big.errandDone && <p>{big.errandDone.icon} <b>{big.errandDone.who}:</b> "{big.errandDone.thanks}" +25 🌰 och en uppdragskista.</p>}
           </div>
         )}
         {o.tired && <p class="note">Hjälten är trött för idag – inga fler kastanjer, men allt du lär dig räknas!</p>}

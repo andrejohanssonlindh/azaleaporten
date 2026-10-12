@@ -11,12 +11,13 @@ import { region as regionById, fitsGrade, type Region } from '../content/world';
 import { leaveToPicker } from '../session';
 import { BackBar, Mentor, Screen, Stars } from './ui';
 import { KastanjGreeting } from './Kastanj';
+import { ErrandCard } from './Uppdrag';
 
 // Azaleabyn (byn i mitten av ön) och regionsidorna med sina områden ("grottor").
 
 const BUILDINGS = [
   { id: 'gard', icon: '🏡', name: 'Azaleagården', desc: 'Ditt hem och ditt hjälteblad', to: 'gard' },
-  { id: 'uppdrag', icon: '📜', name: 'Uppdragstavlan', desc: 'Dagens uppdrag', to: 'uppdrag' },
+  { id: 'uppdrag', icon: '📜', name: 'Uppdragstavlan', desc: 'Dagens, veckans och stora uppdrag', to: 'uppdrag' },
   { id: 'smedjan', icon: '⚒️', name: 'Smedjan', desc: 'Butik, smält och förbättra', to: 'smedjan' },
   { id: 'skraddaren', icon: '🧵', name: 'Skräddaren', desc: 'Kläder och utseende', to: 'skraddaren' },
   { id: 'biblioteket', icon: '📖', name: 'Biblioteket', desc: 'Dina framsteg', to: 'biblioteket' },
@@ -49,6 +50,7 @@ export function Azaleabyn() {
       <BackBar label="Till ön" to="karta" />
       <div class="place-banner village"><span>🌸</span><h1>Azaleabyn</h1></div>
       {needsGearIntro(p.id) ? <GearIntro p={p} /> : <KastanjGreeting p={p} />}
+      <ErrandCard hid={p.id} />
       <div class="building-grid">
         {BUILDINGS.map((b) => (
           <button key={b.id} class={`building${b.to ? '' : ' soon'}`} onClick={() => (b.to ? go(b.to) : toast(`${b.icon} ${b.name} öppnar snart!`))}>
