@@ -55,12 +55,12 @@ test('omladdning mitt i en runda fortsätter med samma fråga', async ({ page })
 
 test('boss: intro och strid', async ({ page }) => {
   await newHero(page);
-  // Lås upp Halvsaurus genom att markera de två första banorna som klara.
+  // Lås upp Halvsaurus genom att markera banorna före den som klara.
   await page.evaluate(() => {
     const meta = JSON.parse(localStorage.getItem('azaleaporten:meta')!);
     const id = meta.heroes[0];
     const st = { stars: 2, cleared: true, best: 10, runs: 1 };
-    localStorage.setItem(`azaleaporten:h:${id}:area:tidstornet`, JSON.stringify({ v: 1, stages: { minutvisaren: st, 'forsta-orden': st }, bosses: {}, xp: 0 }));
+    localStorage.setItem(`azaleaporten:h:${id}:area:tidstornet`, JSON.stringify({ v: 1, stages: { minutvisaren: st, 'forsta-orden': st, 'ord-blir-siffror': st, kvarten: st, 'kvart-siffror': st }, bosses: {}, xp: 0 }));
   });
   await page.goto('./#/omrade/tidstornet');
   await page.getByRole('button', { name: /Möt Halvsaurus/ }).click();

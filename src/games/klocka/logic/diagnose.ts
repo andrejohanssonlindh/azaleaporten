@@ -1,6 +1,6 @@
 import { cap, fmt, h12, minWord, NUM, stMin, tOf, type Phrase } from './language';
 import type { BetweenQ, TimeQ } from './questions';
-import { bMin, durStr } from './questions';
+import { bMin, durStr, MAX_LEVEL } from './questions';
 
 // Diagnos av fel: vilken missuppfattning ligger bakom svaret? Portat från v0.1.
 // Felkoderna är permanenta (de sparas i händelseloggen och används av bossarnas fällor).
@@ -22,7 +22,7 @@ export const ERR: Record<string, string> = {
 export function hmSwapTime(h: number, m: number, lvl: number): number {
   const nh = h12(Math.round(m / 5));
   const pos = (h % 12) * 5 + m / 12;
-  let nm = lvl < 3 ? Math.round(pos / 5) * 5 : Math.round(pos);
+  let nm = lvl < MAX_LEVEL ? Math.round(pos / 5) * 5 : Math.round(pos);
   nm %= 60;
   return tOf(nh, nm);
 }

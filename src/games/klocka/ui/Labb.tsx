@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'preact/hooks';
 import { randomSeed, rngFrom } from '../../../platform/rng';
-import { LEVEL_DESC, makeQ, type Level, type Mode } from '../logic/questions';
+import { LEVEL_DESC, LEVELS, makeQ, type Level, type Mode } from '../logic/questions';
 import { cap, fmt, periodWord, render, structs } from '../logic/language';
 import { parseAny } from '../logic/parse';
 import { QuestionView } from './QuestionView';
@@ -22,7 +22,7 @@ export function FreePractice({ onResult }: { onResult?: (q: unknown, r: FirstAns
   const [n, setN] = useState(0);
   const [score, setScore] = useState({ ok: 0, all: 0 });
   const q = useMemo(() => makeQ(mode, level, rngFrom(randomSeed())), [mode, level, n]);
-  const levels: Level[] = mode === 'choice' ? [0, 1, 2, 3] : [1, 2, 3];
+  const levels: Level[] = LEVELS.map((_, i) => i).filter((l) => l > 0 || mode === 'choice');
   return (
     <div class="labb">
       <div class="seg" role="group" aria-label="Övningstyp">

@@ -7,7 +7,7 @@ const REGIONSBOSS: BossDef = {
   type: 'boss', id: 'regionsmastaren', kind: 'mastare', name: 'Talbergens Mästare', icon: '👑', title: 'Mästaren över hela Talbergen',
   hp: 15, personaId: 'talbergen.region',
   pool: [
-    { mode: 'tidstornet/words', level: 2 }, { mode: 'tidstornet/clock', level: 2 },
+    { mode: 'tidstornet/words', level: 6 }, { mode: 'tidstornet/clock', level: 6 },
     { mode: 'tiokompisbron/plus', level: 2 }, { mode: 'tiokompisbron/minus', level: 2 },
     { mode: 'tabellgruvan/ganger', level: 2 }, { mode: 'tabellgruvan/delat', level: 1 },
     { mode: 'myntmarknaden/vaxel', level: 1 }, { mode: 'myntmarknaden/pris', level: 1 },

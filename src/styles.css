@@ -673,6 +673,8 @@ button.stat.on { border-color: var(--accent); }
 .boss-hud-mid { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .boss-hud-mid .hearts { margin: 0; }
 .boss-hud-mid .hpbar, .mob-mid .hpbar { flex: none; }
+/* Monstret står till höger, så mätaren krymper mot det. */
+.boss-hud-mid .hpbar div, .mob-mid .hpbar div { margin-left: auto; background: linear-gradient(270deg, #e03131, #f76707); }
 .mob-strip { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 14px; padding: 6px 12px; box-shadow: var(--shadow); margin-bottom: 10px; }
 .mob-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .mob-mid small { color: var(--muted); font-size: 13px; }

@@ -318,7 +318,7 @@ function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome
         <div class="big-emoji">⚡</div>
         <h1>{pl.def.texts.cleared}</h1>
         <div class="result-stars"><Stars n={o.stars} /></div>
-        <p>{o.correct} av {o.total} rätt{o.stars === 2 && !o.usedHint ? ` – svara snabbare för tredje stjärnan (snitt ${(o.avgMs / 1000).toFixed(1)} s)` : ''}{o.usedHint && o.stars === 2 ? ' – utan ledtråd kan du få tre stjärnor' : ''}.</p>
+        <p>{o.correct} av {o.total} rätt{o.stars === 1 ? ' – alla tio rätt ger två stjärnor' : ''}{o.stars === 2 && !o.usedHint ? ` – svara snabbare för tredje stjärnan (snitt ${(o.avgMs / 1000).toFixed(1)} s)` : ''}{o.usedHint && o.stars === 2 ? ' – utan ledtråd kan du få tre stjärnor' : ''}.</p>
       </>
     );
   } else {

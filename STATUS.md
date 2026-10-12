@@ -33,7 +33,7 @@
   - Vuxenläge (heroes, backup/restore, lock the gate, import from the old v0.1)
 - **Phase 2, the island + Tidstornet:**
   - the island map: Azaleabyn, Övningsängen, regions, fog spots reserved for later
-  - Tidstornet: the clock game ported from v0.1, 7 eras, 13 stages, 3 monster bosses + 1 Mästare
+  - Tidstornet: the clock game ported from v0.1, 7 eras, 21 stages, 3 monster bosses + 1 Mästare. Difficulty is a ladder of levels 0–7 (`LEVELS` in `logic/questions.ts`): each adds one thing (hel/halv, kvart, tjugo, fem/tio, kväll, fem i halv, every minute), and a boss stands after the stages that teach its phase-2 level (phase 2 = level + 1)
   - 10-question runs with star rules, a 5-question repeat on Övningsängen, Tidslabbet (free practice + the time-reading tool)
   - rewards with no currency per answer, and tiredness after 30 minutes
 - **Phase 3, loot:**

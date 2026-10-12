@@ -167,9 +167,11 @@ describe('import från Klockövning v0.1', () => {
     const hid = hero();
     importV01(hid, 'Hjälte1', parseV01Paste(paste)!['Hjälte1']);
     const area = getArea(hid, 'tidstornet');
-    expect(nextOpenNode(TIDSTORNET, area)?.id).toBe('halvsaurus');
+    // Kvarten kom till efter v0.1 och står före Halvsaurus; importerade banor efter den förblir klara.
+    expect(nextOpenNode(TIDSTORNET, area)?.id).toBe('kvarten');
+    expect(nodeStatus(TIDSTORNET, area, 'halvsaurus')).toBe('locked');
     expect(nodeStatus(TIDSTORNET, area, 'las-klockan')).toBe('done');
-    expect(nodeStatus(TIDSTORNET, area, 'femminutare')).toBe('open');
+    expect(nodeStatus(TIDSTORNET, area, 'tjugo')).toBe('open');
   });
 
   it('XP-kurvan: ingen tappar nivå', () => {

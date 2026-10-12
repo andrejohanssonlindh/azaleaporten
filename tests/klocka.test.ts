@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { fmt, phraseKind, render, stMin, structs, tOf } from '../src/games/klocka/logic/language';
 import { parseAny, parseTime } from '../src/games/klocka/logic/parse';
 import { betweenSteps, diagBetween, diagnose, hmSwapTime } from '../src/games/klocka/logic/diagnose';
-import { makeQ, MINS, type TimeQ, type BetweenQ } from '../src/games/klocka/logic/questions';
+import { LEVELS, makeQ, MINS, type TimeQ, type BetweenQ } from '../src/games/klocka/logic/questions';
 import { rngFrom } from '../src/platform/rng';
 
 describe('svenskt tidsspråk', () => {
@@ -61,7 +61,7 @@ describe('frågor', () => {
   it('flervalsfrågor har fyra olika alternativ med exakt ett rätt', () => {
     const rng = rngFrom(7);
     for (let i = 0; i < 300; i++) {
-      const q = makeQ('choice', (i % 4) as 0 | 1 | 2 | 3, rng) as TimeQ;
+      const q = makeQ('choice', i % LEVELS.length, rng) as TimeQ;
       expect(q.opts).toHaveLength(4);
       expect(new Set(q.opts!.map((o) => o.text)).size).toBe(4);
       expect(q.opts!.filter((o) => o.tag === 'correct')).toHaveLength(1);
@@ -71,6 +71,42 @@ describe('frågor', () => {
     const rng = rngFrom(3);
     for (let i = 0; i < 200; i++) expect(MINS[1]).toContain((makeQ('clock', 1, rng) as TimeQ).m);
   });
+  it('fel alternativ använder bara minuter och uttryck som nivån har övat', () => {
+    const rng = rngFrom(11);
+    for (let level = 1; level < LEVELS.length; level++) {
+      const ok = new Set<string>();
+      for (let h = 1; h <= 12; h++) for (const m of LEVELS[level].mins) {
+        const v = structs(h, m);
+        const alt = LEVELS[level].alt && ((m >= 20 && m <= 24) || (m >= 36 && m <= 40));
+        for (const s of alt ? v : v.slice(0, 1)) ok.add(render(s));
+      }
+      for (let i = 0; i < 200; i++) {
+        const q = makeQ('choice', level, rng) as TimeQ;
+        for (const o of q.opts!) expect(ok, `nivå ${level}: ${o.text}`).toContain(o.text);
+      }
+    }
+  });
+  it('ingen "tjugofem i" eller "tjugofem över", och "halv" kommer inte före sin nivå', () => {
+    const rng = rngFrom(12);
+    for (let level = 1; level < LEVELS.length; level++) for (let i = 0; i < 200; i++) {
+      for (const mode of ['choice', 'words'] as const) {
+        const q = makeQ(mode, level, rng, i % 2 ? 'halv' : undefined) as TimeQ;
+        expect(render(q.s)).not.toMatch(/^tjugofem/);
+        if (!LEVELS[level].alt) expect(q.s.rel && q.s.halv).toBeFalsy();
+      }
+    }
+  });
+  it('eftermiddag och kväll kommer först på kvällsnivån (eller med Nattkorpens fälla)', () => {
+    const rng = rngFrom(13);
+    for (let i = 0; i < 200; i++) {
+      expect((makeQ('words', 4, rng) as TimeQ).isFm).toBe(true);
+      const b = makeQ('between', 2, rng) as BetweenQ;
+      expect(b.a.fmt).toBe(b.b.fmt);
+      expect(b.b.h24 * 60 + b.b.m).toBeLessThanOrEqual(12 * 60);
+    }
+    const pm = Array.from({ length: 100 }, () => (makeQ('clock', 4, rng, 'period') as TimeQ).isFm);
+    expect(pm).toContain(false);
+  });
   it('fällan "halv" ger tider med halv', () => {
     const rng = rngFrom(9);
     for (let i = 0; i < 100; i++) expect((makeQ('words', 2, rng, 'halv') as TimeQ).s.halv).toBe(true);
@@ -78,7 +114,7 @@ describe('frågor', () => {
   it('tid emellan håller sig inom dygnet och nivåns längd', () => {
     const rng = rngFrom(5);
     for (let i = 0; i < 200; i++) {
-      const q = makeQ('between', 1, rng) as BetweenQ;
+      const q = makeQ('between', 2, rng) as BetweenQ;
       const d = q.b.h24 * 60 + q.b.m - (q.a.h24 * 60 + q.a.m);
       expect(d).toBeGreaterThanOrEqual(10);
       expect(d).toBeLessThanOrEqual(240);
