@@ -80,7 +80,8 @@ describe('packningen i Azaleagården', () => {
 describe('Garderoben och Skräddaren', () => {
   it('id:n är unika', () => {
     expect(new Set(COSMETICS.map((c) => c.id)).size).toBe(COSMETICS.length);
-    for (const c of COSMETICS) expect(c.cost !== undefined || c.unlock !== undefined).toBe(true);
+    // Varje plagg går att få: köpa, låsa upp eller hitta i en skattkista.
+    for (const c of COSMETICS) expect(c.cost !== undefined || c.unlock !== undefined || c.kista === true).toBe(true);
   });
 
   it('köpa kostar kastanjer, tar på saken, och går inte två gånger', () => {

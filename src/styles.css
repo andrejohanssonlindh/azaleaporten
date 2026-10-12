@@ -695,7 +695,16 @@ button.stat.on { border-color: var(--accent); }
   .hero-figure.pose-hurt { animation: hurt .5s ease-out; }
   .shake { display: inline-block; animation: shake .35s ease-out; }
   .pop { animation: pop .5s ease-out; }
-  .fig-aura text { animation: twinkle 2.4s ease-in-out infinite; }
+  .fig-aura text, .fig-sparkle { animation: twinkle 2.4s ease-in-out infinite; }
+  .fig-bolt { animation: bolt 2s steps(1) infinite; }
+  .fig-fall { animation: fall 2.2s linear infinite; }
+  .fig-flame { animation: flame .3s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: top; }
+  .fig-disco { animation: twinkle 1.2s ease-in-out infinite; }
+  .fig-halo, .fig-wings { animation: bob 2.6s ease-in-out infinite; }
+  @keyframes bolt { 0%, 40%, 60%, 100% { opacity: 0; } 45%, 55% { opacity: 1; } }
+  @keyframes fall { from { transform: translateY(-24px); opacity: 0; } 30% { opacity: 1; } to { transform: translateY(24px); opacity: 0; } }
+  @keyframes flame { to { transform: scaleY(1.5); } }
+  @keyframes bob { 50% { transform: translateY(-2px); } }
   @keyframes lunge { 40% { transform: translateX(10px) rotate(4deg); } }
   @keyframes hurt { 30% { transform: translateX(-6px); opacity: .5; } 60% { opacity: 1; } }
   @keyframes pop { from { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.2); } }

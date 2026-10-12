@@ -39,7 +39,7 @@ export function Skraddaren() {
                 <span class="item-icon">{c.icon}</span>
                 <div class="item-text">
                   <b>{c.name}</b>
-                  <small>{has ? (worn ? 'Har på dig' : 'Din') : c.unlock ? `🔒 ${unlockText(c.unlock)}` : `${c.cost} 🌰`}</small>
+                  <small>{has ? (worn ? 'Har på dig' : 'Din') : c.unlock ? `🔒 ${unlockText(c.unlock)}` : c.kista ? '🎁 Finns i Spelöns skattkistor' : `${c.cost} 🌰`}</small>
                 </div>
                 <div class="item-actions">
                   <button class="btn small" aria-pressed={trying?.id === c.id} onClick={() => setTrying(trying?.id === c.id ? null : c)}>Prova</button>

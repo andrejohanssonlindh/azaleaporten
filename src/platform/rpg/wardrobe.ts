@@ -20,6 +20,10 @@ export interface Cosmetic {
   unlock?: Unlock;
   /** Finns bara i skattkistor från Spelön. */
   kista?: boolean;
+  /** Vilken ritning HeroFigure använder (annars id:t). Låter flera plagg dela form men ha egna färger. */
+  form?: string;
+  /** Glitter: tecknet som gnistrar runt hjälten. */
+  emoji?: string;
   /** Huvudfärg och ev. andrafärg för ritningen i HeroFigure. */
   color: string;
   color2?: string;
@@ -68,6 +72,61 @@ export const COSMETICS: Cosmetic[] = [
   { id: 'aura.storm', slot: 'aura', name: 'Stormvirvel', icon: '🌪️', unlock: { kind: 'storm', n: 3 }, color: '#74c0fc' },
   { id: 'aura.visdom', slot: 'aura', name: 'Visdomsljus', icon: '💡', unlock: { kind: 'sitter', n: 15 }, color: '#ffe066' },
   { id: 'mantel.uggla', slot: 'mantel', name: 'Ugglemanteln', icon: '🦉', unlock: { kind: 'sitter', n: 40 }, color: '#8d5524', color2: '#ffe8cc' },
+
+  // Mellanpris: många att välja bland.
+  { id: 'hatt.keps.rod', slot: 'hatt', name: 'Röd keps', icon: '🧢', cost: 35, form: 'keps', color: '#e03131', color2: '#ffffff' },
+  { id: 'hatt.keps.bla', slot: 'hatt', name: 'Blå keps', icon: '🧢', cost: 35, form: 'keps', color: '#1c7ed6', color2: '#ffd43b' },
+  { id: 'hatt.mossa.rosa', slot: 'hatt', name: 'Rosa mössa', icon: '🎀', cost: 40, form: 'mossa', color: '#f783ac', color2: '#ffffff' },
+  { id: 'hatt.mossa.gron', slot: 'hatt', name: 'Grön mössa', icon: '🟢', cost: 40, form: 'mossa', color: '#2f9e44', color2: '#ffe066' },
+  { id: 'hatt.kaninoron', slot: 'hatt', name: 'Kaninöron', icon: '🐰', cost: 55, form: 'oron', color: '#f8f9fa', color2: '#faa2c1' },
+  { id: 'hatt.kattoron', slot: 'hatt', name: 'Kattöron', icon: '🐱', cost: 55, form: 'kattoron', color: '#495057', color2: '#faa2c1' },
+  { id: 'hatt.cowboy', slot: 'hatt', name: 'Cowboyhatt', icon: '🤠', cost: 60, form: 'cowboy', color: '#a0522d', color2: '#5c3a1a' },
+  { id: 'hatt.kock', slot: 'hatt', name: 'Kockmössa', icon: '👨‍🍳', cost: 50, form: 'kock', color: '#ffffff', color2: '#dee2e6' },
+  { id: 'hatt.rosett', slot: 'hatt', name: 'Stor rosett', icon: '🎀', cost: 45, form: 'rosett', color: '#e64980', color2: '#fcc2d7' },
+  { id: 'hatt.solhatt', slot: 'hatt', name: 'Solhatt', icon: '👒', cost: 60, form: 'solhatt', color: '#ffe066', color2: '#f06595' },
+  { id: 'hatt.tiara', slot: 'hatt', name: 'Tiara', icon: '💎', cost: 90, form: 'tiara', color: '#ced4da', color2: '#74c0fc' },
+  { id: 'mantel.lila', slot: 'mantel', name: 'Lila mantel', icon: '🟪', cost: 45, color: '#7048e8', color2: '#d0bfff' },
+  { id: 'mantel.orange', slot: 'mantel', name: 'Orange mantel', icon: '🟧', cost: 45, color: '#f76707', color2: '#ffd8a8' },
+  { id: 'mantel.svart', slot: 'mantel', name: 'Svart mantel', icon: '⬛', cost: 55, color: '#212529', color2: '#c92a2a' },
+  { id: 'mantel.randig', slot: 'mantel', name: 'Randig mantel', icon: '🦓', cost: 60, form: 'randig', color: '#1c7ed6', color2: '#ffffff' },
+  { id: 'mantel.prickig', slot: 'mantel', name: 'Prickig mantel', icon: '🍄', cost: 60, form: 'prickig', color: '#e03131', color2: '#ffffff' },
+  { id: 'mantel.hjartan', slot: 'mantel', name: 'Hjärtmantel', icon: '💗', cost: 70, form: 'hjartan', color: '#fcc2d7', color2: '#e64980' },
+  { id: 'skor.rod', slot: 'skor', name: 'Röda skor', icon: '👠', cost: 30, color: '#e03131', color2: '#ffffff' },
+  { id: 'skor.bla', slot: 'skor', name: 'Blå gympaskor', icon: '👟', cost: 35, color: '#1c7ed6', color2: '#ffffff' },
+  { id: 'skor.rosa', slot: 'skor', name: 'Rosa skor', icon: '🩰', cost: 35, color: '#f783ac', color2: '#ffffff' },
+  { id: 'skor.gron', slot: 'skor', name: 'Grodstövlar', icon: '🐸', cost: 40, color: '#40c057', color2: '#ffe066' },
+  { id: 'bg.himmel', slot: 'bakgrund', name: 'Molnhimmel', icon: '☁️', cost: 45, form: 'himmel', color: '#74c0fc', color2: '#ffffff' },
+  { id: 'bg.sno', slot: 'bakgrund', name: 'Snölandet', icon: '⛄', cost: 55, form: 'sno', color: '#e7f5ff', color2: '#a5d8ff' },
+  { id: 'bg.oken', slot: 'bakgrund', name: 'Öknen', icon: '🏜️', cost: 55, form: 'oken', color: '#ffd8a8', color2: '#ffa94d' },
+  { id: 'bg.hav.djup', slot: 'bakgrund', name: 'Under havet', icon: '🐠', cost: 70, form: 'undervatten', color: '#1864ab', color2: '#4dabf7' },
+  { id: 'bg.godis', slot: 'bakgrund', name: 'Godislandet', icon: '🍭', cost: 80, form: 'godis', color: '#fcc2d7', color2: '#b2f2bb' },
+  { id: 'aura.stjarnor', slot: 'aura', name: 'Stjärnor', icon: '⭐', cost: 70, emoji: '⭐', color: '#ffd43b' },
+  { id: 'aura.bubblor', slot: 'aura', name: 'Bubblor', icon: '🫧', cost: 70, emoji: '🫧', color: '#a5d8ff' },
+  { id: 'aura.fjarilar', slot: 'aura', name: 'Fjärilar', icon: '🦋', cost: 80, emoji: '🦋', color: '#74c0fc' },
+  { id: 'aura.musik', slot: 'aura', name: 'Musiknoter', icon: '🎵', cost: 80, emoji: '🎵', color: '#b197fc' },
+  { id: 'aura.snoflingor', slot: 'aura', name: 'Snöflingor', icon: '❄️', cost: 80, emoji: '❄️', color: '#d0ebff' },
+
+  // Glitter och blixtar: dyrt och flashigt.
+  { id: 'aura.blixtar', slot: 'aura', name: 'Blixtar', icon: '⚡', cost: 180, form: 'blixt', emoji: '⚡', color: '#ffe066' },
+  { id: 'aura.glitterregn', slot: 'aura', name: 'Glitterregn', icon: '🌟', cost: 200, form: 'regn', color: '#fcc419', color2: '#f783ac' },
+  { id: 'aura.diamanter', slot: 'aura', name: 'Diamanter', icon: '💎', cost: 160, emoji: '💎', color: '#74c0fc' },
+  { id: 'aura.regnbage', slot: 'aura', name: 'Regnbåge', icon: '🌈', cost: 220, form: 'regnbage', emoji: '🌈', color: '#e64980' },
+  { id: 'mantel.glitter', slot: 'mantel', name: 'Glittermantel', icon: '✨', cost: 160, form: 'glitter', color: '#be4bdb', color2: '#fff3bf' },
+  { id: 'mantel.blixt', slot: 'mantel', name: 'Blixtmantel', icon: '⚡', cost: 170, form: 'blixt', color: '#1c1c3a', color2: '#ffe066' },
+  { id: 'skor.glitter', slot: 'skor', name: 'Glitterskor', icon: '💫', cost: 140, form: 'glitter', color: '#e599f7', color2: '#fff3bf' },
+  { id: 'skor.blixt', slot: 'skor', name: 'Blixtskor', icon: '⚡', cost: 150, form: 'blixt', color: '#fab005', color2: '#1c7ed6' },
+  { id: 'hatt.glorian', slot: 'hatt', name: 'Glorian', icon: '😇', cost: 180, form: 'gloria', color: '#ffe066', color2: '#fff9db' },
+  { id: 'bg.disco', slot: 'bakgrund', name: 'Discot', icon: '🪩', cost: 200, form: 'disco', color: '#2b1a4a', color2: '#f783ac' },
+
+  // Bara i Spelöns skattkistor.
+  { id: 'mantel.fevingar', slot: 'mantel', name: 'Févingar', icon: '🧚', kista: true, form: 'vingar', color: '#d0bfff', color2: '#fcc2d7' },
+  { id: 'mantel.drakvingar', slot: 'mantel', name: 'Drakvingar', icon: '🐉', kista: true, form: 'drakvingar', color: '#2f9e44', color2: '#c0eb75' },
+  { id: 'hatt.enhorning', slot: 'hatt', name: 'Enhörningshorn', icon: '🦄', kista: true, form: 'horn', color: '#ffd43b', color2: '#f783ac' },
+  { id: 'hatt.raket', slot: 'hatt', name: 'Rymdhjälm', icon: '🧑‍🚀', kista: true, form: 'rymdhjalm', color: '#f8f9fa', color2: '#4dabf7' },
+  { id: 'skor.raket', slot: 'skor', name: 'Raketskor', icon: '🚀', kista: true, form: 'raket', color: '#868e96', color2: '#ff6b00' },
+  { id: 'aura.guldregn', slot: 'aura', name: 'Guldregn', icon: '🪙', kista: true, form: 'regn', color: '#fab005', color2: '#fff3bf' },
+  { id: 'aura.regnbagsblixt', slot: 'aura', name: 'Regnbågsblixtar', icon: '🌈', kista: true, form: 'blixt', emoji: '🌈', color: '#f783ac' },
+  { id: 'bg.rymden', slot: 'bakgrund', name: 'Rymden', icon: '🪐', kista: true, form: 'rymd', color: '#0b0b2b', color2: '#ffa94d' },
 ];
 
 export const cosmetic = (id: string | undefined) => COSMETICS.find((c) => c.id === id);
