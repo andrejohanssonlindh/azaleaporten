@@ -45,6 +45,8 @@ export interface BossDef {
   titleReward: string;
   /** Personans boss-plats om den inte är '<område>.mastare', t.ex. 'talbergen.region'. */
   personaId?: string;
+  /** Vapengrupp (sten-sax-påse, se rpg/vapen.ts). Saknas den bestäms den av id:t. */
+  group?: 'narstrid' | 'avstand' | 'magi';
 }
 
 export type PathNode = StageDef | BossDef;

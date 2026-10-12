@@ -2,6 +2,8 @@ import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey, saveHeroState } from '../profiles';
 import { randomSeed, rngFrom, type Rng } from '../rng';
 import { BOSS, BOSS_HP_SCALE, CLEAR_MIN, FAST_MS, HINTS_PER_DAY, KUNSKAP_TITLE_LEVELS, kunskapLevel, LOOT, MASTERY, minHits, MOB, needXP, PRACTICE_LENGTH, REWARD, RUN_LENGTH, TIRED_AFTER_MS, XP } from './balance';
+import { foeGroup, matchup, weaponGroup, withMatchup, type Group } from './vapen';
+import { stigmonster } from '../../content/monsters';
 import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, effectiveStats, useLifePotion, type Chest } from './inventory';
 import type { Item } from './items';
 import { getEvents, logEvents, type LogEvent } from '../learning/events';
@@ -49,7 +51,8 @@ export interface RunState {
   mastery?: { skills: string[]; xp: number };
 }
 
-export interface Hit { dmg: number; crit: boolean; fast?: boolean }
+/** m = vapengruppens utfall ('stark'/'svag'), se rpg/vapen.ts. */
+export interface Hit { dmg: number; crit: boolean; fast?: boolean; m?: 'stark' | 'svag' }
 
 /** k = vilket monster i ordningen (se content/monsters.ts), beaten/blad = besegrade och blad de gav. */
 export interface MobState { k: number; hp: number; maxHp: number; beaten: number; blad: number; lastHit?: Hit & { beat?: boolean; blad?: number } }
@@ -192,8 +195,15 @@ export function bossHearts(hid: string, potion: boolean) {
 /** Skada per vanligt rätt svar mot en boss (utan snabbhet och fullträff), och ungefär hur många träffar som behövs. */
 export function bossPreview(hid: string, boss: BossDef) {
   const maxHp = boss.hp * BOSS_HP_SCALE;
-  const dmg = Math.min(effects.damage(effectiveStats(hid)), Math.floor(maxHp / minHits(boss.kind, boss.hp)));
-  return { maxHp, dmg, hits: Math.ceil(maxHp / dmg) };
+  const group = foeGroup(boss.id, boss.group), weapon = heroWeaponGroup(hid), m = matchup(weapon, group);
+  const dmg = Math.min(withMatchup(effects.damage(effectiveStats(hid)), m), Math.floor(maxHp / minHits(boss.kind, boss.hp)));
+  return { maxHp, dmg, hits: Math.ceil(maxHp / dmg), group, weapon, m };
+}
+
+/** Vapengruppen för hjältens utrustade vapen (null = inget vapen). */
+export function heroWeaponGroup(hid: string): Group | null {
+  const inv = getInv(hid);
+  return weaponGroup(inv.items.find((x) => x.id === inv.equipped.vapen));
 }
 
 export function startRun(hid: string, area: AreaDef, node: PathNode, kind: RunState['kind'] = node.type === 'boss' ? 'boss' : 'stage'): RunState {
@@ -288,15 +298,16 @@ function mobHit(hid: string, run: RunState, mob: MobState, ms: number): MobState
   const ranger = getProfile(hid)?.heroClass === 'ranger';
   const crit = rngFrom(run.seed + run.index * 104729 + 17).next() < effects.critChance(st, ranger);
   const fast = ms < FAST_MS && effects.fastBonus(st) > 0;
-  const dmg = effects.damage(st) + (fast ? effects.fastBonus(st) : 0) + (crit ? 5 : 0);
-  if (mob.hp - dmg > 0) return { ...mob, hp: mob.hp - dmg, lastHit: { dmg, crit, fast } };
+  const m = matchup(heroWeaponGroup(hid), stigmonster(run.seed, mob.k).group) ?? undefined;
+  const dmg = withMatchup(effects.damage(st), m ?? null) + (fast ? effects.fastBonus(st) : 0) + (crit ? 5 : 0);
+  if (mob.hp - dmg > 0) return { ...mob, hp: mob.hp - dmg, lastHit: { dmg, crit, fast, m } };
   let blad = 0;
   if (!isTired(hid)) {
     const s = getHeroState(hid);
     saveHeroState(hid, { ...s, blad: s.blad + MOB.blad });
     blad = MOB.blad;
   }
-  return { k: mob.k + 1, hp: mob.maxHp, maxHp: mob.maxHp, beaten: mob.beaten + 1, blad: mob.blad + blad, lastHit: { dmg, crit, fast, beat: true, blad } };
+  return { k: mob.k + 1, hp: mob.maxHp, maxHp: mob.maxHp, beaten: mob.beaten + 1, blad: mob.blad + blad, lastHit: { dmg, crit, fast, m, beat: true, blad } };
 }
 
 /** Skada för ett rätt svar. Taket gör att ingen utrustning kan vinna med färre än minHits rätta svar. */
@@ -306,9 +317,10 @@ export function bossHit(hid: string, run: RunState, boss: BossDef, ms: number): 
   const ranger = getProfile(hid)?.heroClass === 'ranger';
   const crit = Math.random() < effects.critChance(st, ranger);
   const fast = ms < FAST_MS && effects.fastBonus(st) > 0;
-  const raw = effects.damage(st) + (fast ? effects.fastBonus(st) : 0) + (crit ? 5 : 0);
+  const m = matchup(heroWeaponGroup(hid), foeGroup(boss.id, boss.group)) ?? undefined;
+  const raw = withMatchup(effects.damage(st), m ?? null) + (fast ? effects.fastBonus(st) : 0) + (crit ? 5 : 0);
   const cap = Math.floor((run.maxHp ?? 0) / minHits(boss.kind, boss.hp));
-  return { dmg: Math.min(raw, cap), crit, fast };
+  return { dmg: Math.min(raw, cap), crit, fast, m };
 }
 
 /** Barnet rättade sitt fel: liten XP-bonus, och frågan räknas som klar. */

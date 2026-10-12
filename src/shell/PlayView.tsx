@@ -1,3 +1,4 @@
+import { beatenBy, GROUPS } from '../platform/rpg/vapen';
 import { useMemo, useState } from 'preact/hooks';
 import { chestModal, dataRev, gate, go, heroId, toast, touch } from '../state';
 import { getHeroState, getProfile } from '../platform/profiles';
@@ -162,6 +163,11 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
             {' '}{face.name} har {pv.maxHp} liv. Varje rätt svar gör {pv.dmg} skada, så du behöver ungefär {pv.hits} träffar.
             {boss.trap && <> Akta dig: varannan fråga är en fälla ({game.errLabel(boss.trap)?.toLowerCase()}).</>}
           </p>
+          <p class="boss-group">{GROUPS[pv.group].icon} {face.name} är {GROUPS[pv.group].name.toLowerCase()}. {pv.m === 'stark'
+            ? `Ditt vapen (${GROUPS[pv.weapon!].name.toLowerCase()}) biter extra hårt! 💪`
+            : pv.m === 'svag'
+              ? `Ditt vapen (${GROUPS[pv.weapon!].name.toLowerCase()}) biter sämre – ${GROUPS[beatenBy(pv.group)].icon} ${GROUPS[beatenBy(pv.group)].name.toLowerCase()} hade varit bättre.`
+              : `${GROUPS[beatenBy(pv.group)].icon} ${GROUPS[beatenBy(pv.group)].name} biter bäst på den.`}</p>
           <p class="note">Bättre utrustning ger fler hjärtan och hårdare slag. Svaren måste du alltid kunna själv!</p>
           <div class="row center-row">
             <button class="btn" onClick={() => go(back)}>Inte än</button>
@@ -254,7 +260,7 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
   );
 }
 
-const hitText = (h: Hit) => `💥 −${h.dmg}${h.fast ? ' ⚡ Snabbt!' : ''}${h.crit ? ' ⭐ Fullträff!' : ''}`;
+const hitText = (h: Hit) => `💥 −${h.dmg}${h.m === 'stark' ? ' 💪 Effektivt!' : h.m === 'svag' ? ' 🛡️ Tålig!' : ''}${h.fast ? ' ⚡ Snabbt!' : ''}${h.crit ? ' ⭐ Fullträff!' : ''}`;
 
 /** Stigmonstret i en vanlig bana: rätta svar slår till det, utrustningen avgör hur hårt. */
 function MobStrip({ hid, run, answered }: { hid: string; run: RunState; answered: boolean }) {
@@ -268,7 +274,7 @@ function MobStrip({ hid, run, answered }: { hid: string; run: RunState; answered
       <div class="mob-mid">
         {hit
           ? <p class={`hit small${hit.crit ? ' crit' : ''}`}>{beaten ? `${beaten.icon} ${beaten.name} besegrad!${hit.blad ? ` +${hit.blad} 🌸` : ''}` : hitText(hit)}</p>
-          : <small>{mob.beaten > 0 ? `${mob.beaten} besegrade · ` : ''}{m.name}</small>}
+          : <small>{mob.beaten > 0 ? `${mob.beaten} besegrade · ` : ''}{m.name} {GROUPS[m.group].icon}</small>}
         <div class="hpbar small" aria-label={`${m.name} har ${mob.hp} av ${mob.maxHp} kvar`}><div style={{ width: `${(mob.hp / mob.maxHp) * 100}%` }} /></div>
       </div>
       <span key={`m${run.results.length}`} class={`mob-icon${hit && !beaten ? ' shake' : ''}${beaten ? ' pop' : ''}`}>{m.icon}</span>

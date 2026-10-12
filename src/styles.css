@@ -243,6 +243,7 @@ h3 { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: v
 .place-banner h1 { margin: 0; font-size: 30px; font-weight: 900; text-shadow: 0 2px 6px rgba(0, 0, 0, .3); }
 .place-banner.village { background: linear-gradient(135deg, #f06595, #e8590c); }
 .place-banner.meadow { background: linear-gradient(135deg, #94d82d, #2f9e44); }
+.item-group { display: block; font-size: 13px; color: var(--muted); }
 .place-banner.spelon { background: linear-gradient(135deg, #ffa94d, #e64980); }
 .building-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .building { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 16px 8px; border-radius: 16px; border: 2px solid var(--line); background: var(--card); box-shadow: var(--shadow); }
@@ -350,7 +351,7 @@ h3 { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: v
 .boss-card h1, .result-card h1 { font-size: 28px; font-weight: 900; margin: 8px 0 0; }
 .boss-title { color: var(--muted); font-weight: 700; margin: 2px 0 10px; }
 .boss-speech { font-size: 18px; font-style: italic; background: var(--bg); border-radius: 14px; padding: 12px 14px; margin: 10px 0; border-left: 4px solid var(--bad); text-align: left; }
-.boss-rules { font-size: 15px; }
+.boss-rules, .boss-group { font-size: 15px; }
 .center-row { justify-content: center; margin-top: 14px; }
 .portrait { display: inline-block; line-height: 1; border-radius: 50%; }
 img.portrait { object-fit: cover; }

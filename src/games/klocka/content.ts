@@ -9,7 +9,7 @@ const stage = (id: string, name: string, icon: string, desc: string, mode: Mode,
   ({ type: 'stage', id, name, icon, desc, spec: { mode, level }, thrMs: THR[mode] });
 
 const HALVSAURUS: BossDef = {
-  type: 'boss', id: 'halvsaurus', kind: 'monster', name: 'Halvsaurus', icon: '🦖', title: 'Dinosaurien som delar allt på mitten',
+  type: 'boss', id: 'halvsaurus', kind: 'monster', group: 'narstrid', name: 'Halvsaurus', icon: '🦖', title: 'Dinosaurien som delar allt på mitten',
   hp: 8, trap: 'halv', pool: [{ mode: 'choice', level: 1 }, { mode: 'words', level: 1 }],
   lines: {
     entrance: 'RAAAWR! Halv tre är väl tre och trettio? Hehe… eller? Ingen tar sig förbi mig utan att kunna "halv"!',
@@ -22,7 +22,7 @@ const HALVSAURUS: BossDef = {
 };
 
 const MUMIEN: BossDef = {
-  type: 'boss', id: 'mumien', kind: 'monster', name: 'Mumien Vändkappa', icon: '🧟', title: 'Lindad åt fel håll i tretusen år',
+  type: 'boss', id: 'mumien', kind: 'monster', group: 'magi', name: 'Mumien Vändkappa', icon: '🧟', title: 'Lindad åt fel håll i tretusen år',
   hp: 8, trap: 'rel', pool: [{ mode: 'choice', level: 3 }, { mode: 'words', level: 3 }, { mode: 'clock', level: 3 }],
   lines: {
     entrance: 'Mmmmfff… I eller över? Över eller i? Jag har lindat in alla klockor i pyramiden baklänges!',
@@ -35,7 +35,7 @@ const MUMIEN: BossDef = {
 };
 
 const NATTKORPEN: BossDef = {
-  type: 'boss', id: 'nattkorpen', kind: 'monster', name: 'Nattkorpen', icon: '🐦‍⬛', title: 'Vet aldrig om det är morgon eller kväll',
+  type: 'boss', id: 'nattkorpen', kind: 'monster', group: 'avstand', name: 'Nattkorpen', icon: '🐦‍⬛', title: 'Vet aldrig om det är morgon eller kväll',
   hp: 8, trap: 'period', pool: [{ mode: 'clock', level: 4 }, { mode: 'words', level: 4 }, { mode: 'between', level: 4 }],
   lines: {
     entrance: 'KRAA! Är det morgon eller kväll? Jag har flugit runt jorden så länge att jag har glömt bort det!',

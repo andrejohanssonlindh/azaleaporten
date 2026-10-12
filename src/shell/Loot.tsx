@@ -1,3 +1,4 @@
+import { BEATS, GROUPS, weaponGroup } from '../platform/rpg/vapen';
 import type { ComponentChildren } from 'preact';
 import { useState } from 'preact/hooks';
 import { chestModal, dataRev, go, heroId, route, toast, touch } from '../state';
@@ -19,6 +20,7 @@ export function ItemCard({ it, children, equipped = false, note }: { it: Item; c
         <b style={{ color: r.color }}>{it.name}{it.plus ? ` +${it.plus}` : ''}</b>
         <small>{r.name}{it.unique ? ' · Unik' : ''} · Nivå {it.ilvl}{equipped ? ' · Används' : ''}</small>
         <span class="item-stats">{statLine(itemStats(it))}</span>
+        {weaponGroup(it) && <span class="item-group">{GROUPS[weaponGroup(it)!].icon} {GROUPS[weaponGroup(it)!].name} · starkt mot {GROUPS[BEATS[weaponGroup(it)!]].name.toLowerCase()}</span>}
         {it.flavor && <i class="item-flavor">{it.flavor}</i>}
         {note}
       </div>
