@@ -288,6 +288,8 @@ const PET_STAT: Record<string, Stat> = {
   tvartom: 'snabbhet', bokstavligt: 'visdom', punkt: 'skydd', 'komma-och': 'tur',
   liknar: 'klurighet', 'falsk-van': 'tur', bokstavsljud: 'snabbhet', 'teen-ty': 'kraft', 'half-past': 'kraft', 'past-to': 'skydd',
   'som-svenska': 'visdom', 'tyst-bokstav': 'klurighet', 'glomt-s': 'kraft', 'svensk-ordfoljd': 'skydd',
+  'harmar-sista': 'klurighet', 'missar-inte': 'visdom', 'ett-steg': 'snabbhet', 'vanster-hoger': 'skydd',
+  'loop-antal': 'kraft', 'bara-forsta': 'tur', 'sista-blocket': 'klurighet', citat: 'visdom', 'range-noll': 'snabbhet',
 };
 
 /** Ger husdjursföremålet för en tämjd boss (om det inte redan finns). */

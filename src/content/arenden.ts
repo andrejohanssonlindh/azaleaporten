@@ -57,6 +57,9 @@ export const ARENDEN: Arende[] = [
   { id: 'turisten', who: 'Turisten Tilly', icon: '🧳', areaId: 'hamnen', n: 3,
     story: 'Hello! I am lost! … Förlåt, jag kommer från Västerön och pratar bara lite svenska. Kan du lyssna på engelska i Hamnen så att vi förstår varandra?',
     thanks: 'Thank you so much! Nu hittar jag tillbaka till båten.' },
+  { id: 'uppfinnaren', who: 'Uppfinnaren Ugo', icon: '🧑‍🔬', areaId: 'kodstigen', n: 3,
+    story: 'Min nya robot har rymt till Robotön, och den hittar inte hem till laddaren! Kan du styra den åt mig på Kodstigen?',
+    thanks: 'Pip pip! Där är den – fulladdad och glad. Tack, robotförare!' },
 ];
 
 export const arende = (id: string | null | undefined) => ARENDEN.find((a) => a.id === id);

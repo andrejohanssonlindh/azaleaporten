@@ -11,7 +11,7 @@ import { Screen, TopBar, UpdateBanner } from './ui';
 import { KastanjGreeting } from './Kastanj';
 
 // Ön: startskärmen efter porten. Allt detaljerat ligger ett tryck bort.
-// Reserverade platser (dimman) är till för framtida ämnen. Spelön har minispelen, Robotön (programmering) kommer.
+// Reserverade platser (dimman) är till för framtida ämnen. Spelön har minispelen, Robotön har programmering.
 
 function Spot({ label, onClick, x, y, children, cls = '' }: { label: string; onClick: () => void; x: number; y: number; children: ComponentChildren; cls?: string }) {
   const w = label.length * 7.4 + 22;
@@ -70,7 +70,7 @@ function Island({ heroEmoji, mist }: { heroEmoji: string; mist: Partial<Record<R
         <path d="M356 50 L364 36 L372 50 Z" fill="#ffd43b" stroke="#e8590c" stroke-width="1" />
       </Spot>
 
-      {/* Robotön: programmering (kommer snart) */}
+      {/* Robotön: programmering */}
       <Spot label="Robotön" x={350} y={506} onClick={() => go('region/roboton')}>
         <ellipse cx="364" cy="482" rx="30" ry="15" fill="#f4e3b5" />
         <ellipse cx="364" cy="480" rx="23" ry="10" fill="#ced4da" />

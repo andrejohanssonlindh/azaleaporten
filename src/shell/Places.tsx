@@ -81,6 +81,7 @@ function RegionBanner({ r }: { r: Region }) {
         {r.id === 'talbergen' && <path d="M0 80 L50 34 L82 58 L130 18 L178 60 L214 36 L262 64 L300 44 V80 Z" fill={ground} />}
         {r.id === 'ordskogen' && <g fill={ground}>{[10, 40, 70, 100, 130, 160, 190, 220, 250, 280].map((x, i) => <path key={x} d={`M${x} 80 L${x + 16} ${30 + (i % 3) * 10} L${x + 32} 80 Z`} />)}</g>}
         {r.id === 'vasteron' && <><circle cx="240" cy="34" r="14" fill="#ffd43b" opacity=".9" /><rect y="58" width="300" height="22" fill="#4dabf7" opacity=".7" /><path d="M60 62 Q120 40 180 62 Z" fill={ground} /></>}
+        {r.id === 'roboton' && <><rect y="60" width="300" height="20" fill={ground} />{[160, 205, 250].map((x) => <g key={x}><rect x={x} y={34} width={26} height={26} rx={6} fill="#74c0fc" stroke="#1864ab" stroke-width="2" /><circle cx={x + 8} cy={44} r={3} fill="#1c2a3a" /><circle cx={x + 18} cy={44} r={3} fill="#1c2a3a" /><path d={`M${x + 13} 34 V26`} stroke="#1864ab" stroke-width="2" /><circle cx={x + 13} cy={24} r={3} fill="#f08c00" /></g>)}<circle cx="284" cy="18" r="9" fill="#fff3bf" /></>}
         {r.id === 'betongbukten' && <><rect y="62" width="300" height="18" fill={ground} /><path d="M40 62 a30 30 0 0 1 30 -30 v30 z M260 62 a30 30 0 0 0 -30 -30 v30 z" fill="#adb5bd" /><circle cx="150" cy="30" r="12" fill="#fff3bf" /></>}
       </svg>
       <div class="region-name"><span>{r.icon} {r.name}</span><small>{r.subject}</small></div>

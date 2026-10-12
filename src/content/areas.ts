@@ -26,6 +26,10 @@ import { BIG_BEN_TORNET } from '../games/bigben/content';
 import { STAVKLIPPAN } from '../games/stavklippan/content';
 import { PIRATSKEPPET } from '../games/pirat/content';
 import { VASTERONS_FYR } from '../games/vasteron';
+import { LOGIKSLINGAN } from '../games/logik/content';
+import { BUGGJAKTEN, KODSTIGEN, LOOPVERKSTADEN } from '../games/robot/content';
+import { PYTHONHAMNEN } from '../games/python/content';
+import { ROBOTFABRIKEN } from '../games/roboton';
 
 // Spelbara områden: områdets innehåll (litet, laddas direkt) + spelet som levererar frågorna.
 // Spelkoden laddas först när någon spelar i området, så att startsidan förblir liten.
@@ -53,6 +57,11 @@ const AREAS: Record<string, Playable> = {
   'big-ben-tornet': { def: BIG_BEN_TORNET, load: () => import('../games/bigben').then((m) => m.bigben) },
   stavklippan: { def: STAVKLIPPAN, load: () => import('../games/stavklippan').then((m) => m.stavklippan) },
   piratskeppet: { def: PIRATSKEPPET, load: () => import('../games/pirat').then((m) => m.pirat) },
+  logikslingan: { def: LOGIKSLINGAN, load: () => import('../games/logik').then((m) => m.logik) },
+  kodstigen: { def: KODSTIGEN, load: () => import('../games/robot').then((m) => m.kodstigen) },
+  loopverkstaden: { def: LOOPVERKSTADEN, load: () => import('../games/robot').then((m) => m.loopverkstaden) },
+  buggjakten: { def: BUGGJAKTEN, load: () => import('../games/robot').then((m) => m.buggjakten) },
+  pythonhamnen: { def: PYTHONHAMNEN, load: () => import('../games/python').then((m) => m.python) },
 };
 
 // Regionbossar: en blandning av regionens spel.
@@ -66,6 +75,7 @@ export const PLAYABLE: Record<string, Playable> = {
   talbergen: { def: TALBERGEN_TOPPEN, load: async () => regionGame('talbergen', await gamesOf('talbergen')) },
   betongbukten: { def: BETONGBUKTENS_TOPP, load: async () => regionGame('betongbukten', await gamesOf('betongbukten')) },
   vasteron: { def: VASTERONS_FYR, load: async () => regionGame('vasteron', await gamesOf('vasteron')) },
+  roboton: { def: ROBOTFABRIKEN, load: async () => regionGame('roboton', await gamesOf('roboton')) },
 };
 
 const loading = new Map<string, Promise<GameModule>>();

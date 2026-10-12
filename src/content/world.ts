@@ -77,16 +77,15 @@ export const REGIONS: Region[] = [
     ],
   },
   {
-    // Planerad: först logik och instruktioner utan kod, sedan enkel Python. Delområdena är inte bestämda i detalj än.
     id: 'roboton', name: 'Robotön', subject: 'Programmering', icon: '🤖',
-    tagline: 'En ö full av robotar som bara gör exakt det man säger. Lär dem tänka – steg för steg!',
+    tagline: 'En ö full av robotar som bara gör exakt det man säger. Längs Logikslingan lär man sig tänka som en robot, på Kodstigen styr man dem, i Loopverkstaden snurrar maskinerna, i Buggjakten kryper felen omkring – och i Pythonhamnen pratar robotarna riktig kod.',
     sky: ['#364fc7', '#a5d8ff', '#868e96'],
     areas: [
-      { id: 'logikslingan', name: 'Logikslingan', icon: '🧩', desc: 'Logiska pussel: vad hör ihop och vad kommer sedan?', grades: [1, 4], status: 'soon' },
-      { id: 'kodstigen', name: 'Kodstigen', icon: '🧭', desc: 'Styr roboten steg för steg.', grades: [1, 4], status: 'soon' },
-      { id: 'loopverkstaden', name: 'Loopverkstaden', icon: '🔁', desc: 'Gör samma sak många gånger: loopar.', grades: [2, 5], status: 'soon' },
-      { id: 'buggjakten', name: 'Buggjakten', icon: '🐞', desc: 'Hitta felet i robotens instruktioner.', grades: [2, 6], status: 'soon' },
-      { id: 'pythonhamnen', name: 'Pythonhamnen', icon: '🐍', desc: 'Dina första rader Python.', grades: [4, 6], status: 'soon' },
+      { id: 'logikslingan', name: 'Logikslingan', icon: '🧩', desc: 'Logiska pussel: vad hör ihop och vad kommer sedan?', grades: [1, 4], status: 'open' },
+      { id: 'kodstigen', name: 'Kodstigen', icon: '🧭', desc: 'Styr roboten steg för steg.', grades: [1, 5], status: 'open' },
+      { id: 'loopverkstaden', name: 'Loopverkstaden', icon: '🔁', desc: 'Gör samma sak många gånger: loopar.', grades: [2, 5], status: 'open' },
+      { id: 'buggjakten', name: 'Buggjakten', icon: '🐞', desc: 'Hitta felet i robotens instruktioner.', grades: [2, 6], status: 'open' },
+      { id: 'pythonhamnen', name: 'Pythonhamnen', icon: '🐍', desc: 'Läs dina första rader Python.', grades: [4, 6], status: 'open' },
     ],
   },
 ];

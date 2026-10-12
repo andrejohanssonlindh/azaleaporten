@@ -116,10 +116,10 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
     const next = () => onDone(wasWrong ? (tries >= 3 && shows ? 'shown' : 'self') : undefined);
     const feedback = phase === 'done' ? (wasWrong ? 'Rätt! Nu stämmer det.' : 'Rätt! Bra jobbat!') : phase === 'fixing' ? (tries > 1 ? 'Fortfarande fel' : 'Fel') : '';
     const task = kind === 'val' ? 'Välj ett annat alternativ.' : kind === 'markera' ? 'Leta vidare!'
-      : kind === 'ordna' ? (tries >= 3 ? `Så här blir det: ${capFirst(q.answer)}${q.end ?? ''} Bygg meningen så.` : 'Flytta bitarna och rätta igen.')
+      : kind === 'ordna' ? (tries >= 3 ? (q.lines ? `Så här blir det: ${q.tiles!.slice().sort((a, b) => q.answer.indexOf(a) - q.answer.indexOf(b)).map((t, i) => `${i + 1}. ${t}`).join(' ')} Lägg raderna så.` : `Så här blir det: ${capFirst(q.answer)}${q.end ?? ''} Bygg meningen så.`) : 'Flytta bitarna och rätta igen.')
       : tries >= 3 ? `Så här stavas ordet: ${q.answer}. Skriv av det för att gå vidare.` : 'Rätta ordet för att gå vidare.';
     const pics = !!q.alts?.some((a) => a.pic);
-    const long = !pics && q.alts?.some((a) => (a.label ?? a.text).length > 16);
+    const long = !pics && !q.mono && q.alts?.some((a) => (a.label ?? a.text).length > 16);
     const Visual = g.Visual;
     const done = phase === 'done';
     const status = (
@@ -177,7 +177,7 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
 
         {kind === 'markera'
           ? (
-            <p class="ord-sentence ord-tokens" role="group" aria-label="Meningen">
+            <p class={`ord-sentence ord-tokens${q.lines ? ' lines' : ''}${q.mono ? ' mono' : ''}`} role="group" aria-label={q.lines ? 'Raderna' : 'Meningen'}>
               {q.tokens!.map((t, i) => {
                 const hit = done && q.targets!.includes(i);
                 const miss = wrong.includes(String(i));
@@ -191,14 +191,14 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
           )
           : kind === 'ordna'
             ? (
-              <div class="ordna">
-                <p class={`ord-sentence ordna-line${done ? ' done' : ''}`} aria-label="Din mening">
+              <div class={`ordna${q.lines ? ' lines' : ''}${q.mono ? ' mono' : ''}`}>
+                <p class={`ord-sentence ordna-line${done ? ' done' : ''}`} aria-label={q.lines ? 'Din ordning' : 'Din mening'}>
                   {placed.length
                     ? placed.map((i, k) => (
                       <button key={i} type="button" class="ord-token placed" disabled={done} aria-label={`Ta bort ${q.tiles![i]}`}
-                        onClick={() => { setPlaced((p) => p.filter((x) => x !== i)); setWarn(''); }}>{k === 0 ? capFirst(q.tiles![i]) : q.tiles![i]}</button>
+                        onClick={() => { setPlaced((p) => p.filter((x) => x !== i)); setWarn(''); }}>{q.lines ? <><b class="ordna-nr">{k + 1}</b>{q.tiles![i]}</> : k === 0 ? capFirst(q.tiles![i]) : q.tiles![i]}</button>
                     ))
-                    : <span class="ordna-empty">Tryck på bitarna i rätt ordning</span>}
+                    : <span class="ordna-empty">{q.lines ? 'Tryck på raderna i rätt ordning' : 'Tryck på bitarna i rätt ordning'}</span>}
                   <span class="ordna-end">{q.end}</span>
                 </p>
                 {!done && (
@@ -230,7 +230,7 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
         )}
 
         {kind === 'val' && !done && (
-          <div class={long ? 'choices' : `drill-choices words${pics ? ' pics' : ''}`} role="group" aria-label="Välj svar">
+          <div class={long ? 'choices' : `drill-choices words${pics ? ' pics' : ''}${q.mono ? ' mono' : ''}`} role="group" aria-label="Välj svar">
             {q.alts!.map((a) => {
               const off = wrong.some((w) => sameAs(q, w, a.text, true));
               return (

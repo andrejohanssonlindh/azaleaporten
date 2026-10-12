@@ -29,7 +29,8 @@ export function checkQuestion<Q extends OrdQ>(g: OrdGame<Q>, q: Q, where: string
   if (q.sentence) expect(reveals(q.sentence, q.answer), `mening: ${where}`).toBe(false);
   const h = hintFor(g, q);
   expect(reveals(h, q.answer) || h.includes('…'), `ledtråd: ${where}: ${h}`).toBe(false);
-  expect(g.solution(q).toLocaleLowerCase('sv'), where).toContain(q.answer.toLocaleLowerCase('sv'));
+  if (q.lines && q.tiles) for (const t of q.tiles) expect(g.solution(q), where).toContain(t);
+  else expect(g.solution(q).toLocaleLowerCase('sv'), where).toContain(q.answer.toLocaleLowerCase('sv'));
   const explainOk = (tag: string, given: string) => {
     const ex = explainAny(g, tag, q, given);
     const all = `${ex.title} ${ex.text}`;

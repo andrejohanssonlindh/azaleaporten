@@ -82,6 +82,15 @@ const GRAM: Record<string, string> = {
   'a-an': 'a och an', be: 'am, is och are', plural: 'engelsk plural', 's-form': '-s efter he, she och it', fragord: 'engelska frågeord',
   prep: 'in, on och under', do: "don't och doesn't", ordfoljd: 'engelsk ordföljd',
 };
+const PROG: Record<string, string> = {
+  'logik.monster': 'mönster', 'logik.ordning': 'steg i rätt ordning', 'logik.ochinte': 'och, eller och inte', 'logik.omsa': 'om … så',
+  'kod.pilar': 'att styra roboten med pilar', 'kod.svang': 'att styra roboten med svängar', 'kod.vart': 'att följa ett program',
+  'kod.diamant': 'robotvägar med diamanter',
+  'loop.antal': 'varv i loopar', 'loop.vart': 'att följa en loop', 'loop.bygg': 'att bygga med loopar', 'loop.nastlad': 'loopar i loopar',
+  'bugg.pilar': 'buggar med pilar', 'bugg.svang': 'buggar med svängar', 'bugg.loop': 'buggar i loopar', 'bugg.laga': 'att laga program',
+  'py.print': 'print i Python', 'py.variabel': 'variabler i Python', 'py.text': 'text och tal i Python', 'py.if': 'if och else i Python',
+  'py.for': 'for-loopar i Python', 'py.fel': 'fel i Python-kod',
+};
 const TAL = ['nollans', 'ettans', 'tvåans', 'treans', 'fyrans', 'femmans', 'sexans', 'sjuans', 'åttans', 'nians', 'tians', 'elvans', 'tolvans'];
 
 export function skillLabel(skill: string): string {
@@ -96,6 +105,8 @@ export function skillLabel(skill: string): string {
   if (enTopic === 'tid' && ENTID[enRest]) return ENTID[enRest];
   if (enTopic === 'stav' && ENSTAV[enRest]) return ENSTAV[enRest];
   if (enTopic === 'gram' && GRAM[enRest]) return GRAM[enRest];
+  const [, progRest] = /^prog\.(.+)$/.exec(skill) ?? [];
+  if (progRest && PROG[progRest]) return PROG[progRest];
   const [, topic, rest] = /^ma\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
   if (topic === 'tid' && TID[rest]) return TID[rest];
   if (topic === 'add' && ADD[rest]) return ADD[rest];

@@ -961,3 +961,87 @@ button.stat.on { border-color: var(--accent); }
 .pirat-table .pirat-skirt { fill: #c92a2a; opacity: .85; }
 .update-check { text-align: center; }
 .update-check .row { justify-content: center; }
+
+/* Ordmotorn: rader under varandra (steg, kodrader) och kodstil */
+.ord-tokens.lines, .ordna.lines .ordna-line, .ordna.lines .ordna-pool { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
+.ord-tokens.lines .ord-token, .ordna.lines .ord-token { text-align: left; font-size: 18px; padding: 8px 12px; }
+.ordna.lines .ord-token.ghost { display: none; }
+.ordna-nr { display: inline-block; min-width: 1.6em; color: var(--muted); }
+.mono .ord-token, .drill-choices.mono .drill-choice { font-family: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace; }
+.ord-tokens.lines.mono .ord-token { white-space: pre; font-size: 16px; }
+.drill-choices.mono .drill-choice { white-space: pre-line; font-size: 18px; line-height: 1.25; min-width: 96px; text-align: left; }
+
+/* Robotmotorn */
+.robot .drill-prompt { margin-bottom: 4px; }
+.rb-grid { display: block; width: 100%; margin: 6px auto 10px; touch-action: manipulation; }
+.rb-cell { fill: color-mix(in srgb, var(--fm) 8%, var(--card)); stroke: var(--line); stroke-width: 1; }
+.rb-cell.alt { fill: color-mix(in srgb, var(--fm) 14%, var(--card)); }
+.rb-trail { fill: var(--fm); opacity: .35; }
+.rb-rock { fill: #868e96; stroke: #495057; stroke-width: 2; stroke-linejoin: round; }
+.rb-emoji { font-size: 28px; }
+.rb-emoji.picked { opacity: .15; }
+.rb-boom { font-size: 30px; animation: rb-pop .4s ease-out; }
+.rb-robot { transition: transform .28s ease-in-out; }
+.rb-body { fill: #74c0fc; stroke: #1864ab; stroke-width: 2.5; }
+.rb-eye { fill: #1c2a3a; }
+.rb-mouth { fill: #1864ab; }
+.rb-nose { fill: #f08c00; stroke: #a35800; stroke-width: 1.5; stroke-linejoin: round; }
+.rb-robot.crashed .rb-body { fill: #ffa8a8; stroke: var(--bad); }
+.rb-spot { cursor: pointer; }
+.rb-spot circle { fill: var(--card); stroke: var(--accent); stroke-width: 3; }
+.rb-spot text { font: 900 17px var(--font); fill: var(--accent); }
+.rb-spot.wrong { opacity: .35; cursor: default; }
+.rb-spot.hit circle { stroke: var(--ok); fill: color-mix(in srgb, var(--ok) 20%, var(--card)); }
+.rb-spot.hit text { fill: var(--ok); }
+.rb-limit { font-size: 15px; color: var(--muted); margin: 0; }
+.rb-limit .over { color: var(--bad); }
+.rb-prog { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-start; min-height: 56px; padding: 8px; margin: 0 auto 10px; max-width: 520px;
+  border: 2px dashed var(--line); border-radius: 14px; background: var(--card); text-align: left; }
+.rb-prog.open { border-color: var(--accent); }
+.rb-start { color: var(--ok); font-size: 18px; }
+.rb-empty { color: var(--muted); font-size: 15px; }
+.rb-chip { display: inline-flex; align-items: center; gap: 4px; font: 800 16px var(--font); padding: 6px 9px; min-height: 40px; border-radius: 10px;
+  border: 2px solid var(--line); background: var(--card); color: var(--ink); }
+button.rb-chip { cursor: pointer; }
+button.rb-chip:disabled { cursor: default; color: var(--ink); }
+.rb-chip.big { min-height: 52px; padding: 8px 12px; font-size: 17px; }
+.rb-glyph { font-size: 20px; line-height: 1; }
+.rb-chip.a-V, .rb-chip.a-H { border-color: #f08c00; }
+.rb-chip.a-F { border-color: #1c7ed6; }
+.rb-chip.active { background: color-mix(in srgb, var(--gold) 30%, var(--card)); border-color: var(--gold); }
+.rb-chip.wrong { border-color: var(--bad); opacity: .55; text-decoration: line-through; }
+.rb-chip.hit { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 18%, var(--card)); }
+.rb-chip.filled { border-color: var(--ok); }
+.rb-hole { border-style: dashed; border-color: var(--accent); color: var(--accent); font-weight: 900; min-width: 40px; justify-content: center; }
+span.rb-hole { padding: 0 6px; border-radius: 8px; border: 2px dashed var(--accent); }
+.rb-loop { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 12px; border: 2px solid #9775fa;
+  background: color-mix(in srgb, #9775fa 10%, var(--card)); }
+.rb-loop.open { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent); }
+.rb-loop.active, .rb-loop.wrong { border-color: var(--bad); }
+.rb-loop.hit { border-color: var(--ok); }
+.rb-loop-head { display: inline-flex; align-items: center; gap: 4px; font-weight: 900; color: #7048e8; }
+.rb-loop-btn { font: inherit; color: inherit; background: none; border: 0; padding: 4px; cursor: pointer; }
+.rb-loop-body { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 40px; min-width: 40px; padding: 2px 6px; border-radius: 10px;
+  border: 2px dashed color-mix(in srgb, #9775fa 50%, transparent); cursor: pointer; }
+.rb-rep { display: inline-flex; gap: 2px; }
+.rb-rep button, .rb-x { font: 900 16px var(--font); width: 30px; height: 30px; border-radius: 8px; border: 2px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.rb-caret { width: 3px; height: 30px; background: var(--accent); border-radius: 2px; animation: rb-blink 1s steps(2) infinite; }
+.rb-palette { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 0 0 8px; }
+.rb-add-loop { border-color: #9775fa; color: #7048e8; }
+.rb-actions { gap: 8px; }
+.rb-fills { gap: 10px; }
+@keyframes rb-blink { 50% { opacity: 0; } }
+@keyframes rb-pop { from { transform: scale(.4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .rb-robot { transition: none; } .rb-caret, .rb-boom { animation: none; } }
+
+/* Pythonhamnen och Logikslingan */
+.py-code { text-align: left; margin: 4px auto 12px; max-width: 520px; padding: 12px 14px; border-radius: 12px; background: #1e1e2e; color: #e9ecef;
+  font: 600 17px/1.5 ui-monospace, "Cascadia Code", Menlo, Consolas, monospace; overflow-x: auto; white-space: pre; }
+.py-kw { color: #ff79c6; }
+.py-str { color: #a9e34b; }
+.py-num { color: #ffd43b; }
+.py-fn { color: #74c0fc; }
+.py-nr { color: #6c757d; user-select: none; display: inline-block; width: 1.6em; }
+.logik-rule { max-width: 460px; margin: 4px auto 12px; padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: var(--card); text-align: left; font-size: 18px; }
+.logik-rule b { color: var(--accent); }
+.logik-rule .logik-now { margin-top: 8px; padding-top: 8px; border-top: 2px dashed var(--line); font-weight: 800; }

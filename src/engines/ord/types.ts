@@ -63,6 +63,10 @@ export interface OrdQ {
   read?: string;
   /** En stor bild ovanför frågan: en emoji eller en färg ('#e03131'). */
   pic?: string;
+  /** ordna och markera: bitarna är hela rader (steg i en instruktion, kodrader) och står under varandra. */
+  lines?: boolean;
+  /** Kod: raderna och alternativen skrivs med kodstil (och alternativ kan ha flera rader). */
+  mono?: boolean;
 }
 
 export interface Explained { title: string; text: string }
