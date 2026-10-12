@@ -122,15 +122,25 @@ function horn(level: number, rng: Rng, noCircle: boolean): FQ {
     prompt: `Hur många ${count} har formen?`, parts: [null, count] };
 }
 
+/**
+ * Sortera handlar om att känna igen former, även sneda – inte om att räkna hörn noga. Därför är
+ * fem-, sex- och åttahörningar här alltid regelbundna (bara vridna), och nivå 1 håller sig till
+ * triangel, kvadrat och rektangel.
+ */
 function sortera(level: number, rng: Rng): FQ {
-  const target = level === 0 ? rng.pick([1, 2, 0]) : rng.pick([1, 2, 3, 4, 5]);
-  const total = level === 0 ? 6 : 9;
+  const target = level === 0 ? rng.pick([1, 2, 0]) : level === 1 ? rng.pick([1, 2, 3]) : rng.pick([1, 2, 3, 4, 5]);
+  const total = level <= 1 ? 6 : 8;
   const k = range(rng, 2, level === 0 ? 3 : 4);
   const odd = level === 0 ? 0 : range(rng, 1, k - 1);
-  const look: Record<number, number[]> = { 0: [1, 2, 3], 1: [9, 2, 3, 0], 2: [3, 7, 1, 0], 3: [8, 1, 0, 9], 4: [5, 1, 3], 5: [4, 6, 2] };
+  const look: Record<number, number[]> = level <= 1
+    ? { 0: [1, 2, 3], 1: [2, 3, 0], 2: [3, 1, 0], 3: [2, 1, 0] }
+    : { 1: [9, 2, 3, 0], 2: [3, 7, 1, 0], 3: [8, 1, 0, 9], 4: [5, 1, 3], 5: [4, 6, 2] };
+  const shape = (kind: number, tilt: boolean): Shape => (kind >= 4 && kind <= 6
+    ? { kind, pts: tilt ? rotate(regular(CORNERS[kind], 0, 0, 1), angle(rng), 0, 0) : regular(CORNERS[kind], 0, 0, 1), odd: tilt }
+    : makeShape(kind, tilt, rng));
   const shapes: Shape[] = [];
-  for (let i = 0; i < k; i++) shapes.push(makeShape(target, i < odd, rng));
-  while (shapes.length < total) shapes.push(makeShape(rng.pick(look[target]), level > 0 && rng.next() < 0.5, rng));
+  for (let i = 0; i < k; i++) shapes.push(shape(target, i < odd));
+  while (shapes.length < total) shapes.push(shape(rng.pick(look[target]), level > 0 && rng.next() < 0.5));
   return { mode: 'sortera', level, skill: SKILL.sortera, shapes: rng.shuffle(shapes), ask: target, answer: k,
     prompt: `Hur många ${PLURAL[target]} finns det?`, parts: [null, PLURAL[target]] };
 }

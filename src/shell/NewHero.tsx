@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import { ANIMALS, CLASSES, COLORS, GRADES, gradeName, heroClass, type AnimalId, type ClassId, type ColorId } from '../content/heroes';
-import { cleanName, createHero, listHeroes, nameTaken } from '../platform/profiles';
+import { cleanName, createHero, listHeroes, NAME_MAX, nameTaken } from '../platform/profiles';
 import { requestPersistentStorage } from '../platform/device';
 import { go, touch } from '../state';
 import { selectHero } from '../session';
@@ -40,7 +40,7 @@ export function NewHero() {
       {step === 0 && (
         <form onSubmit={(e) => { e.preventDefault(); next(); }}>
           <h1 class="page-title">Vad heter du, hjälte?</h1>
-          <input class="big-input" value={name} maxLength={20} autoFocus autocomplete="off" aria-label="Ditt namn"
+          <input class="big-input" value={name} maxLength={NAME_MAX} autoFocus autocomplete="off" aria-label="Ditt namn"
             onInput={(e) => setName(e.currentTarget.value)} placeholder="Skriv ditt namn" />
           {nameTaken(name) && <p class="note warn">Det finns redan en hjälte som heter {clean} här. Det går bra, men kanske lägga till något?</p>}
           <p class="note">Ditt namn sparas bara på den här enheten.</p>

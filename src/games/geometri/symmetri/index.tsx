@@ -67,10 +67,11 @@ function Sym({ v, at: [x, y], r = 10, cls = 'geo-sym' }: { v: number; at: Pt; r?
 function Upprepa({ q, done }: { q: SQ; done: boolean }) {
   const step = 27, n = q.shown!, w = Math.max(300, 20 + n * step + 80);
   return (
-    <Fig w={w} h={74} label={`Ett mönster med ${n} former`}>
+    <Fig w={w} h={74} label={`Ett mönster med ${n} former. Frågan gäller plats ${q.pos}.`}>
       {Array.from({ length: n }, (_, i) => <Sym key={i} v={q.unit![i % q.unit!.length]} at={[22 + i * step, 28]} />)}
       {Array.from({ length: n }, (_, i) => <Txt key={`n${i}`} at={[22 + i * step, 58]} cls="geo-small">{i + 1}</Txt>)}
       <Txt at={[22 + n * step + 6, 28]} cls="geo-label">…</Txt>
+      {q.pos! > n + 1 && <Txt at={[22 + n * step + 6, 58]} cls="geo-small">{q.pos! - 1 > n + 1 ? `${n + 1}–${q.pos! - 1}` : n + 1}</Txt>}
       <rect x={w - 52} y={10} width={36} height={36} rx={8} class="geo-box" />
       {done ? <Sym v={q.answer} at={[w - 34, 28]} cls="geo-sym geo-hit" /> : <Txt at={[w - 34, 28]} cls="geo-label big">?</Txt>}
       <Txt at={[w - 34, 58]} cls="geo-small">{q.pos}</Txt>

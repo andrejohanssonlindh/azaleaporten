@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { dataRev, gate, go, heroId, toast, touch } from '../state';
-import { backupDue, cleanName, deleteHero, getMeta, getProfile, listHeroes, markExported, saveProfile, type Profile } from '../platform/profiles';
+import { backupDue, cleanName, NAME_MAX, deleteHero, getMeta, getProfile, listHeroes, markExported, saveProfile, type Profile } from '../platform/profiles';
 import { exportAll, importReplace, isDeviceExport, listBackups, restoreBackup } from '../platform/storage/backup';
 import { kv } from '../platform/storage/kv';
 import { initGate, lockGate } from '../platform/gate/gate';
@@ -44,7 +44,7 @@ function HeroAdmin({ p }: { p: Profile }) {
       <div class="admin-hero-head"><Avatar p={p} size={44} /><b>{p.name}</b></div>
       <label>Namn
         <span class="row">
-          <input value={name} maxLength={20} onInput={(e) => setName(e.currentTarget.value)} />
+          <input value={name} maxLength={NAME_MAX} onInput={(e) => setName(e.currentTarget.value)} />
           <button class="btn small" disabled={!cleanName(name) || cleanName(name) === p.name} onClick={() => save({ name: cleanName(name) })}>Spara</button>
         </span>
       </label>

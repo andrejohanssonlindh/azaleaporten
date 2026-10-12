@@ -131,7 +131,9 @@ export function markTip(id: string, tip: string) {
   if (!s.tips.includes(tip)) saveHeroState(id, { ...s, tips: [...s.tips, tip] });
 }
 
-export const cleanName = (name: string) => name.replace(/\s+/g, ' ').trim().slice(0, 20);
+/** Längsta namnet: längre namn får inte plats på hjältekorten och i striderna. */
+export const NAME_MAX = 12;
+export const cleanName = (name: string) => name.replace(/\s+/g, ' ').trim().slice(0, NAME_MAX);
 
 export function nameTaken(name: string, exceptId?: string): boolean {
   const n = cleanName(name).toLocaleLowerCase('sv');

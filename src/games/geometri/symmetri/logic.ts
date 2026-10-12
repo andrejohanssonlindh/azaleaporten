@@ -134,7 +134,7 @@ function upprepa(level: number, rng: Rng): SQ {
   const pos = level === 0 ? shown + 1 : level === 1 ? range(rng, shown + 3, 15) : range(rng, 20, level === 3 ? 60 : 40);
   const used = [...new Set(unit)].sort();
   return { mode: 'upprepa', level, skill: SKILL.upprepa, unit, shown, pos, answer: unit[(pos - 1) % len],
-    choices: used.map((v) => ({ label: SYMBOLS[v], value: v })), prompt: `Mönstret fortsätter likadant. Vilken form kommer på plats ${pos}?`, parts: [null] };
+    choices: used.map((v) => ({ label: SYMBOLS[v], value: v })), prompt: pos === shown + 1 ? `Mönstret fortsätter likadant. Vilken form kommer på plats ${pos}?` : `Mönstret fortsätter likadant. Vilken form kommer på plats ${pos}? Det är inte nästa form – räkna vidare ända till ${pos}.`, parts: [null] };
 }
 
 export const tiles = (q: SQ, n: number) => q.start! + q.step! * n;

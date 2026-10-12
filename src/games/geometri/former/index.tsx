@@ -22,7 +22,7 @@ function One({ s, x, y, w, h, cls, dots }: { s: Shape; x: number; y: number; w: 
 
 function Shapes({ q, hint: showHint, done }: { q: FQ; hint: boolean; done: boolean }) {
   if (q.mode === 'sortera') {
-    const cols = 3, rows = Math.ceil(q.shapes.length / cols), cw = 100, ch = 74;
+    const cols = q.shapes.length > 6 ? 4 : 3, rows = Math.ceil(q.shapes.length / cols), cw = 100, ch = 74;
     return (
       <Fig w={cols * cw} h={rows * ch} label={`${q.shapes.length} former`}>
         {q.shapes.map((s, i) => (
