@@ -117,22 +117,34 @@ function LegacyImport({ heroes }: { heroes: Profile[] }) {
   );
 }
 
-/** Finns en svensk röst? Stavningsträskets diktamen behöver en; utan den blir det flerval. */
+/** Finns en svensk och en engelsk röst? Stavningsträskets diktamen behöver en svensk, Västeröns hörfrågor och diktamen en engelsk. */
 function Upplasning() {
   voices.value;
   const v = voiceFor('sv-SE');
+  const en = voiceFor('en-GB');
   return (
     <section class="card">
       <h2>Uppläsning</h2>
       {!canSpeak() ? <p class="note warn">Den här webbläsaren kan inte läsa upp text.</p>
-        : v ? <p>Svensk röst: <b>{v.name}</b>{!v.localService && ' (hämtas via nätet)'}</p>
-          : <p class="note warn">Ingen svensk röst hittades. I Stavningsträsket blir diktamen då flerval i stället.</p>}
-      {canSpeak() && <button class="btn small" onClick={() => speak('Hej! Så här låter uppläsningen. Kan du stava till sjöjungfru?')}>🔊 Testa uppläsning</button>}
-      <h3>Saknas svensk röst?</h3>
+        : (
+          <>
+            {v ? <p>Svensk röst: <b>{v.name}</b>{!v.localService && ' (hämtas via nätet)'}</p>
+              : <p class="note warn">Ingen svensk röst hittades. I Stavningsträsket blir diktamen då flerval i stället.</p>}
+            {en ? <p>Engelsk röst: <b>{en.name}</b>{!en.localService && ' (hämtas via nätet)'}</p>
+              : <p class="note warn">Ingen engelsk röst hittades. På Västerön får barnet då läsa i stället för att lyssna, och diktamen blir flerval.</p>}
+          </>
+        )}
+      {canSpeak() && (
+        <div class="row">
+          <button class="btn small" onClick={() => speak('Hej! Så här låter uppläsningen. Kan du stava till sjöjungfru?')}>🔊 Testa svenska</button>
+          <button class="btn small" onClick={() => speak('Hello! This is how English sounds. Can you spell elephant?', 'en-GB')}>🔊 Testa engelska</button>
+        </div>
+      )}
+      <h3>Saknas en röst?</h3>
       <ul class="install">
-        <li><b>Windows:</b> Inställningar → Tid och språk → Tal → Lägg till röster → Svenska. Starta om webbläsaren efteråt. Syns rösten ändå inte i Chrome, prova Microsoft Edge – den hittar fler röster.</li>
-        <li><b>iPad:</b> Inställningar → Hjälpmedel → Uppläst innehåll → Röster → Svenska.</li>
-        <li><b>Android:</b> Inställningar → Hjälpmedel → Text till tal → Googles talmotor → Installera röstdata → Svenska.</li>
+        <li><b>Windows:</b> Inställningar → Tid och språk → Tal → Lägg till röster → Svenska (och Engelska, Storbritannien). Starta om webbläsaren efteråt. Syns rösten ändå inte i Chrome, prova Microsoft Edge – den hittar fler röster.</li>
+        <li><b>iPad:</b> Inställningar → Hjälpmedel → Uppläst innehåll → Röster → Svenska (och Engelska).</li>
+        <li><b>Android:</b> Inställningar → Hjälpmedel → Text till tal → Googles talmotor → Installera röstdata → Svenska (och Engelska).</li>
       </ul>
     </section>
   );

@@ -1,5 +1,7 @@
+import type { ComponentType } from 'preact';
 import type { Rng } from '../../platform/rng';
 import type { QuestionCtx, QuestionSpec } from '../../platform/rpg/types';
+import type { Lang } from '../../platform/speech';
 
 // Ordmotorn: frågor där svaret är ord – välja rätt alternativ, skriva ett ord man hör,
 // trycka på ett ord i en mening, eller lägga ordbitar i rätt ordning. Spelet levererar frågor, diagnos och förklaringar;
@@ -9,7 +11,13 @@ import type { QuestionCtx, QuestionSpec } from '../../platform/rpg/types';
 export type OrdKind = 'val' | 'skriv' | 'markera' | 'ordna';
 
 /** Ett svarsalternativ. err = felkoden om barnet väljer det (saknas = rätt svar). label = det som står på knappen, om det ska vara något annat än text. */
-export interface Alt { text: string; err?: string; label?: string }
+export interface Alt {
+  text: string;
+  err?: string;
+  label?: string;
+  /** En bild i stället för text på knappen: en emoji eller en färg ('#e03131'). */
+  pic?: string;
+}
 
 export interface OrdQ {
   mode: string;
@@ -47,6 +55,14 @@ export interface OrdQ {
   exact?: boolean;
   /** Det som står i luckan när frågan är klar, om det inte ska vara svaret (t.ex. '?' när svaret är 'frågetecken'). */
   fill?: string;
+  /** Språket som say läses upp på och som barnet skriver på (engelska: tangentbordet utan åäö). Saknas = svenska. */
+  lang?: Lang;
+  /** Hörfråga: say spelas upp direkt och står inte utskrivet. Saknas en röst för språket visas read (eller say) i stället. */
+  listen?: boolean;
+  /** Texten som visas vid en hörfråga när enheten inte kan läsa upp. */
+  read?: string;
+  /** En stor bild ovanför frågan: en emoji eller en färg ('#e03131'). */
+  pic?: string;
 }
 
 export interface Explained { title: string; text: string }
@@ -66,4 +82,6 @@ export interface OrdGame<Q extends OrdQ = OrdQ> {
   explainMiss?(q: Q, i: number, tag: string): Explained;
   specsForSkill(skill: string): QuestionSpec[];
   errLabels: Record<string, string>;
+  /** En egen bild till frågan (t.ex. en klocka). done = frågan är klar. */
+  Visual?: ComponentType<{ q: Q; done: boolean }>;
 }

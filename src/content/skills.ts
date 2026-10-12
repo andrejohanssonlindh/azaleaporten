@@ -58,6 +58,30 @@ const MENING: Record<string, string> = {
   punkt: 'stor bokstav och punkt', grans: 'var en mening slutar', tecken: 'punkt, frågetecken och utropstecken',
   ordfoljd: 'ordföljd', samband: 'sambandsord', komma: 'kommatecken', anforing: 'anföring',
 };
+const GLOSOR: Record<string, string> = {
+  farger: 'färger på engelska', siffror: 'siffror på engelska', djur: 'djur på engelska', familj: 'familjen på engelska',
+  kroppen: 'kroppen på engelska', mat: 'mat på engelska', klader: 'kläder på engelska', skolan: 'skolord på engelska',
+  leksaker: 'leksaker på engelska', vader: 'väder på engelska', hemmet: 'hemmet på engelska', stan: 'stan och resor på engelska',
+  naturen: 'naturen på engelska', verb: 'engelska verb', kanslor: 'känslor på engelska', dagar: 'dagar och månader på engelska',
+  yrken: 'yrken på engelska', falska: 'falska vänner',
+};
+const LYSSNA: Record<string, string> = {
+  siffror: 'engelska tal', bokstaver: 'engelska bokstäver', fraser: 'engelska fraser', instruktioner: 'instruktioner på engelska',
+  fragor: 'frågor på engelska', meningar: 'meningar på engelska',
+};
+const ENTID: Record<string, string> = {
+  hel: "o'clock", half: 'half past', quarter: 'quarter past och quarter to', past: 'minuter past', to: 'minuter to',
+  minuter: 'varenda minut på engelska', ampm: 'a.m. och p.m.',
+};
+const ENSTAV: Record<string, string> = {
+  'c-k': 'c, k och ck på engelska', y: 'y på engelska', w: 'w på engelska', th: 'th', 'ee-ea': 'ee och ea', 'sh-ch': 'sh och ch',
+  'lang-i': 'engelska aj-ljudet', 'lang-a': 'engelska ej-ljudet', 'oo-ou': 'oo, ou och ow', dubbel: 'dubbla bokstäver på engelska',
+  tyst: 'tysta bokstäver', plural: 'engelsk plural',
+};
+const GRAM: Record<string, string> = {
+  'a-an': 'a och an', be: 'am, is och are', plural: 'engelsk plural', 's-form': '-s efter he, she och it', fragord: 'engelska frågeord',
+  prep: 'in, on och under', do: "don't och doesn't", ordfoljd: 'engelsk ordföljd',
+};
 const TAL = ['nollans', 'ettans', 'tvåans', 'treans', 'fyrans', 'femmans', 'sexans', 'sjuans', 'åttans', 'nians', 'tians', 'elvans', 'tolvans'];
 
 export function skillLabel(skill: string): string {
@@ -66,6 +90,12 @@ export function skillLabel(skill: string): string {
   if (svTopic === 'veckans') return `veckans ord "${svRest}"`;
   if (svTopic === 'ord' && ORD[svRest]) return ORD[svRest];
   if (svTopic === 'mening' && MENING[svRest]) return MENING[svRest];
+  const [, enTopic, enRest] = /^en\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
+  if (enTopic === 'glosor' && GLOSOR[enRest]) return GLOSOR[enRest];
+  if (enTopic === 'lyssna' && LYSSNA[enRest]) return LYSSNA[enRest];
+  if (enTopic === 'tid' && ENTID[enRest]) return ENTID[enRest];
+  if (enTopic === 'stav' && ENSTAV[enRest]) return ENSTAV[enRest];
+  if (enTopic === 'gram' && GRAM[enRest]) return GRAM[enRest];
   const [, topic, rest] = /^ma\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
   if (topic === 'tid' && TID[rest]) return TID[rest];
   if (topic === 'add' && ADD[rest]) return ADD[rest];

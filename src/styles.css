@@ -941,3 +941,21 @@ button.stat.on { border-color: var(--accent); }
 .veckans-banner { border: 2px solid var(--forest); background: color-mix(in srgb, var(--forest) 10%, var(--card)); }
 .veckans-editor { display: flex; flex-direction: column; gap: 6px; }
 .veckans-editor textarea { font: inherit; padding: 8px 10px; border-radius: 10px; border: 2px solid var(--line); background: var(--bg); color: var(--ink); resize: vertical; }
+
+/* Ordmotorn: bilder, färgrutor och hörfrågor (Västerön). */
+.ord-pic { display: flex; justify-content: center; margin: 4px 0 8px; }
+.ord-emoji { font-size: 34px; line-height: 1; }
+.ord-emoji.big { font-size: 76px; }
+.ord-swatch { display: inline-block; width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--line); vertical-align: middle; }
+.ord-swatch.big { width: 96px; height: 96px; border-radius: 20px; }
+.drill-choices.pics .drill-choice { min-width: 92px; min-height: 84px; }
+.ord-heard { font-size: 22px; font-weight: 800; text-align: center; margin: 6px 0; }
+.bigben-clock { display: flex; justify-content: center; margin: 2px 0 8px; }
+.bigben-digital { width: fit-content; margin: 4px auto 12px; padding: 6px 18px; border-radius: 12px; background: #1f2a1f; color: #8cf58c; font: 800 44px/1.1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 2px; box-shadow: inset 0 0 0 3px #3a4a3a; }
+.pirat-scene { display: flex; justify-content: center; margin: 0 0 6px; }
+.pirat-ground { stroke: var(--line); }
+.pirat-box rect, .pirat-box path { fill: #c08a50; stroke: #7a5230; stroke-width: 2; }
+.pirat-box .pirat-side { fill: #a87440; }
+.pirat-inside { fill: #5c3d1e; }
+.pirat-table rect { fill: #8b5a2b; }
+.pirat-table .pirat-skirt { fill: #c92a2a; opacity: .85; }

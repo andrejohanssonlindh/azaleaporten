@@ -20,6 +20,12 @@ import { STAPELBADDSPARKEN } from '../games/geometri/cirklar/content';
 import { STAVNINGSTRASKET } from '../games/stavning/content';
 import { RIMBACKEN } from '../games/rim/content';
 import { MENINGSSMEDJAN } from '../games/mening/content';
+import { GLOSVIKEN } from '../games/glosor/content';
+import { HAMNEN } from '../games/hamnen/content';
+import { BIG_BEN_TORNET } from '../games/bigben/content';
+import { STAVKLIPPAN } from '../games/stavklippan/content';
+import { PIRATSKEPPET } from '../games/pirat/content';
+import { VASTERONS_FYR } from '../games/vasteron';
 
 // Spelbara områden: områdets innehåll (litet, laddas direkt) + spelet som levererar frågorna.
 // Spelkoden laddas först när någon spelar i området, så att startsidan förblir liten.
@@ -42,6 +48,11 @@ const AREAS: Record<string, Playable> = {
   stavningstrasket: { def: STAVNINGSTRASKET, load: () => import('../games/stavning').then((m) => m.stavning) },
   rimbacken: { def: RIMBACKEN, load: () => import('../games/rim').then((m) => m.rim) },
   meningssmedjan: { def: MENINGSSMEDJAN, load: () => import('../games/mening').then((m) => m.mening) },
+  glosviken: { def: GLOSVIKEN, load: () => import('../games/glosor').then((m) => m.glosor) },
+  hamnen: { def: HAMNEN, load: () => import('../games/hamnen').then((m) => m.hamnen) },
+  'big-ben-tornet': { def: BIG_BEN_TORNET, load: () => import('../games/bigben').then((m) => m.bigben) },
+  stavklippan: { def: STAVKLIPPAN, load: () => import('../games/stavklippan').then((m) => m.stavklippan) },
+  piratskeppet: { def: PIRATSKEPPET, load: () => import('../games/pirat').then((m) => m.pirat) },
 };
 
 // Regionbossar: en blandning av regionens spel.
@@ -54,6 +65,7 @@ export const PLAYABLE: Record<string, Playable> = {
   ...AREAS,
   talbergen: { def: TALBERGEN_TOPPEN, load: async () => regionGame('talbergen', await gamesOf('talbergen')) },
   betongbukten: { def: BETONGBUKTENS_TOPP, load: async () => regionGame('betongbukten', await gamesOf('betongbukten')) },
+  vasteron: { def: VASTERONS_FYR, load: async () => regionGame('vasteron', await gamesOf('vasteron')) },
 };
 
 const loading = new Map<string, Promise<GameModule>>();

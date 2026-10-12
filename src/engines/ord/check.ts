@@ -12,13 +12,13 @@ export const ENGINE_ERR: Record<string, string> = {
 };
 
 /** Samma skrivsätt för jämförelser: ett mellanslag mellan orden, inget punkt på slutet. */
-export const norm = (s: string) => s.normalize('NFC').trim().replace(/\s+/g, ' ').replace(/[.!?]+$/, '');
+export const norm = (s: string) => s.normalize('NFC').trim().replace(/\s+/g, ' ').replace(/[’‘]/g, "'").replace(/[.!?]+$/, '');
 
 /** Jämför två ord, med eller utan hänsyn till stor bokstav. */
 export const same = (a: string, b: string, caseStrict = false) =>
   caseStrict ? norm(a) === norm(b) : norm(a).toLocaleLowerCase('sv') === norm(b).toLocaleLowerCase('sv');
 
-const exactNorm = (s: string) => s.normalize('NFC').trim().replace(/\s+/g, ' ');
+const exactNorm = (s: string) => s.normalize('NFC').trim().replace(/\s+/g, ' ').replace(/[’‘]/g, "'");
 
 /** Jämför två svar på frågans sätt: exakt (med skiljetecken och stor bokstav) eller som ord. */
 export const sameAs = (q: OrdQ, a: string, b: string, caseStrict = q.caseStrict) =>

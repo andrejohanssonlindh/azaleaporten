@@ -66,12 +66,14 @@ export const REGIONS: Region[] = [
   },
   {
     id: 'vasteron', name: 'Västerön', subject: 'Engelska', icon: '🏝️',
-    tagline: 'En liten ö i väster där alla pratar engelska. Ta båten dit!',
+    tagline: 'En liten ö i väster där alla pratar engelska. I viken fångar fiskarna ord, i hamnen ropar alla på engelska, klocktornet slår på engelska, klippan ska bestigas och vid kajen ligger ett piratskepp. Ta båten dit!',
     sky: ['#2b6cb0', '#ffd8a8', '#c2a878'],
     areas: [
-      { id: 'glosviken', name: 'Glosviken', icon: '⚓', desc: 'Engelska ord med bild och ljud.', grades: [1, 6], status: 'soon' },
-      { id: 'hamnen', name: 'Hamnen', icon: '🚢', desc: 'Lyssna och välj rätt.', grades: [1, 5], status: 'soon' },
-      { id: 'big-ben-tornet', name: 'Big Ben-tornet', icon: '🕰️', desc: 'Klockan på engelska.', grades: [3, 6], status: 'soon' },
+      { id: 'glosviken', name: 'Glosviken', icon: '⚓', desc: 'Engelska ord med bild och ljud.', grades: [1, 6], status: 'open' },
+      { id: 'hamnen', name: 'Hamnen', icon: '🚢', desc: 'Lyssna och välj rätt.', grades: [1, 5], status: 'open' },
+      { id: 'big-ben-tornet', name: 'Big Ben-tornet', icon: '🕰️', desc: 'Klockan på engelska.', grades: [3, 6], status: 'open' },
+      { id: 'stavklippan', name: 'Stavklippan', icon: '🧗', desc: 'Stava på engelska – det låter inte som det stavas!', grades: [3, 6], status: 'open' },
+      { id: 'piratskeppet', name: 'Piratskeppet', icon: '🏴‍☠️', desc: 'a och an, am, is och are, och orden i rätt ordning.', grades: [2, 6], status: 'open' },
     ],
   },
   {

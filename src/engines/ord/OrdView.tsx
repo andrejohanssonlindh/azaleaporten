@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { GameModule, QuestionViewProps } from '../../platform/rpg/types';
-import { canSpeak, hasVoice, speak, voices } from '../../platform/speech';
+import { canSpeak, hasVoice, speak, voices, type Lang } from '../../platform/speech';
 import { diagnoseAny, errLabel, explainAny, hintFor, isRight, norm, sameAs } from './check';
 import { isTouch, Tangentbord } from './Tangentbord';
 import type { Explained, OrdGame, OrdKind, OrdQ } from './types';
@@ -21,6 +21,14 @@ function Gap({ sentence, fill }: { sentence: string; fill?: string }) {
     </p>
   );
 }
+
+/** En bild: en färg ('#e03131') blir en färgruta, annars en emoji. */
+export function Pic({ pic, big = false }: { pic: string; big?: boolean }) {
+  if (pic.startsWith('#')) return <span class={`ord-swatch${big ? ' big' : ''}`} style={{ background: pic }} aria-hidden="true" />;
+  return <span class={`ord-emoji${big ? ' big' : ''}`} aria-hidden="true">{pic}</span>;
+}
+
+const LANG_NAME: Record<Lang, string> = { 'sv-SE': 'svenska', 'en-GB': 'engelska' };
 
 /** Stor bokstav först i en mening. */
 const capFirst = (s: string) => s.charAt(0).toLocaleUpperCase('sv') + s.slice(1);
@@ -46,12 +54,16 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
     const kindAtAnswer = useRef<OrdKind | null>(null);
     const touch = useMemo(isTouch, []);
 
-    // Diktat kräver en svensk röst. Saknas den (eller hör barnet inget) blir frågan ett val i stället.
-    const listen = q.kind === 'skriv' && !noSound && hasVoice('sv-SE');
+    // Diktat och hörfrågor kräver en röst för språket. Saknas den (eller hör barnet inget) blir diktatet
+    // ett val, och hörfrågan visar texten i stället.
+    const lang: Lang = q.lang ?? 'sv-SE';
+    const voice = hasVoice(lang);
+    const listen = q.kind === 'skriv' && !noSound && voice;
     const kind: OrdKind = kindAtAnswer.current ?? (q.kind === 'skriv' && !listen ? 'val' : q.kind);
-    const say = () => { if (q.say) speak(q.say, 'sv-SE', kind === 'skriv' ? 0.85 : 0.95); };
+    const hear = !!q.listen && kind === 'val' && !noSound && voice && canSpeak();
+    const say = () => { if (q.say) speak(q.say, lang, kind === 'skriv' || hear ? 0.85 : 0.95); };
 
-    useEffect(() => { if (kind === 'skriv') say(); }, [kind]);
+    useEffect(() => { if (kind === 'skriv' || hear) say(); }, [kind, hear]);
     useEffect(() => { if (kind === 'skriv') inputRef.current?.focus({ preventScroll: true }); }, [tries, kind]);
     // Som attribut: Preact sätter annars egenskapen autocorrect, och strängen "off" blir då sann (= på).
     useEffect(() => { inputRef.current?.setAttribute('autocorrect', 'off'); }, [kind]);
@@ -106,7 +118,9 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
     const task = kind === 'val' ? 'Välj ett annat alternativ.' : kind === 'markera' ? 'Leta vidare!'
       : kind === 'ordna' ? (tries >= 3 ? `Så här blir det: ${capFirst(q.answer)}${q.end ?? ''} Bygg meningen så.` : 'Flytta bitarna och rätta igen.')
       : tries >= 3 ? `Så här stavas ordet: ${q.answer}. Skriv av det för att gå vidare.` : 'Rätta ordet för att gå vidare.';
-    const long = q.alts?.some((a) => (a.label ?? a.text).length > 16);
+    const pics = !!q.alts?.some((a) => a.pic);
+    const long = !pics && q.alts?.some((a) => (a.label ?? a.text).length > 16);
+    const Visual = g.Visual;
     const done = phase === 'done';
     const status = (
       <>
@@ -127,10 +141,29 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
         {hint && <p class="hint-tag">💡 {hintFor(g, q)}</p>}
         <div class="ord-head">
           <p class="drill-prompt">{kind === 'val' && q.kind === 'skriv' ? 'Vilken stavning är rätt?' : q.prompt}</p>
-          {kind !== 'skriv' && q.say && canSpeak() && hasVoice('sv-SE') && (
+          {kind !== 'skriv' && !hear && q.say && canSpeak() && voice && (
             <button type="button" class="speak" onClick={say} aria-label="Läs upp">🔊</button>
           )}
         </div>
+
+        {q.pic && <div class="ord-pic"><Pic pic={q.pic} big /></div>}
+        {Visual && <Visual q={q} done={done} />}
+
+        {hear && (
+          <div class="ord-listen">
+            <button type="button" class="btn big" onClick={say}>🔊 Lyssna igen</button>
+            {done && q.read && <p class="ord-heard" lang="en">{q.read}</p>}
+            {!done && (!soundHelp
+              ? <button type="button" class="link" onClick={() => setSoundHelp(true)}>Hör du inget?</button>
+              : <p class="note">Kolla att ljudet är på och inte för lågt. Hörs ändå inget? <button type="button" class="link" onClick={() => setNoSound(true)}>Läs i stället</button></p>)}
+          </div>
+        )}
+        {q.listen && !hear && (
+          <>
+            <p class="ord-heard" lang="en">{q.read ?? q.say}</p>
+            {!voice && <p class="note">Den här enheten kan inte läsa upp {LANG_NAME[lang]}, så du får läsa i stället.</p>}
+          </>
+        )}
 
         {kind === 'skriv' && !done && (
           <div class="ord-listen">
@@ -140,7 +173,7 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
               : <p class="note">Kolla att ljudet är på och inte för lågt. Hörs ändå inget? <button type="button" class="link" onClick={() => setNoSound(true)}>Välj i stället</button></p>}
           </div>
         )}
-        {q.kind === 'skriv' && kind === 'val' && !hasVoice('sv-SE') && <p class="note">Den här enheten kan inte läsa upp svenska, så du får välja i stället.</p>}
+        {q.kind === 'skriv' && kind === 'val' && !voice && <p class="note">Den här enheten kan inte läsa upp {LANG_NAME[lang]}, så du får välja i stället.</p>}
 
         {kind === 'markera'
           ? (
@@ -183,11 +216,11 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
         {kind === 'skriv' && status}
         {kind === 'skriv' && !done && (
           <form class="ord-form" onSubmit={(e) => { e.preventDefault(); checkText(input); }}>
-            <input ref={inputRef} class="ord-input" value={input} lang="sv" aria-label="Skriv ordet"
+            <input ref={inputRef} class="ord-input" value={input} lang={lang === 'en-GB' ? 'en' : 'sv'} aria-label="Skriv ordet"
               autocomplete="off" autocapitalize="off" spellcheck={false} inputMode={touch ? 'none' : 'text'} enterKeyHint="done"
               onInput={(e) => { setInput(e.currentTarget.value); setWarn(''); }} />
             {touch
-              ? <Tangentbord onKey={(c) => { setInput((s) => s + c); setWarn(''); }} onBack={() => setInput((s) => s.slice(0, -1))} onSubmit={() => checkText(input)} />
+              ? <Tangentbord english={lang === 'en-GB'} onKey={(c) => { setInput((s) => s + c); setWarn(''); }} onBack={() => setInput((s) => s.slice(0, -1))} onSubmit={() => checkText(input)} />
               : <div class="row center-row"><button class="btn primary">Rätta</button></div>}
           </form>
         )}
@@ -197,12 +230,13 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
         )}
 
         {kind === 'val' && !done && (
-          <div class={long ? 'choices' : 'drill-choices words'} role="group" aria-label="Välj svar">
+          <div class={long ? 'choices' : `drill-choices words${pics ? ' pics' : ''}`} role="group" aria-label="Välj svar">
             {q.alts!.map((a) => {
               const off = wrong.some((w) => sameAs(q, w, a.text, true));
               return (
-                <button key={a.text} type="button" class={`${long ? 'choice' : 'btn drill-choice'} ord-choice${off ? ' wrong' : ''}`} disabled={off}
-                  onClick={() => checkText(a.text)}>{a.label ?? a.text}</button>
+                <button key={a.text} type="button" class={`${long ? 'choice' : 'btn drill-choice'} ord-choice${off ? ' wrong' : ''}${a.pic ? ' pic' : ''}`} disabled={off}
+                  aria-label={a.pic ? a.text : undefined}
+                  onClick={() => checkText(a.text)}>{a.pic ? <Pic pic={a.pic} /> : (a.label ?? a.text)}</button>
               );
             })}
           </div>
