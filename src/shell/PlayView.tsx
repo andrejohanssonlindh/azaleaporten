@@ -350,6 +350,7 @@ function Result({ o, news, big, areaId, node, face, practice, onAgain }: { o: Ou
           {o.key && <span>🗝️ Du hittade en spelnyckel! Använd den på Spelön.</span>}
           {o.levelUps > 0 && <span>⭐ Nivå {hs.level} – {levelTitle(hs.level)}</span>}
           {o.gained.pet && <span>🐾 {o.gained.pet} följer med dig hem!</span>}
+          {o.gained.petGrew && <span>🐾 {o.gained.petGrew} växte och blev starkare!</span>}
           {o.gained.mentor && <span>🎓 {o.gained.mentor} blir din mentor!</span>}
           {o.gained.title && <span>🏷️ Ny titel: {o.gained.title}</span>}
         </div>

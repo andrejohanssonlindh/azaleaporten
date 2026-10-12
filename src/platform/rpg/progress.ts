@@ -5,7 +5,7 @@ import { BOSS, BOSS_HP_SCALE, CLEAR_MIN, FAST_MS, HINTS_PER_DAY, KUNSKAP_TITLE_L
 import { foeGroup, matchup, weaponGroup, withMatchup, type Group } from './vapen';
 import { stigmonster } from '../../content/monsters';
 import { rollKey } from './nycklar';
-import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, effectiveStats, useLifePotion, type Chest } from './inventory';
+import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, growPet, effectiveStats, useLifePotion, type Chest } from './inventory';
 import type { Item } from './items';
 import { getEvents, logEvents, type LogEvent } from '../learning/events';
 import { noteAnswer } from '../learning/skills';
@@ -375,7 +375,7 @@ export interface Outcome {
   kastanjer: number;
   levelUps: number;
   tired: boolean;
-  gained: { pet?: string; mentor?: string; title?: string; items?: Item[] };
+  gained: { pet?: string; petGrew?: string; mentor?: string; title?: string; items?: Item[] };
   chests: Chest[];
   /** Hittade en spelnyckel 🗝️. */
   key?: boolean;
@@ -469,7 +469,14 @@ export function finishRun(hid: string, area: AreaDef, run: RunState, extras: { s
       chest = { minRarity: 2, boss: true };
     } else if (o.bossWon) {
       // Mindre belöning, och bara en gång per dag och boss.
-      if (bp.lastWinDay !== today()) { reward(REWARD.bossRewin); chest = { minRarity: 1, boss: true }; }
+      if (bp.lastWinDay !== today()) {
+        reward(REWARD.bossRewin);
+        chest = { minRarity: 1, boss: true };
+        if (node.kind === 'monster' && node.pet) {
+          const grown = growPet(hid, `${area.areaId}:${node.id}`);
+          if (grown) { o.gained.petGrew = grown.name; o.gained.items = [grown]; }
+        }
+      }
     } else reward(REWARD.bossLoss);
   }
 

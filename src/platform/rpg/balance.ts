@@ -76,6 +76,12 @@ export const LOOT = {
   practiceChance: 0.2,
 };
 
+/**
+ * Husdjur: ett tämjt monster börjar som ovanligt (grönt). Besegrar man bossen igen (en gång per dag räknas)
+ * kan det växa ett steg i sällsynthet: chansen per nuvarande sällsynthet (1 → 2, 2 → 3, 3 → 4).
+ */
+export const PETS = { rarity: 1 as const, ilvl: 5, grow: [0, 0.5, 0.3, 0.15, 0] };
+
 export const BOSS_HP_SCALE = 10;
 /** Minsta antal rätta svar för att vinna, oavsett utrustning (lärandets integritet). */
 export const minHits = (kind: 'monster' | 'mastare', hp: number) => (kind === 'mastare' ? Math.max(10, hp - 2) : Math.ceil(hp * 0.75));

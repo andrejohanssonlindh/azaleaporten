@@ -76,6 +76,8 @@ export interface Foe {
   id: number; kind: FoeKind; x: number; y: number; r: number; hp: number; maxHp: number; spd: number; dmg: number;
   /** Tider (s) för bedövning, långsamhet, vit blink och nästa gång en snurrande sak får slå. */
   stun: number; slow: number; flash: number; orbitCd: number;
+  /** Tid tills hammaren kan bedöva igen (annars blir snabba hammarslag ett evigt stillastående). */
+  stunCd: number;
   kbx: number; kby: number; wob: number;
   boss?: { state: 'walk' | 'aim' | 'charge'; t: number; dx: number; dy: number; summon: number };
 }
@@ -204,7 +206,7 @@ function spawn(g: Game, kind: FoeKind, x?: number, y?: number) {
     [x, y] = side === 0 ? [u * W, -pad] : side === 1 ? [W + pad, u * H] : side === 2 ? [u * W, H + pad] : [-pad, u * H];
   }
   const hp = Math.round(d.hp * s.hp);
-  const f: Foe = { id: g.nextId++, kind, x, y, r: d.r, hp, maxHp: hp, spd: d.spd * (0.9 + g.rng.next() * 0.2), dmg: Math.round(d.dmg * s.dmg), stun: 0, slow: 0, flash: 0, orbitCd: 0, kbx: 0, kby: 0, wob: g.rng.next() * 6 };
+  const f: Foe = { id: g.nextId++, kind, x, y, r: d.r, hp, maxHp: hp, spd: d.spd * (0.9 + g.rng.next() * 0.2), dmg: Math.round(d.dmg * s.dmg), stun: 0, stunCd: 0, slow: 0, flash: 0, orbitCd: 0, kbx: 0, kby: 0, wob: g.rng.next() * 6 };
   if (kind === 'jatte') f.boss = { state: 'walk', t: 2.5, dx: 0, dy: 0, summon: 6 };
   g.foes.push(f);
 }
@@ -247,6 +249,8 @@ function levelCheck(g: Game) {
 /* ---------- vapnen ---------- */
 
 // Närstrid slår hårdare än skott: man måste gå nära monstren för att träffa.
+/** Sekunder ett monster går fritt efter hammarens bedövning innan det kan bedövas igen. */
+export const STUN_REST = 1.2;
 const WEAPON_CD: Record<WeaponKind, number> = { svard: 0.6, yxa: 1.0, stav: 0.75, bage: 0.5, hammare: 1.25, nava: 0.55 };
 
 /** Försöker attackera. Returnerar false om inget monster var inom räckhåll (då väntar vapnet). */
@@ -312,7 +316,11 @@ function attack(g: Game): boolean {
         if (dist2(h.x, h.y, f.x, f.y) > (reach + f.r) ** 2) continue;
         const { dmg, crit } = roll(g, 20);
         hurt(g, f, dmg, crit, 40, h);
-        if (!f.boss) f.stun = Math.max(f.stun, 0.8 + 0.3 * g.ups.fler);
+        if (!f.boss && f.stunCd <= 0) {
+          const t = 0.8 + 0.3 * g.ups.fler;
+          f.stun = Math.max(f.stun, t);
+          f.stunCd = t + STUN_REST;
+        }
       }
       g.shake = Math.max(g.shake, 0.15);
       return true;
@@ -474,6 +482,7 @@ export function step(g: Game, dt: number, input: Input) {
     f.flash = Math.max(0, f.flash - dt);
     f.orbitCd = Math.max(0, f.orbitCd - dt);
     f.stun = Math.max(0, f.stun - dt);
+    f.stunCd = Math.max(0, f.stunCd - dt);
     f.slow = Math.max(0, f.slow - dt);
     if (auraR && dist2(h.x, h.y, f.x, f.y) < (auraR + f.r) ** 2) {
       f.slow = 0.2;

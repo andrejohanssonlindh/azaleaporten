@@ -104,18 +104,25 @@ const statSum = (stats: Partial<Record<Stat, number>>) => Object.values(stats).r
  * Sänker aldrig: ligger de redan över budgeten lämnas de som de är.
  */
 export function fitBudget(stats: Partial<Record<Stat, number>>, budget: number): Partial<Record<Stat, number>> {
+  return statSum(stats) >= budget ? stats : scaleStats(stats, budget);
+}
+
+/** Skalar egenskaperna till precis `budget` poäng, i samma proportioner (största resten först), uppåt eller nedåt. */
+export function scaleStats(stats: Partial<Record<Stat, number>>, budget: number): Partial<Record<Stat, number>> {
   const sum = statSum(stats);
-  if (sum <= 0 || sum >= budget) return stats;
+  if (sum <= 0) return stats;
   const keys = (Object.keys(stats) as Stat[]).filter((k) => (stats[k] ?? 0) > 0);
   const exact = keys.map((k) => ((stats[k] ?? 0) * budget) / sum);
   const out = keys.map((_, i) => Math.floor(exact[i]));
   let left = budget - out.reduce((a, b) => a + b, 0);
   for (const i of keys.map((_, i) => i).sort((a, b) => (exact[b] - out[b]) - (exact[a] - out[a]))) { if (left-- <= 0) break; out[i]++; }
-  return Object.fromEntries(keys.map((k, i) => [k, out[i]]));
+  return Object.fromEntries(keys.map((k, i) => [k, out[i]]).filter(([, n]) => (n as number) > 0));
 }
 
 /** Unika föremål följer samma budget som slumpade: nivå och sällsynthet bestämmer poängen. */
 export const fitUnique = (it: Item): Item => (it.unique ? { ...it, stats: fitBudget(it.stats, statBudget(it.ilvl, it.rarity)) } : it);
+
+export const isPet = (it: Item) => it.base.startsWith('husdjur:');
 
 let counter = 0;
 const newId = () => `i-${Date.now().toString(36)}-${(counter++).toString(36)}-${Math.random().toString(36).slice(2, 6)}`;

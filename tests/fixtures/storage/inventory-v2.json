@@ -1,0 +1,13 @@
+{
+  "v": 2,
+  "items": [
+    { "id": "i-pet", "base": "husdjur:tiokompis.boss1", "slot": "husdjur", "name": "Testgris", "icon": "🐷", "rarity": 3, "ilvl": 5, "stats": { "kraft": 14, "klurighet": 4 }, "plus": 2, "unique": true, "flavor": "Tämjd i en bossstrid. Följer dig överallt.", "foundAt": "2026-10-01T10:00:00.000Z" },
+    { "id": "i-sig", "base": "signatur:x", "slot": "vapen", "name": "Kavel", "icon": "🪄", "rarity": 4, "ilvl": 9, "stats": { "kraft": 13, "visdom": 12, "tur": 10 }, "plus": 5, "unique": true, "foundAt": "2026-10-01T10:00:00.000Z" }
+  ],
+  "equipped": { "husdjur": "i-pet", "vapen": "i-sig" },
+  "chests": [],
+  "pity": 1,
+  "capacity": 30,
+  "potions": { "liv": 0 },
+  "bonusHints": { "day": "", "n": 0 }
+}

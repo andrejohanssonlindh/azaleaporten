@@ -92,6 +92,22 @@ describe('Dimstormen: spelet', () => {
     }
   });
 
+  it('hammaren kan inte hålla ett monster bedövat för evigt', () => {
+    const g: Game = newGame({ ...lo(12, 'hammare'), cdMult: 0.2 }, 1, 1);
+    while (!g.foes.length) step(g, 1 / 60, { dx: 0, dy: 0 });
+    const f = g.foes[0];
+    let stunned = 0, frames = 0;
+    for (let i = 0; i < 60 * 10; i++) {
+      if (g.phase === 'choose') choose(g, g.offer[0]);
+      g.foes = [f];
+      Object.assign(f, { x: g.hero.x + 30, y: g.hero.y, hp: f.maxHp });
+      step(g, 1 / 60, { dx: 0, dy: 0 });
+      if (i > 60) { frames++; if (f.stun > 0) stunned++; }
+    }
+    expect(stunned).toBeGreaterThan(0);
+    expect(stunned / frames).toBeLessThan(0.6);
+  });
+
   it('en ny nivå pausar spelet tills en kraft är vald', () => {
     const g: Game = newGame(lo(0, 'svard'), 1, 1);
     g.xp = needXp(1);

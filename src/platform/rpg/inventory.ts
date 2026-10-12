@@ -2,8 +2,8 @@ import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey, saveHeroState } from '../profiles';
 import { randomSeed, rngFrom } from '../rng';
 import { COSMETICS, giveCosmetic, owns, type Cosmetic } from './wardrobe';
-import { fitUnique, generateItem, itemStats, MAX_PLUS, salvageValue, STATS, uniqueItem, upgradeCost, type Item, type Rarity, type Slot, type Stat } from './items';
-import { LOOT } from './balance';
+import { fitUnique, generateItem, isPet, itemStats, scaleStats, statBudget, MAX_PLUS, salvageValue, STATS, uniqueItem, upgradeCost, type Item, type Rarity, type Slot, type Stat } from './items';
+import { LOOT, PETS } from './balance';
 
 // Packningen: föremål, utrustade föremål och oöppnade kistor.
 // Kistor sparas med seed när de hittas – att öppna dem kan inte "slumpas om" genom att ladda om.
@@ -32,11 +32,13 @@ export interface Inventory {
 }
 
 export const INVENTORY: RecordSpec<Inventory> = {
-  version: 2,
-  defaults: () => ({ v: 2, items: [], equipped: {}, chests: [], pity: 0, capacity: LOOT.capacity, potions: { liv: 0 }, bonusHints: { day: '', n: 0 } }),
+  version: 3,
+  defaults: () => ({ v: 3, items: [], equipped: {}, chests: [], pity: 0, capacity: LOOT.capacity, potions: { liv: 0 }, bonusHints: { day: '', n: 0 } }),
   migrations: {
     // v2: unika föremål (signatur, husdjur, Pionjärmanteln) fick för få egenskaper för sin nivå och sällsynthet.
     1: (old) => ({ ...old, v: 2, items: (old.items ?? []).map(fitUnique) }),
+    // v3: husdjuren börjar som ovanliga (gröna) och kan växa när bossen besegras igen.
+    2: (old) => ({ ...old, v: 3, items: (old.items ?? []).map((it: Item) => (isPet(it) ? petAt(it, PETS.rarity) : it)) }),
   },
 };
 
@@ -302,9 +304,26 @@ export function givePetItem(hid: string, key: string, pet: { name: string; icon:
   const base = `husdjur:${key}`;
   if (inv.items.some((x) => x.base === base)) return null;
   const main = PET_STAT[trap ?? ''] ?? 'visdom';
-  const it = uniqueItem({ base, slot: 'husdjur', name: pet.name, icon: pet.icon, rarity: 3, ilvl: 5, stats: { [main]: 4, klurighet: 1 }, flavor: 'Tämjd i en bossstrid. Följer dig överallt.' });
+  const it = uniqueItem({ base, slot: 'husdjur', name: pet.name, icon: pet.icon, rarity: PETS.rarity, ilvl: PETS.ilvl, stats: { [main]: 4, klurighet: 1 }, flavor: PET_FLAVOR });
   saveInv(hid, { ...inv, items: [...inv.items, it] });
   return it;
+}
+
+const PET_FLAVOR = 'Tämjd i en bossstrid. Besegra bossen igen, så kan husdjuret växa sig starkare.';
+
+/** Husdjuret på en viss sällsynthet: egenskaperna följer budgeten för nivå och sällsynthet, i samma proportioner. */
+function petAt(it: Item, rarity: Rarity): Item {
+  return { ...it, rarity, ilvl: PETS.ilvl, stats: scaleStats(it.stats, statBudget(PETS.ilvl, rarity)), flavor: PET_FLAVOR };
+}
+
+/** En boss som redan är tämjd besegras igen: kanske växer husdjuret ett steg. Returnerar det växta husdjuret. */
+export function growPet(hid: string, key: string, roll = Math.random()): Item | null {
+  const inv = getInv(hid);
+  const it = inv.items.find((x) => x.base === `husdjur:${key}`);
+  if (!it || it.rarity >= 4 || roll >= (PETS.grow[it.rarity] ?? 0)) return null;
+  const grown = petAt(it, (it.rarity + 1) as Rarity);
+  saveInv(hid, { ...inv, items: inv.items.map((x) => (x.id === it.id ? grown : x)) });
+  return grown;
 }
 
 /** Mästarens signaturföremål. */
