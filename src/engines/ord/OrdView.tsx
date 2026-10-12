@@ -12,12 +12,12 @@ import type { Explained, OrdGame, OrdKind, OrdQ } from './types';
 type Phase = 'open' | 'fixing' | 'done';
 
 /** Meningen med luckan ('___'), tom eller ifylld. */
-function Gap({ sentence, fill }: { sentence: string; fill?: string }) {
+function Gap({ sentence, fill, box }: { sentence: string; fill?: string; box?: boolean }) {
   const i = sentence.indexOf('___');
   if (i < 0) return <p class="ord-sentence">{sentence}</p>;
   return (
     <p class="ord-sentence">
-      {sentence.slice(0, i)}<span class={`ord-gap${fill ? ' filled' : ''}`}>{fill ?? '  '}</span>{sentence.slice(i + 3)}
+      {sentence.slice(0, i)}<span class={`ord-gap${box ? ' box' : ''}${fill ? ' filled' : ''}`}>{fill ?? (box ? '?' : '  ')}</span>{sentence.slice(i + 3)}
     </p>
   );
 }
@@ -210,7 +210,7 @@ export function makeOrdView<Q extends OrdQ>(g: OrdGame<Q>) {
                 )}
               </div>
             )
-            : q.sentence && <Gap sentence={q.sentence} fill={done ? (q.fill ?? q.answer) : undefined} />}
+            : q.sentence && <Gap sentence={q.sentence} box={q.gapBox} fill={done ? (q.fill ?? q.answer) : undefined} />}
 
         {/* Vid skriv står rättningen ovanför rutan, så att den syns ovanför tangentbordet på en mobil. */}
         {kind === 'skriv' && status}

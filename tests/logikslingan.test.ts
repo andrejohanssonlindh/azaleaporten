@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { rngFrom } from '../src/platform/rng';
 import { isRight } from '../src/engines/ord/check';
 import { logikGame } from '../src/games/logik';
+import { makeQ } from '../src/games/logik/logic';
 import { LOGIKSLINGAN } from '../src/games/logik/content';
 import { RUTINER } from '../src/games/logik/data';
 import { checkArea, checkDecks, checkTraps } from './ordcheck';
@@ -22,6 +23,17 @@ describe('Logikslingan', () => {
       const swapped = [steps[1], steps[0], ...steps.slice(2)].join(' ');
       expect(logikGame.diagnose(q, swapped)).toBe('bytte-plats');
       expect(logikGame.diagnose(q, [...steps].reverse().join(' '))).toBe('fel-ordning');
+    }
+  });
+});
+
+describe('Logikslingan: mönstrets ruta', () => {
+  it('varje mönster visar en ruta (luckan), också när den står sist', () => {
+    for (let seed = 1; seed < 300; seed++) {
+      for (const level of [0, 1]) {
+        const q = makeQ({ mode: 'monster', level }, rngFrom(seed));
+        expect(q.sentence, `seed ${seed}`).toContain('___');
+      }
     }
   });
 });

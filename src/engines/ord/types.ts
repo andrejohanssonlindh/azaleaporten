@@ -29,6 +29,8 @@ export interface OrdQ {
   prompt: string;
   /** En mening där '___' är luckan (val och skriv). */
   sentence?: string;
+  /** Luckan ritas som en ruta i stället för ett streck (t.ex. i ett mönster av bilder). */
+  gapBox?: boolean;
   /** Rätt svar. */
   answer: string;
   /** Stor och liten bokstav räknas (annars spelar de ingen roll). */

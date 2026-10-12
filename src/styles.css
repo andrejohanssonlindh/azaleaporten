@@ -914,6 +914,8 @@ button.stat.on { border-color: var(--accent); }
 .ord-sentence { font-size: 22px; line-height: 1.7; margin: 6px 0 12px; white-space: pre-line; }
 .ord-gap { display: inline-block; min-width: 3.2em; border-bottom: 3px solid var(--accent); margin: 0 4px; font-weight: 800; line-height: 1.2; }
 .ord-gap.filled { color: var(--ok); border-color: var(--ok); }
+.ord-gap.box { min-width: 1.6em; min-height: 1.4em; border: 3px dashed var(--accent); border-radius: 10px; padding: 2px 6px; text-align: center; color: var(--accent); vertical-align: middle; }
+.ord-gap.box.filled { border-style: solid; border-color: var(--ok); }
 .ord-listen { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 2px 0 6px; }
 .ord-form { display: flex; flex-direction: column; align-items: center; }
 .ord-input { width: min(100%, 14em); font: inherit; font-size: 28px; text-align: center; padding: 8px 10px; border-radius: 14px; border: 3px solid var(--line); background: var(--bg); color: var(--ink); min-height: 56px; }

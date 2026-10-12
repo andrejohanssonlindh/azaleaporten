@@ -97,6 +97,26 @@ export function rollRarity(rng: Rng, tur: number, min: Rarity = 0): Rarity {
 
 export const statBudget = (ilvl: number, rarity: Rarity) => Math.max(1, Math.round((2 + ilvl) * RARITIES[rarity].mult));
 
+const statSum = (stats: Partial<Record<Stat, number>>) => Object.values(stats).reduce((a, b) => a + (b ?? 0), 0);
+
+/**
+ * Skalar upp egenskaperna så att de blir precis `budget` poäng, i samma proportioner (största resten först).
+ * Sänker aldrig: ligger de redan över budgeten lämnas de som de är.
+ */
+export function fitBudget(stats: Partial<Record<Stat, number>>, budget: number): Partial<Record<Stat, number>> {
+  const sum = statSum(stats);
+  if (sum <= 0 || sum >= budget) return stats;
+  const keys = (Object.keys(stats) as Stat[]).filter((k) => (stats[k] ?? 0) > 0);
+  const exact = keys.map((k) => ((stats[k] ?? 0) * budget) / sum);
+  const out = keys.map((_, i) => Math.floor(exact[i]));
+  let left = budget - out.reduce((a, b) => a + b, 0);
+  for (const i of keys.map((_, i) => i).sort((a, b) => (exact[b] - out[b]) - (exact[a] - out[a]))) { if (left-- <= 0) break; out[i]++; }
+  return Object.fromEntries(keys.map((k, i) => [k, out[i]]));
+}
+
+/** Unika föremål följer samma budget som slumpade: nivå och sällsynthet bestämmer poängen. */
+export const fitUnique = (it: Item): Item => (it.unique ? { ...it, stats: fitBudget(it.stats, statBudget(it.ilvl, it.rarity)) } : it);
+
 let counter = 0;
 const newId = () => `i-${Date.now().toString(36)}-${(counter++).toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
@@ -138,7 +158,7 @@ export const upgradeCost = (it: Item) => ({ blad: (it.plus + 1) * [2, 3, 4, 6, 8
 
 /** Unikt föremål (bossens signatur, husdjur, pionjär). */
 export function uniqueItem(u: Omit<Item, 'id' | 'plus' | 'foundAt' | 'unique'>): Item {
-  return { ...u, id: newId(), plus: 0, unique: true, foundAt: new Date().toISOString() };
+  return fitUnique({ ...u, id: newId(), plus: 0, unique: true, foundAt: new Date().toISOString() });
 }
 
 export const statLine = (stats: Partial<Record<Stat, number>>) =>

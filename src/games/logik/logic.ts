@@ -43,7 +43,7 @@ function monsterQ(rng: Rng, lvl: number, trap: string | undefined, ctx?: Questio
     for (const w of [answer + Math.sign(tm.step), answer + tm.step, answer - Math.sign(tm.step) * 1]) {
       if (alts.length < 4 && !alts.some((a) => a.text === String(w)) && w >= 0) alts.push({ text: String(w), err: 'fel-steg' });
     }
-    return { ...base, kind: 'val', sentence: `${seq.slice(0, n).join(', ')}, ___`, answer: String(answer), alts: rng.shuffle(alts) };
+    return { ...base, kind: 'val', sentence: `${seq.slice(0, n).join(', ')}, ___`, gapBox: true, answer: String(answer), alts: rng.shuffle(alts) };
   }
   const units = ENHETER.filter((e) => e.band <= lvl + 1);
   for (let tries = 0; ; tries++) {
@@ -64,8 +64,8 @@ function monsterQ(rng: Rng, lvl: number, trap: string | undefined, ctx?: Questio
       if (alts.some((a) => a.text === set[u][1])) continue;
       alts.push({ text: set[u][1], pic: set[u][0], err: 'fel-monster' });
     }
-    const shown = seq.slice(0, len + (gap < len ? 1 : 0)).map((u, i) => (i === gap ? '___' : set[u][0]));
-    return { ...base, kind: 'val', sentence: shown.join(' '), answer: set[answer][1], alts: rng.shuffle(alts) };
+    const shown = seq.slice(0, len + 1).map((u, i) => (i === gap ? '___' : set[u][0]));
+    return { ...base, kind: 'val', sentence: shown.join(' '), gapBox: true, fill: set[answer][0], answer: set[answer][1], alts: rng.shuffle(alts) };
   }
 }
 

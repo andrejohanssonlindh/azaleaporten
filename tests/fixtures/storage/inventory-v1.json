@@ -1,0 +1,14 @@
+{
+  "v": 1,
+  "items": [
+    { "id": "i-sig", "base": "signatur:tidstornet.mastare", "slot": "vapen", "name": "Mästerbagarens kavel", "icon": "🪄", "rarity": 4, "ilvl": 9, "stats": { "kraft": 5, "visdom": 5, "tur": 4 }, "plus": 5, "unique": true, "flavor": "Test", "foundAt": "2026-10-01T10:00:00.000Z" },
+    { "id": "i-pet", "base": "husdjur:tidstornet.boss1", "slot": "husdjur", "name": "Testdjur", "icon": "🐸", "rarity": 3, "ilvl": 5, "stats": { "visdom": 4, "klurighet": 1 }, "plus": 0, "unique": true, "foundAt": "2026-10-01T10:00:00.000Z" },
+    { "id": "i-ham", "base": "hammare", "slot": "vapen", "name": "Bronshammare av styrka", "icon": "🔨", "rarity": 3, "ilvl": 5, "stats": { "kraft": 13, "klurighet": 5 }, "plus": 5, "foundAt": "2026-10-01T10:00:00.000Z" }
+  ],
+  "equipped": { "vapen": "i-ham", "husdjur": "i-pet" },
+  "chests": [],
+  "pity": 2,
+  "capacity": 30,
+  "potions": { "liv": 1 },
+  "bonusHints": { "day": "", "n": 0 }
+}

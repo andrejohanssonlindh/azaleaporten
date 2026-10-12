@@ -2,7 +2,7 @@ import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey, saveHeroState } from '../profiles';
 import { randomSeed, rngFrom } from '../rng';
 import { COSMETICS, giveCosmetic, owns, type Cosmetic } from './wardrobe';
-import { generateItem, itemStats, MAX_PLUS, salvageValue, STATS, uniqueItem, upgradeCost, type Item, type Rarity, type Slot, type Stat } from './items';
+import { fitUnique, generateItem, itemStats, MAX_PLUS, salvageValue, STATS, uniqueItem, upgradeCost, type Item, type Rarity, type Slot, type Stat } from './items';
 import { LOOT } from './balance';
 
 // Packningen: föremål, utrustade föremål och oöppnade kistor.
@@ -32,8 +32,12 @@ export interface Inventory {
 }
 
 export const INVENTORY: RecordSpec<Inventory> = {
-  version: 1,
-  defaults: () => ({ v: 1, items: [], equipped: {}, chests: [], pity: 0, capacity: LOOT.capacity, potions: { liv: 0 }, bonusHints: { day: '', n: 0 } }),
+  version: 2,
+  defaults: () => ({ v: 2, items: [], equipped: {}, chests: [], pity: 0, capacity: LOOT.capacity, potions: { liv: 0 }, bonusHints: { day: '', n: 0 } }),
+  migrations: {
+    // v2: unika föremål (signatur, husdjur, Pionjärmanteln) fick för få egenskaper för sin nivå och sällsynthet.
+    1: (old) => ({ ...old, v: 2, items: (old.items ?? []).map(fitUnique) }),
+  },
 };
 
 export const getInv = (hid: string) => loadRecord(heroKey(hid, 'inventory'), INVENTORY).value;
