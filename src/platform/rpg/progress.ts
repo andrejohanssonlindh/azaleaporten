@@ -4,6 +4,7 @@ import { randomSeed, rngFrom, type Rng } from '../rng';
 import { BOSS, BOSS_HP_SCALE, CLEAR_MIN, FAST_MS, HINTS_PER_DAY, KUNSKAP_TITLE_LEVELS, kunskapLevel, LOOT, MASTERY, minHits, MOB, needXP, PRACTICE_LENGTH, REWARD, RUN_LENGTH, TIRED_AFTER_MS, XP } from './balance';
 import { foeGroup, matchup, weaponGroup, withMatchup, type Group } from './vapen';
 import { stigmonster } from '../../content/monsters';
+import { rollKey } from './nycklar';
 import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, effectiveStats, useLifePotion, type Chest } from './inventory';
 import type { Item } from './items';
 import { getEvents, logEvents, type LogEvent } from '../learning/events';
@@ -376,6 +377,8 @@ export interface Outcome {
   tired: boolean;
   gained: { pet?: string; mentor?: string; title?: string; items?: Item[] };
   chests: Chest[];
+  /** Hittade en spelnyckel 🗝️. */
+  key?: boolean;
   /** Stigmonster besegrade under rundan och azaleablad de gav. */
   mobs?: { beaten: number; blad: number };
   /** Färdigheter som sitter bättre än någonsin (behärskning) och kunskaps-XP de gav. */
@@ -477,6 +480,8 @@ export function finishRun(hid: string, area: AreaDef, run: RunState, extras: { s
       const c = addChest(hid, { ilvl: ilvl + (chest.boss ? 1 : 0), minRarity: chest.minRarity, kind: chest.boss ? 'boss' : 'vanlig', source: node.name });
       o.chests.push(c);
     } else bumpPity(hid);
+    // Spelnyckel till Spelön: bara i vanliga banor och bossstrider.
+    if ((run.kind === 'stage' || (run.kind === 'boss' && o.bossWon)) && rollKey(hid, run.kind === 'boss')) o.key = true;
   }
   if (run.mastery) o.mastery = run.mastery;
   const titles = grantKunskapTitles(hid, area);

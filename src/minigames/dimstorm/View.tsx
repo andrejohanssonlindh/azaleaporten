@@ -6,7 +6,7 @@ import { auraRadius, choose, FOES, H, needXp, newGame, orbitPositions, step, UPS
 // Dimstormens skärm: ritar spelet på en canvas, hjältefiguren (SVG) ligger ovanpå och följer med.
 // Styrs med fingret (en "joystick" där man sätter ner fingret) eller med piltangenterna/WASD.
 
-export interface StormResult { won: boolean; waves: number; picked: number; kills: number; lvl: number }
+export interface StormResult { won: boolean; waves: number; picked: number; kills: number; lvl: number; skatter: number }
 
 const STEP = 1 / 60;
 const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
@@ -115,7 +115,7 @@ function draw(ctx: CanvasRenderingContext2D, g: Game, sp: Sprites, bg: HTMLCanva
       ctx.fillStyle = d.v >= 3 ? '#da77f2' : '#66d9e8';
       ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(d.x, d.y - r * 1.4); ctx.lineTo(d.x + r, d.y); ctx.lineTo(d.x, d.y + r * 1.4); ctx.lineTo(d.x - r, d.y); ctx.closePath(); ctx.fill(); ctx.stroke();
-    } else sp.draw(ctx, d.kind === 'blad' ? '🌸' : '🍓', d.x, d.y, d.kind === 'blad' ? 15 : 16);
+    } else sp.draw(ctx, d.kind === 'blad' ? '🌸' : d.kind === 'skatt' ? '🎁' : '🍓', d.x, d.y, d.kind === 'blad' ? 15 : d.kind === 'skatt' ? 22 : 16);
   }
 
   // Jättens anfall syns i förväg
@@ -201,7 +201,7 @@ function draw(ctx: CanvasRenderingContext2D, g: Game, sp: Sprites, bg: HTMLCanva
   label(ctx, `❤️ ${Math.ceil(h.hp)}`, 140, 14, 11, '#fff', 'left');
   const boss = g.foes.find((f) => f.boss);
   label(ctx, g.wave > STORM_WAVES ? 'Stormjätten!' : `Våg ${g.wave} av ${STORM_WAVES}`, W / 2 + 34, 14, 12);
-  label(ctx, `🌸 ${g.picked}`, W - 8, 14, 12, '#fff', 'right');
+  label(ctx, `${g.skatt ? `🎁 ${g.skatter} · ` : ''}🌸 ${g.picked}`, W - 8, 14, 12, '#fff', 'right');
   bar(ctx, 8, 25, W - 16, 6, g.wave > STORM_WAVES ? 1 : g.waveT / WAVE_SECS, 'rgba(255,255,255,.7)');
   bar(ctx, 8, 34, W - 16, 6, g.xp / needXp(g.lvl), '#66d9e8');
   label(ctx, `Nivå ${g.lvl}`, 10, 47, 10, '#c5f6fa', 'left');
@@ -230,8 +230,8 @@ function draw(ctx: CanvasRenderingContext2D, g: Game, sp: Sprites, bg: HTMLCanva
 
 type Ui = 'intro' | 'play' | 'choose' | 'paused' | 'over';
 
-export default function StormGame({ hid, steg, seed, live, onEnd }: { hid: string; steg: number; seed: number; live: { current: Game | null }; onEnd: (r: StormResult) => void }) {
-  const game = useMemo(() => newGame(stormLoadout(hid), steg, seed), []);
+export default function StormGame({ hid, steg, seed, skatt = false, live, onEnd }: { hid: string; steg: number; seed: number; skatt?: boolean; live: { current: Game | null }; onEnd: (r: StormResult) => void }) {
+  const game = useMemo(() => newGame(stormLoadout(hid), steg, seed, skatt), []);
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const heroEl = useRef<HTMLDivElement>(null);
@@ -277,7 +277,7 @@ export default function StormGame({ hid, steg, seed, live, onEnd }: { hid: strin
       if ((game.phase === 'won' || game.phase === 'lost') && !endAt) endAt = now + 1600;
       if (endAt && now >= endAt && uiRef.current !== 'over') {
         setUiBoth('over');
-        onEnd({ won: game.phase === 'won', waves: wavesCleared(game), picked: game.picked, kills: game.kills, lvl: game.lvl });
+        onEnd({ won: game.phase === 'won', waves: wavesCleared(game), picked: game.picked, kills: game.kills, lvl: game.lvl, skatter: game.skatter });
       }
       const sc = size / W;
       draw(ctx, game, sp, bg, stick.current && { ox: stick.current.ox / sc, oy: stick.current.oy / sc, x: stick.current.x / sc, y: stick.current.y / sc }, calm);

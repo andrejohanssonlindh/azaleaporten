@@ -85,3 +85,7 @@ export const FAST_MS = 6000;
 /** Stigmonster i vanliga banor: rätta svar slår till det, utrustningen avgör hur hårt.
  *  Rundan är alltid 10 frågor och stjärnorna räknas som vanligt; monstret ger bara azaleablad. */
 export const MOB = { hp: 50, blad: 1 };
+
+/** Spelnycklar: hittas ibland när en vanlig bana eller bossstrid är klar (aldrig när hjälten är trött).
+ *  En nyckel startar en skattrunda i ett minispel, där upp till chestsPerRun skattkistor dyker upp. */
+export const KEYS = { stageChance: 0.08, bossChance: 0.3, max: 5, chestsPerRun: 3 };

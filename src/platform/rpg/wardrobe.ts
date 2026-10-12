@@ -18,6 +18,8 @@ export interface Cosmetic {
   /** Pris i kastanjer, eller en belöning som låses upp. */
   cost?: number;
   unlock?: Unlock;
+  /** Finns bara i skattkistor från Spelön. */
+  kista?: boolean;
   /** Huvudfärg och ev. andrafärg för ritningen i HeroFigure. */
   color: string;
   color2?: string;
@@ -119,6 +121,12 @@ export function buyCosmetic(hid: string, id: string): boolean {
   const w = getWardrobe(hid);
   saveWardrobe(hid, { ...w, owned: [...w.owned, c.id], worn: { ...w.worn, [c.slot]: c.id } });
   return true;
+}
+
+/** Ger ett plagg (t.ex. ur en skattkista). */
+export function giveCosmetic(hid: string, id: string) {
+  const w = getWardrobe(hid);
+  if (!w.owned.includes(id)) saveWardrobe(hid, { ...w, owned: [...w.owned, id] });
 }
 
 export function wear(hid: string, id: string): boolean {

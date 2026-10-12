@@ -56,7 +56,7 @@ export function Gard({ tab: initial }: { tab?: string }) {
           <div class="chest-row">
             {inv.chests.map((k) => (
               <button key={k.id} class="chest-btn" onClick={() => { chestModal.value = k.id; }}>
-                <span>{k.kind === 'pionjar' ? '🎁' : k.kind === 'boss' ? '💎' : '🧰'}</span><small>{k.kind === 'pionjar' ? 'Pionjärkistan' : k.source}</small>
+                <span>{k.kind === 'pionjar' || k.kind === 'spel' ? '🎁' : k.kind === 'boss' ? '💎' : '🧰'}</span><small>{k.kind === 'pionjar' ? 'Pionjärkistan' : k.source}</small>
               </button>
             ))}
           </div>

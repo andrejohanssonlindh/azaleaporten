@@ -1,6 +1,7 @@
 import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey, saveHeroState } from '../profiles';
-import { randomSeed } from '../rng';
+import { randomSeed, rngFrom } from '../rng';
+import { COSMETICS, giveCosmetic, owns, type Cosmetic } from './wardrobe';
 import { generateItem, itemStats, MAX_PLUS, salvageValue, STATS, uniqueItem, upgradeCost, type Item, type Rarity, type Slot, type Stat } from './items';
 import { LOOT } from './balance';
 
@@ -12,7 +13,7 @@ export interface Chest {
   seed: number;
   ilvl: number;
   minRarity: Rarity;
-  kind: 'vanlig' | 'boss' | 'pionjar' | 'kopt' | 'dag';
+  kind: 'vanlig' | 'boss' | 'pionjar' | 'kopt' | 'dag' | 'spel';
   source: string;
   at: string;
 }
@@ -136,9 +137,27 @@ export const spaceLeft = (inv: Inventory) => inv.capacity - inv.items.length;
 
 /** Öppnar en kista. Returnerar föremålen, eller null om packningen är full. */
 export function openChest(hid: string, id: string): Item[] | null {
+  return openChestFull(hid, id)?.items ?? null;
+}
+
+/**
+ * Öppnar en kista. En skattkista från Spelön (kind 'spel') ger varannan gång ett klädesplagg som bara
+ * finns i skattkistor (om det finns något kvar att få), annars ett föremål. Allt bestäms av kistans seed.
+ */
+export function openChestFull(hid: string, id: string): { items: Item[]; look?: Cosmetic } | null {
   const inv = getInv(hid);
   const c = inv.chests.find((x) => x.id === id);
   if (!c) return null;
+  if (c.kind === 'spel') {
+    const rng = rngFrom(c.seed + 99);
+    const left = COSMETICS.filter((x) => x.kista && !owns(hid, x));
+    if (left.length && rng.next() < 0.5) {
+      const look = rng.pick(left);
+      giveCosmetic(hid, look.id);
+      saveInv(hid, { ...inv, chests: inv.chests.filter((x) => x.id !== id) });
+      return { items: [], look };
+    }
+  }
   const n = c.kind === 'pionjar' ? 2 : 1;
   if (spaceLeft(inv) < n) return null;
   const ranger = getProfile(hid)?.heroClass === 'ranger';
@@ -153,7 +172,7 @@ export function openChest(hid: string, id: string): Item[] | null {
     saveHeroState(hid, { ...s, legacy: { ...s.legacy, pioneerChest: 'opened' } });
   }
   saveInv(hid, { ...inv, items: [...inv.items, ...got], chests: inv.chests.filter((x) => x.id !== id) });
-  return got;
+  return { items: got };
 }
 
 /** Skapar Pionjärkistan om hjälten har en som väntar (från importen av v0.1). */

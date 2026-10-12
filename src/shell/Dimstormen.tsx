@@ -4,6 +4,7 @@ import { Purse, TokenRow } from './Polletter';
 import { getHeroState, getProfile } from '../platform/profiles';
 import { randomSeed } from '../platform/rng';
 import { payToken } from '../platform/rpg/arena';
+import { giveSkattkistor, grantSpelTitlar, payKey } from '../platform/rpg/nycklar';
 import { finishStorm, OFFHANDS, STORM_WAVES, stormLoadout, WEAPONS } from '../platform/rpg/dimstorm';
 import { leaveToPicker } from '../session';
 import { HeroFigure } from './HeroFigure';
@@ -17,13 +18,13 @@ import type { StormResult } from '../minigames/dimstorm/View';
 
 const loadStorm = () => import('../minigames/dimstorm/View');
 
-type Run = { steg: number; seed: number };
+type Run = { steg: number; seed: number; skatt: boolean };
 
 export function Dimstormen() {
   dataRev.value;
   const p = getProfile(heroId.value!);
   const [run, setRun] = useState<Run | null>(null);
-  const [result, setResult] = useState<(StormResult & { steg: number; blad: number; opened: boolean }) | null>(null);
+  const [result, setResult] = useState<(StormResult & { steg: number; blad: number; opened: boolean; titles: string[] }) | null>(null);
   const [steg, setSteg] = useState<number | null>(null);
   /** Stormen som pågår. Lämnar barnet sidan mitt i sparas det som hunnits plocka. */
   const live = useRef<Game | null>(null);
@@ -31,19 +32,23 @@ export function Dimstormen() {
 
   useEffect(() => () => {
     const g = live.current;
-    if (p && g && !saved.current) finishStorm(p.id, { steg: g.steg, waves: Math.min(STORM_WAVES, g.wave - 1), won: false, picked: g.picked });
+    if (p && g && !saved.current) {
+      finishStorm(p.id, { steg: g.steg, waves: Math.min(STORM_WAVES, g.wave - 1), won: false, picked: g.picked });
+      giveSkattkistor(p.id, g.skatter, 'Dimstormen');
+      grantSpelTitlar(p.id);
+    }
   }, []);
 
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   const s = getHeroState(p.id);
   const chosen = Math.min(steg ?? s.storm.steg, s.storm.steg);
 
-  function start() {
-    if (!payToken(p!.id)) { toast('Du behöver en pollett 🎟️'); return; }
+  function start(withKey = false) {
+    if (withKey ? !payKey(p!.id) : !payToken(p!.id)) { toast(withKey ? 'Du behöver en spelnyckel 🗝️' : 'Du behöver en pollett 🎟️'); return; }
     saved.current = false;
     live.current = null;
     setResult(null);
-    setRun({ steg: chosen, seed: randomSeed() });
+    setRun({ steg: chosen, seed: randomSeed(), skatt: withKey });
     touch();
   }
 
@@ -53,7 +58,9 @@ export function Dimstormen() {
     const before = getHeroState(p!.id).storm.steg;
     const blad = finishStorm(p!.id, { steg: run!.steg, waves: r.waves, won: r.won, picked: r.picked });
     const opened = getHeroState(p!.id).storm.steg > before;
-    setResult({ ...r, steg: run!.steg, blad, opened });
+    giveSkattkistor(p!.id, r.skatter, 'Dimstormen');
+    const titles = grantSpelTitlar(p!.id);
+    setResult({ ...r, steg: run!.steg, blad, opened, titles });
     setRun(null);
     if (opened) setSteg(null);
     touch();
@@ -73,6 +80,8 @@ export function Dimstormen() {
           <h1>{result.won ? `Du klarade steg ${result.steg}!` : result.waves ? `Du klarade ${result.waves} ${result.waves === 1 ? 'våg' : 'vågor'}` : 'Dimman var för stark den här gången'}</h1>
           <p>+{result.blad} 🌸 azaleablad · {result.kills} monster · nivå {result.lvl}</p>
           {result.opened && <p><b>Steg {result.steg + 1} är öppet!</b> Där tål monstren mer och slår hårdare.</p>}
+          {result.skatter > 0 && <p>🎁 {result.skatter} skattkist{result.skatter === 1 ? 'a' : 'or'} – öppna i Azaleagården!</p>}
+          {result.titles.map((t) => <p key={t}>🏷️ Ny titel: {t}</p>)}
           {!result.won && <p class="muted small">Tips: spring runt och låt monstren komma till dig. Bättre utrustning hjälper också!</p>}
         </section>
       )}
@@ -89,8 +98,10 @@ export function Dimstormen() {
             </div>
           )}
           <div class="row center-row">
-            <button class="btn primary big" disabled={s.polletter < 1} onClick={start}>🌪️ Starta steg {chosen} (1 🎟️)</button>
+            <button class="btn primary big" disabled={s.polletter < 1} onClick={() => start()}>🌪️ Starta steg {chosen} (1 🎟️)</button>
+            {s.nycklar > 0 && <button class="btn big" onClick={() => start(true)}>🗝️ Skattstorm</button>}
           </div>
+          {s.nycklar > 0 && <p class="small">🗝️ En skattstorm kostar en spelnyckel i stället för en pollett. Då dyker skattkistor 🎁 upp i stormen!</p>}
           <TokenRow hid={p.id} />
           <p class="muted small">Stormen ger azaleablad 🌸: de du plockar, ett per våg och extra om du vinner.</p>
         </div>
@@ -117,11 +128,11 @@ export function Dimstormen() {
 
 function StormRun({ hid, run, live, onEnd }: { hid: string; run: Run; live: { current: Game | null }; onEnd: (r: StormResult) => void }) {
   const mod = useLoaded('dimstorm', loadStorm);
-  if (mod === 'laddar' || mod === 'fel') return <Loading failed={mod === 'fel'} back="by" />;
+  if (mod === 'laddar' || mod === 'fel') return <Loading failed={mod === 'fel'} back="spelon" />;
   const Game = mod.default;
   return (
     <Screen class="place storm-place">
-      <Game hid={hid} steg={run.steg} seed={run.seed} live={live} onEnd={onEnd} />
+      <Game hid={hid} steg={run.steg} seed={run.seed} skatt={run.skatt} live={live} onEnd={onEnd} />
     </Screen>
   );
 }

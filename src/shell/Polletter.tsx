@@ -6,7 +6,7 @@ import { ARENA, buyToken } from '../platform/rpg/arena';
 
 export function Purse({ hid }: { hid: string }) {
   const s = getHeroState(hid);
-  return <span class="purse">🌰 {s.kastanjer} · 🎟️ {s.polletter} · 🌸 {s.blad}</span>;
+  return <span class="purse">🌰 {s.kastanjer} · 🎟️ {s.polletter}{s.nycklar > 0 ? ` · 🗝️ ${s.nycklar}` : ''} · 🌸 {s.blad}</span>;
 }
 
 export function TokenRow({ hid }: { hid: string }) {

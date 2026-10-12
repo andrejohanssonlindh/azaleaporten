@@ -1,9 +1,10 @@
 import { BEATS, GROUPS, weaponGroup } from '../platform/rpg/vapen';
+import type { Cosmetic } from '../platform/rpg/wardrobe';
 import type { ComponentChildren } from 'preact';
 import { useState } from 'preact/hooks';
 import { chestModal, dataRev, go, heroId, route, toast, touch } from '../state';
 import { getHeroState, getProfile } from '../platform/profiles';
-import { buy, canUpgrade, getInv, isEquipped, openChest, salvage, SHOP, upgrade } from '../platform/rpg/inventory';
+import { buy, canUpgrade, getInv, isEquipped, openChestFull, salvage, SHOP, upgrade } from '../platform/rpg/inventory';
 import { itemStats, MAX_PLUS, RARITIES, salvageValue, statLine, upgradeCost, type Item } from '../platform/rpg/items';
 import { today } from '../platform/rpg/progress';
 import { leaveToPicker } from '../session';
@@ -36,15 +37,17 @@ export function ChestModal() {
   const id = chestModal.value;
   const [phase, setPhase] = useState<'closed' | 'shaking' | 'open' | 'full'>('closed');
   const [items, setItems] = useState<Item[]>([]);
+  const [look, setLook] = useState<Cosmetic | null>(null);
   const hid = heroId.value;
   if (!id || !hid) return null;
   const chest = getInv(hid).chests.find((c) => c.id === id);
-  const close = () => { chestModal.value = null; setPhase('closed'); setItems([]); touch(); };
+  const close = () => { chestModal.value = null; setPhase('closed'); setItems([]); setLook(null); touch(); };
 
   function open() {
-    const got = openChest(hid!, id!);
+    const got = openChestFull(hid!, id!);
     if (!got) { setPhase('full'); return; }
-    setItems(got);
+    setItems(got.items);
+    setLook(got.look ?? null);
     setPhase('shaking');
     setTimeout(() => setPhase('open'), reduceMotion() ? 0 : 900);
   }
@@ -54,8 +57,8 @@ export function ChestModal() {
       <div class="modal-sheet" role="dialog" aria-modal="true" aria-label="Skattkista">
         {phase !== 'open' && (
           <>
-            <div class={`chest-big${phase === 'shaking' ? ' shaking' : ''}`}>{chest?.kind === 'pionjar' ? '🎁' : chest?.kind === 'boss' ? '💎' : chest?.kind === 'dag' ? '📜' : '🧰'}</div>
-            <h2>{chest?.kind === 'pionjar' ? 'Pionjärkistan' : chest?.kind === 'boss' ? 'Bosskista' : chest?.kind === 'dag' ? 'Dagens kista' : 'Skattkista'}</h2>
+            <div class={`chest-big${phase === 'shaking' ? ' shaking' : ''}`}>{chest?.kind === 'pionjar' || chest?.kind === 'spel' ? '🎁' : chest?.kind === 'boss' ? '💎' : chest?.kind === 'dag' ? '📜' : '🧰'}</div>
+            <h2>{chest?.kind === 'pionjar' ? 'Pionjärkistan' : chest?.kind === 'boss' ? 'Bosskista' : chest?.kind === 'dag' ? 'Dagens kista' : chest?.kind === 'spel' ? 'Spelöns skattkista' : 'Skattkista'}</h2>
             {chest && <p class="muted">Hittad vid {chest.source}</p>}
             {phase === 'full' && <p class="note warn">Packningen är full! Smält något i Smedjan först.</p>}
             <div class="row center-row">
@@ -69,10 +72,16 @@ export function ChestModal() {
             <div class="chest-big">✨</div>
             <h2>Du fick:</h2>
             {items.map((it) => <ItemCard key={it.id} it={it} />)}
-            <p class="note">Ta på dig {items.length > 1 ? 'dem' : 'den'} i Azaleagården, så syns {items.length > 1 ? 'de' : 'den'} på din hjälte.</p>
+            {look && (
+              <div class="item-card look-card">
+                <span class="item-icon">{look.icon}</span>
+                <div class="item-text"><b>{look.name}</b><small>Ett plagg som bara finns i skattkistor!</small></div>
+              </div>
+            )}
+            <p class="note">{look ? 'Ta på dig det i Garderoben i Azaleagården.' : `Ta på dig ${items.length > 1 ? 'dem' : 'den'} i Azaleagården, så syns ${items.length > 1 ? 'de' : 'den'} på din hjälte.`}</p>
             <div class="row center-row">
               <button class="btn" onClick={close}>Toppen!</button>
-              {route.value[0] !== 'gard' && <button class="btn primary" onClick={() => { close(); go('gard'); }}>Till Azaleagården</button>}
+              {route.value[0] !== 'gard' && <button class="btn primary" onClick={() => { close(); go(look ? 'gard/garderob' : 'gard'); }}>Till Azaleagården</button>}
             </div>
           </>
         )}

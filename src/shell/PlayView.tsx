@@ -342,6 +342,7 @@ function Result({ o, news, areaId, node, face, practice, onAgain }: { o: Outcome
           {o.kunskap?.titles.map((t) => <span key={t}>🏷️ Ny titel: {t}</span>)}
           {o.mobs && o.mobs.beaten > 0 && <span>👾 {o.mobs.beaten} stigmonster besegrade{o.mobs.blad > 0 ? ` · 🌸 +${o.mobs.blad}` : ''}</span>}
           {o.kastanjer > 0 && <span>🌰 +{o.kastanjer}</span>}
+          {o.key && <span>🗝️ Du hittade en spelnyckel! Använd den på Spelön.</span>}
           {o.levelUps > 0 && <span>⭐ Nivå {hs.level} – {levelTitle(hs.level)}</span>}
           {o.gained.pet && <span>🐾 {o.gained.pet} följer med dig hem!</span>}
           {o.gained.mentor && <span>🎓 {o.gained.mentor} blir din mentor!</span>}

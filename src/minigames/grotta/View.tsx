@@ -7,7 +7,7 @@ import { act, attackDir, BOSS_EVERY, descend, GH, goHome, GW, isLit, isSeen, MON
 // Tryck på en ruta för att gå dit (hjälten stannar om något dyker upp), på ett monster för att slå eller skjuta.
 // Piltangenter/WASD = ett steg, mellanslag = vänta, Q = drick, E = blixt.
 
-export interface CaveResult { depth: number; blad: number; home: boolean; kills: number }
+export interface CaveResult { depth: number; blad: number; home: boolean; kills: number; skatter: number }
 
 const WALK_MS = 150;
 const KEYS: Record<string, [number, number]> = {
@@ -18,8 +18,8 @@ const pos = (x: number, y: number) => ({ transform: `translate(${x * 100}%, ${y 
 
 type Overlay = null | 'intro' | 'quit';
 
-export default function GrottaGame({ hid, seed, live, onEnd }: { hid: string; seed: number; live: { current: Cave | null }; onEnd: (r: CaveResult) => void }) {
-  const cave = useMemo(() => newCave(caveLoadout(hid), seed), []);
+export default function GrottaGame({ hid, seed, skatt = false, live, onEnd }: { hid: string; seed: number; skatt?: boolean; live: { current: Cave | null }; onEnd: (r: CaveResult) => void }) {
+  const cave = useMemo(() => newCave(caveLoadout(hid), seed, skatt), []);
   live.current = cave;
   const [, setRev] = useState(0);
   const [overlay, setOverlay] = useState<Overlay>('intro');
@@ -35,7 +35,7 @@ export default function GrottaGame({ hid, seed, live, onEnd }: { hid: string; se
   function finish(home: boolean) {
     if (ended.current) return;
     ended.current = true;
-    onEnd({ depth: c.depth, blad: c.blad, home, kills: c.kills });
+    onEnd({ depth: c.depth, blad: c.blad, home, kills: c.kills, skatter: c.skatter });
   }
 
   function doAct(a: Action) {

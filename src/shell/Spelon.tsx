@@ -1,5 +1,6 @@
 import { dataRev, go, heroId } from '../state';
-import { getProfile } from '../platform/profiles';
+import { getHeroState, getProfile } from '../platform/profiles';
+import { SPEL_TITLAR } from '../platform/rpg/nycklar';
 import { leaveToPicker } from '../session';
 import { BackBar, Screen } from './ui';
 import { Purse, TokenRow } from './Polletter';
@@ -16,12 +17,14 @@ export function Spelon() {
   dataRev.value;
   const p = getProfile(heroId.value!);
   if (!p) { queueMicrotask(leaveToPicker); return null; }
+  const s = getHeroState(p.id);
   return (
     <Screen class="place">
       <BackBar label="Till ön" to="karta" right={<Purse hid={p.id} />} />
       <div class="place-banner spelon"><span>🎡</span><h1>Spelön</h1></div>
       <section class="card">
         <TokenRow hid={p.id} />
+        <p class="small">🗝️ Spelnycklar: <b>{s.nycklar}</b>. Ibland hittar du en när du klarar en bana eller besegrar en boss. Med en nyckel blir minispelet en <b>skattrunda</b>, där skattkistor 🎁 med ovanliga saker och kläder dyker upp.</p>
       </section>
       <div class="building-grid">
         {MINISPEL.map((g) => (
@@ -32,6 +35,12 @@ export function Spelon() {
           </button>
         ))}
       </div>
+      <section class="card">
+        <h3>🏷️ Titlar på Spelön</h3>
+        <ul class="arena-stats">
+          {SPEL_TITLAR.map((t) => <li key={t.title}>{s.titles.includes(t.title) ? '✅' : '🔒'} <b>{t.title}</b>: {t.how}</li>)}
+        </ul>
+      </section>
     </Screen>
   );
 }

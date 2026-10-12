@@ -27,7 +27,7 @@ export const depthScale = (d: number) => ({ hp: 1 + 0.18 * (d - 1), dmg: 1 + 0.1
 
 /* ---------- saker ---------- */
 
-export type ThingKind = 'blad' | 'dryck' | 'nyckel' | 'kista' | 'vass' | 'rustning' | 'kristall';
+export type ThingKind = 'blad' | 'dryck' | 'nyckel' | 'kista' | 'vass' | 'rustning' | 'kristall' | 'skatt';
 
 export const THINGS: Record<ThingKind, { icon: string; name: string }> = {
   blad: { icon: '🌸', name: 'Azaleablad' },
@@ -37,7 +37,11 @@ export const THINGS: Record<ThingKind, { icon: string; name: string }> = {
   vass: { icon: '🪨', name: 'Brynsten (+1 skada)' },
   rustning: { icon: '🔩', name: 'Rustningsbit (+1 skydd)' },
   kristall: { icon: '💖', name: 'Livskristall (+5 liv)' },
+  skatt: { icon: '🎁', name: 'Skattkista (bara i skattrundor)' },
 };
+
+/** Högst så här många skattkistor per skattrunda (samma som KEYS.chestsPerRun). */
+export const SKATT_MAX = 3;
 
 /* ---------- tillstånd ---------- */
 
@@ -85,6 +89,11 @@ export interface Cave {
   hero: Hero;
   blad: number;
   kills: number;
+  /** Skattrunda (startad med en spelnyckel): skattkistor 🎁 ligger i grottan. */
+  skatt: boolean;
+  /** Skattkistor utlagda och upplockade. */
+  skattUt: number;
+  skatter: number;
   turn: number;
   phase: Phase;
   /** Senaste meddelandet till barnet. */
@@ -229,11 +238,11 @@ function genFloor(depth: number, rng: Rng, nextId: () => number): Floor {
   return f;
 }
 
-export function newCave(lo: CaveLoadout, seed: number): Cave {
+export function newCave(lo: CaveLoadout, seed: number, skatt = false): Cave {
   const c: Cave = {
     lo, seed, rng: rngFrom(seed), depth: 1, floor: null as unknown as Floor, lit: [],
     hero: { x: 0, y: 0, hp: lo.maxHp, maxHp: lo.maxHp, dmgBonus: 0, armorBonus: 0, potions: lo.potions, keys: 0, spell: 0, face: 1 },
-    blad: 0, kills: 0, turn: 0, phase: 'play', msg: 'Våning 1. Hitta trappan ner!', evs: [], nextId: 1,
+    blad: 0, kills: 0, skatt, skattUt: 0, skatter: 0, turn: 0, phase: 'play', msg: 'Våning 1. Hitta trappan ner!', evs: [], nextId: 1,
   };
   enterFloor(c);
   return c;
@@ -241,9 +250,34 @@ export function newCave(lo: CaveLoadout, seed: number): Cave {
 
 function enterFloor(c: Cave) {
   c.floor = genFloor(c.depth, rngFrom(c.seed + c.depth * 7919), () => c.nextId++);
+  if (c.skatt) placeSkatt(c);
   c.hero.x = c.floor.start.x;
   c.hero.y = c.floor.start.y;
   computeLit(c);
+}
+
+/** I en skattrunda: en skattkista på våningen (alltid på bossvåningar, annars ofta), långt från starten.
+ *  Egen slump, så att vanliga dyk inte ändras. */
+function placeSkatt(c: Cave) {
+  const f = c.floor;
+  const rng = rngFrom(c.seed + c.depth * 31 + 5);
+  if (c.skattUt >= SKATT_MAX || (c.depth % BOSS_EVERY !== 0 && rng.next() < 0.35)) return;
+  const busy = (x: number, y: number) => f.things.some((t) => t.x === x && t.y === y) || f.mons.some((m) => m.x === x && m.y === y)
+    || f.traps.some((t) => t.x === x && t.y === y) || (f.stairs.x === x && f.stairs.y === y) || (f.start.x === x && f.start.y === y);
+  const free = (minDist: number) => {
+    const out: [number, number][] = [];
+    for (let i = 0; i < f.open.length; i++) {
+      const x = i % GW, y = Math.floor(i / GW);
+      if (f.open[i] && !busy(x, y) && Math.abs(x - f.start.x) + Math.abs(y - f.start.y) >= minDist) out.push([x, y]);
+    }
+    return out;
+  };
+  const far = free(4);
+  const spots = far.length ? far : free(1);
+  if (!spots.length) return;
+  const [x, y] = rng.pick(spots);
+  f.things.push({ id: c.nextId++, kind: 'skatt', x, y, v: 1 });
+  c.skattUt++;
 }
 
 /* ---------- strid ---------- */
@@ -368,6 +402,7 @@ function stepOn(c: Cave) {
       case 'vass': h.dmgBonus++; c.msg = 'En brynsten: ditt vapen blir vassare (+1 skada).'; break;
       case 'rustning': h.armorBonus++; c.msg = 'En rustningsbit: +1 skydd.'; break;
       case 'kristall': h.maxHp += 5; h.hp += 5; c.msg = 'En livskristall: +5 liv!'; break;
+      case 'skatt': c.skatter++; c.msg = 'En skattkista 🎁! Du öppnar den i Azaleagården.'; break;
       case 'kista':
         if (h.keys > 0) { h.keys--; c.blad += t.v; c.msg = `Du låser upp kistan: +${t.v} 🌸!`; }
         else { took = false; c.msg = 'Kistan är låst. Hitta en nyckel 🗝️'; }

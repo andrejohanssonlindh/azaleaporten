@@ -3,6 +3,7 @@ import { dataRev, heroId, toast, touch } from '../state';
 import { getHeroState, getProfile } from '../platform/profiles';
 import { randomSeed } from '../platform/rng';
 import { payToken } from '../platform/rpg/arena';
+import { giveSkattkistor, grantSpelTitlar, payKey } from '../platform/rpg/nycklar';
 import { CAVE_OFFHANDS, CAVE_WEAPONS, caveLoadout, finishCave } from '../platform/rpg/grotta';
 import { leaveToPicker } from '../session';
 import { HeroFigure } from './HeroFigure';
@@ -21,20 +22,26 @@ export function Grottdyket() {
   dataRev.value;
   const p = getProfile(heroId.value!);
   const [seed, setSeed] = useState<number | null>(null);
-  const [result, setResult] = useState<(CaveResult & { got: number; record: boolean }) | null>(null);
+  const [skatt, setSkatt] = useState(false);
+  const [result, setResult] = useState<(CaveResult & { got: number; record: boolean; titles: string[] }) | null>(null);
   const live = useRef<Cave | null>(null);
   const saved = useRef(true);
 
   useEffect(() => () => {
     const c = live.current;
-    if (p && c && !saved.current) finishCave(p.id, { depth: c.depth, blad: c.blad, home: false });
+    if (p && c && !saved.current) {
+      finishCave(p.id, { depth: c.depth, blad: c.blad, home: false });
+      giveSkattkistor(p.id, c.skatter, 'Grottdyket');
+      grantSpelTitlar(p.id);
+    }
   }, []);
 
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   const s = getHeroState(p.id);
 
-  function start() {
-    if (!payToken(p!.id)) { toast('Du behöver en pollett 🎟️'); return; }
+  function start(withKey = false) {
+    if (withKey ? !payKey(p!.id) : !payToken(p!.id)) { toast(withKey ? 'Du behöver en spelnyckel 🗝️' : 'Du behöver en pollett 🎟️'); return; }
+    setSkatt(withKey);
     saved.current = false;
     live.current = null;
     setResult(null);
@@ -47,12 +54,14 @@ export function Grottdyket() {
     saved.current = true;
     const record = r.depth > getHeroState(p!.id).grotta.best;
     const got = finishCave(p!.id, r);
-    setResult({ ...r, got, record });
+    giveSkattkistor(p!.id, r.skatter, 'Grottdyket');
+    const titles = grantSpelTitlar(p!.id);
+    setResult({ ...r, got, record, titles });
     setSeed(null);
     touch();
   }
 
-  if (seed !== null) return <CaveRun hid={p.id} seed={seed} live={live} onEnd={end} />;
+  if (seed !== null) return <CaveRun hid={p.id} seed={seed} skatt={skatt} live={live} onEnd={end} />;
 
   const lo = caveLoadout(p.id);
   return (
@@ -66,6 +75,8 @@ export function Grottdyket() {
           <h1>{result.home ? `Hemma med skatten från våning ${result.depth}!` : `Du föll på våning ${result.depth}`}</h1>
           <p>+{result.got} 🌸 azaleablad{!result.home && result.blad > 0 ? ` (hälften av ${result.blad})` : ''} · {result.kills} monster</p>
           {result.record && <p><b>Nytt rekord: våning {result.depth}!</b></p>}
+          {result.skatter > 0 && <p>🎁 {result.skatter} skattkist{result.skatter === 1 ? 'a' : 'or'} – öppna i Azaleagården!</p>}
+          {result.titles.map((t) => <p key={t}>🏷️ Ny titel: {t}</p>)}
           {!result.home && <p class="muted small">Tips: vid trappan kan du gå hem med allt. Läkedrycker 🧪 räddar dig när livet är lågt.</p>}
         </section>
       )}
@@ -75,8 +86,10 @@ export function Grottdyket() {
         <div>
           <p>Under Azaleabyn finns en djup grotta full av monster och skatter. Hur djupt vågar du gå? Vid varje trappa väljer du: <b>djupare</b>, eller <b>hem med skatten</b>. Faller du får du bara behålla hälften.</p>
           <div class="row center-row">
-            <button class="btn primary big" disabled={s.polletter < 1} onClick={start}>⛏️ Kliv ner (1 🎟️)</button>
+            <button class="btn primary big" disabled={s.polletter < 1} onClick={() => start()}>⛏️ Kliv ner (1 🎟️)</button>
+            {s.nycklar > 0 && <button class="btn big" onClick={() => start(true)}>🗝️ Skattdyk</button>}
           </div>
+          {s.nycklar > 0 && <p class="small">🗝️ Ett skattdyk kostar en spelnyckel i stället för en pollett. Då gömmer sig skattkistor 🎁 i grottan!</p>}
           <TokenRow hid={p.id} />
           {s.grotta.dives > 0 && <p class="muted small">Djupast hittills: våning {s.grotta.best} · {s.grotta.dives} dyk</p>}
         </div>
@@ -100,13 +113,13 @@ export function Grottdyket() {
   );
 }
 
-function CaveRun({ hid, seed, live, onEnd }: { hid: string; seed: number; live: { current: Cave | null }; onEnd: (r: CaveResult) => void }) {
+function CaveRun({ hid, seed, skatt, live, onEnd }: { hid: string; seed: number; skatt: boolean; live: { current: Cave | null }; onEnd: (r: CaveResult) => void }) {
   const mod = useLoaded('grotta', loadCave);
-  if (mod === 'laddar' || mod === 'fel') return <Loading failed={mod === 'fel'} back="by" />;
+  if (mod === 'laddar' || mod === 'fel') return <Loading failed={mod === 'fel'} back="spelon" />;
   const Game = mod.default;
   return (
     <Screen class="place cave-place">
-      <Game hid={hid} seed={seed} live={live} onEnd={onEnd} />
+      <Game hid={hid} seed={seed} skatt={skatt} live={live} onEnd={onEnd} />
     </Screen>
   );
 }

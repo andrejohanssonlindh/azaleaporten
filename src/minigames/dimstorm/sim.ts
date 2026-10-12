@@ -80,7 +80,10 @@ export interface Foe {
   boss?: { state: 'walk' | 'aim' | 'charge'; t: number; dx: number; dy: number; summon: number };
 }
 export interface Shot { x: number; y: number; vx: number; vy: number; dmg: number; crit: boolean; pierce: number; life: number; kind: 'pil' | 'troll'; hit: number[] }
-export interface Drop { x: number; y: number; kind: 'xp' | 'blad' | 'hjarta'; v: number; pull: boolean; life: number }
+export interface Drop { x: number; y: number; kind: 'xp' | 'blad' | 'hjarta' | 'skatt'; v: number; pull: boolean; life: number }
+
+/** Högst så här många skattkistor per skattrunda (samma som KEYS.chestsPerRun). */
+export const SKATT_MAX = 3;
 export type Fx =
   | { kind: 'arc'; x: number; y: number; ang: number; spread: number; r: number; t: number; ttl: number }
   | { kind: 'ring'; x: number; y: number; r: number; t: number; ttl: number; color: string }
@@ -128,19 +131,23 @@ export interface Game {
   offer: UpId[];
   /** Plockade azaleablad (belöning efteråt). */
   picked: number;
+  /** Skattrunda (startad med en spelnyckel): skattkistor 🎁 dyker upp i våg 2 och 4 och när jätten faller. */
+  skatt: boolean;
+  skattUt: number;
+  skatter: number;
   kills: number;
   phase: Phase;
   nextId: number;
   shake: number;
 }
 
-export function newGame(lo: Loadout, steg: number, seed: number): Game {
+export function newGame(lo: Loadout, steg: number, seed: number, skatt = false): Game {
   return {
     lo, steg, rng: rngFrom(seed), t: 0, wave: 1, waveT: 0, spawnAcc: 0, swarmDone: false,
     foes: [], shots: [], drops: [], fx: [{ kind: 'text', text: 'Våg 1', t: 0, ttl: 2 }],
     hero: { x: W / 2, y: H / 2 + 20, hp: lo.maxHp, maxHp: lo.maxHp, inv: 0, fx: 1, fy: 0, cd: 0.5, shield: 0, pet: { x: W / 2 - 24, y: H / 2 + 34, cd: 1, tx: null, ty: null }, zap: 2, orbit: 0, swings: 0, hurts: 0 },
     lvl: 1, xp: 0, ups: { skada: 0, fart: 0, rackvidd: 0, fler: 0, liv: 0, lak: 0, magnet: 0, skor: 0, blad: 0, blixt: 0, tur: 0 }, offer: [],
-    picked: 0, kills: 0, phase: 'play', nextId: 1, shake: 0,
+    picked: 0, skatt, skattUt: 0, skatter: 0, kills: 0, phase: 'play', nextId: 1, shake: 0,
   };
 }
 
@@ -148,6 +155,12 @@ export function newGame(lo: Loadout, steg: number, seed: number): Game {
 export const wavesCleared = (g: Game) => (g.phase === 'won' ? STORM_WAVES + 1 : Math.min(STORM_WAVES, g.wave - 1));
 
 /* ---------- hjälpare ---------- */
+
+function dropSkatt(g: Game, x: number, y: number) {
+  if (g.skattUt >= SKATT_MAX) return;
+  g.skattUt++;
+  g.drops.push({ x, y, kind: 'skatt', v: 1, pull: false, life: 99 });
+}
 
 const dist2 = (ax: number, ay: number, bx: number, by: number) => (ax - bx) ** 2 + (ay - by) ** 2;
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -344,6 +357,7 @@ export function step(g: Game, dt: number, input: Input) {
       spawn(g, 'jatte', W / 2, -40);
       g.fx.push({ kind: 'text', text: 'Stormjätten kommer!', t: 0, ttl: 2.5 });
     } else g.fx.push({ kind: 'text', text: `Våg ${g.wave}`, t: 0, ttl: 2 });
+    if (g.skatt && (g.wave === 2 || g.wave === 4)) dropSkatt(g, 40 + g.rng.next() * (W - 80), 60 + g.rng.next() * (H - 120));
   }
   const wv = WAVES[g.wave - 1];
   const s = stegScale(g.steg);
@@ -535,6 +549,7 @@ export function step(g: Game, dt: number, input: Input) {
     g.fx.push({ kind: 'poof', x: f.x, y: f.y, t: 0, ttl: 0.35 });
     if (f.boss) {
       for (let k = 0; k < 3; k++) g.drops.push({ x: f.x + (k - 1) * 20, y: f.y, kind: 'blad', v: 1, pull: true, life: 99 });
+      if (g.skatt) dropSkatt(g, f.x, f.y + 24);
       g.phase = 'won';
       continue;
     }
@@ -560,6 +575,7 @@ export function step(g: Game, dt: number, input: Input) {
       dr.life = 0;
       if (dr.kind === 'xp') g.xp += dr.v * lo.xpMult;
       else if (dr.kind === 'blad') g.picked++;
+      else if (dr.kind === 'skatt') { g.skatter++; g.fx.push({ kind: 'text', text: 'En skattkista! 🎁', t: 0, ttl: 2 }); }
       else h.hp = Math.min(h.maxHp, h.hp + dr.v);
     }
   }
@@ -579,7 +595,7 @@ export function step(g: Game, dt: number, input: Input) {
 
   if (g.phase === 'won') {
     // Allt som ligger kvar plockas upp av sig självt.
-    for (const dr of g.drops) if (dr.kind === 'blad') g.picked++;
+    for (const dr of g.drops) if (dr.kind === 'blad') g.picked++; else if (dr.kind === 'skatt') g.skatter++;
     g.drops = [];
     return;
   }
