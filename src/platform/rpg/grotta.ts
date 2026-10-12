@@ -1,5 +1,5 @@
 import { getHeroState, getProfile, saveHeroState } from '../profiles';
-import { getInv, heroStats, type Stats } from './inventory';
+import { getInv, effectiveStats, type Stats } from './inventory';
 import type { Item } from './items';
 import { offOf, weaponOf, type OffKind, type WeaponKind } from './dimstorm';
 
@@ -79,7 +79,7 @@ export function caveLoadout(hid: string): CaveLoadout {
   const weapon = weaponOf(w), off = offOf(o);
   return {
     weapon, weaponIcon: w?.icon ?? '👊', off, offIcon: o?.icon ?? '', pet: pet?.icon ?? null,
-    ...caveNumbers(heroStats(hid), weapon, off, getProfile(hid)?.heroClass),
+    ...caveNumbers(effectiveStats(hid), weapon, off, getProfile(hid)?.heroClass),
   };
 }
 

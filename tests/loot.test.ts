@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createHero, getHeroState, saveHeroState, type NewHero } from '../src/platform/profiles';
 import { generateItem, RARITIES, rollRarity, statBudget, upgradeCost, type Item } from '../src/platform/rpg/items';
 import {
+  effectiveStats, statExplain, statScale,
   addChest, buy, ensurePioneerChest, equip, getInv, heroStats, openChest, salvage, saveInv, syncPetItems, upgrade, effects,
 } from '../src/platform/rpg/inventory';
 import { advance, bossHit, findNode, finishRun, getArea, getPlay, recordAnswer, runOver, savePlay, startRun, today, hintsLeft } from '../src/platform/rpg/progress';
@@ -179,5 +180,22 @@ describe('utrustning i bossstrider – men aldrig på bekostnad av lärandet', (
     syncPetItems(old, lookup);
     expect(getInv(old).items.filter((x) => x.slot === 'husdjur')).toHaveLength(1);
     expect(getArea(old, 'tidstornet')).toBeTruthy();
+  });
+});
+
+describe('egenskapernas skala följer hjältens nivå', () => {
+  it('samma utrustning verkar mindre på högre nivå, men det som visas är detsamma', () => {
+    const hid = hero();
+    const inv = getInv(hid);
+    const it: Item = { ...generateItem(1, { ilvl: 5 }), stats: { kraft: 16 } };
+    inv.items.push(it);
+    inv.equipped.vapen = it.id;
+    saveInv(hid, inv);
+    expect(effectiveStats(hid).kraft).toBe(16);
+    saveHeroState(hid, { ...getHeroState(hid), level: 10 });
+    expect(statScale(10)).toBe(2);
+    expect(heroStats(hid).kraft).toBe(16);
+    expect(effectiveStats(hid).kraft).toBe(8);
+    expect(statExplain('kraft', heroStats(hid), false, 2)).toContain('Vid 24 Kraft');
   });
 });

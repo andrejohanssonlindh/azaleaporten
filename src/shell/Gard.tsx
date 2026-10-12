@@ -3,7 +3,7 @@ import { chestModal, dataRev, go, heroId, toast, touch } from '../state';
 import { getHeroState, getProfile, saveHeroState } from '../platform/profiles';
 import { getArea } from '../platform/rpg/progress';
 import { KUNSKAP_TITLE_LEVELS, kunskapLevel, levelTitle, needXP } from '../platform/rpg/balance';
-import { ensurePioneerChest, equip, getInv, heroStats, isEquipped, salvage, salvageCommon, statDiff, statExplain, syncPetItems, unequip } from '../platform/rpg/inventory';
+import { ensurePioneerChest, equip, getInv, heroStats, isEquipped, salvage, salvageCommon, statDiff, statExplain, statScale, syncPetItems, unequip } from '../platform/rpg/inventory';
 import { salvageValue, SLOTS, STATS, type Slot, type Stat } from '../platform/rpg/items';
 import { COSMETICS, getWardrobe, LOOK_SLOTS, owns, takeOff, unlockText, wear } from '../platform/rpg/wardrobe';
 import type { BossDef } from '../platform/rpg/types';
@@ -125,8 +125,8 @@ function HeroTab({ hid }: { hid: string }) {
           ))}
         </div>
         {stat
-          ? <p class="stat-explain"><b>{STATS.find((x) => x.id === stat)!.icon} {STATS.find((x) => x.id === stat)!.name}:</b> {statExplain(stat, st, ranger)}</p>
-          : <p class="note">Tryck på en egenskap så ser du vad den gör. Egenskaper hjälper i strider och med skatter – men svaren måste du alltid kunna själv!</p>}
+          ? <p class="stat-explain"><b>{STATS.find((x) => x.id === stat)!.icon} {STATS.find((x) => x.id === stat)!.name}:</b> {statExplain(stat, st, ranger, statScale(getHeroState(hid).level))}</p>
+          : <p class="note">Tryck på en egenskap så ser du vad den gör. Egenskaper hjälper i strider och med skatter – men svaren måste du alltid kunna själv! Ju högre nivå du har, desto fler poäng behövs, så bättre utrustning gör alltid nytta.</p>}
       </section>
 
       <section class="card">

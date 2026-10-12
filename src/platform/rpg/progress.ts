@@ -2,7 +2,7 @@ import { loadRecord, saveRecord, type RecordSpec } from '../storage/record';
 import { getHeroState, getProfile, heroKey, saveHeroState } from '../profiles';
 import { randomSeed, rngFrom, type Rng } from '../rng';
 import { BOSS, BOSS_HP_SCALE, CLEAR_MIN, FAST_MS, HINTS_PER_DAY, KUNSKAP_TITLE_LEVELS, kunskapLevel, LOOT, MASTERY, minHits, MOB, needXP, PRACTICE_LENGTH, REWARD, RUN_LENGTH, TIRED_AFTER_MS, XP } from './balance';
-import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, heroStats, useLifePotion, type Chest } from './inventory';
+import { addChest, bumpPity, effects, getInv, giveSignatureItem, givePetItem, effectiveStats, useLifePotion, type Chest } from './inventory';
 import type { Item } from './items';
 import { getEvents, logEvents, type LogEvent } from '../learning/events';
 import { noteAnswer } from '../learning/skills';
@@ -112,7 +112,7 @@ export function hintsLeft(hid: string): number {
   const prof = getProfile(hid);
   const inv = getInv(hid);
   const bonus = inv.bonusHints.day === today() ? inv.bonusHints.n : 0;
-  return Math.max(0, HINTS_PER_DAY + (prof?.heroClass === 'uppfinnare' ? 1 : 0) + effects.extraHints(heroStats(hid)) + bonus - getPlay(hid).hintsUsed);
+  return Math.max(0, HINTS_PER_DAY + (prof?.heroClass === 'uppfinnare' ? 1 : 0) + effects.extraHints(effectiveStats(hid)) + bonus - getPlay(hid).hintsUsed);
 }
 export function useHint(hid: string): boolean {
   if (hintsLeft(hid) < 1) return false;
@@ -128,7 +128,7 @@ export const isTired = (hid: string) => getPlay(hid).activeMs >= TIRED_AFTER_MS;
 export function giveXP(hid: string, areaId: string, base: number): { xp: number; levelUps: number } {
   if (base <= 0) return { xp: 0, levelUps: 0 };
   const cls = getProfile(hid)?.heroClass;
-  return addXP(hid, areaId, Math.round(base * (1 + (cls === 'trollkarl' ? XP.trollkarlBonus : 0) + effects.xpBonus(heroStats(hid)))));
+  return addXP(hid, areaId, Math.round(base * (1 + (cls === 'trollkarl' ? XP.trollkarlBonus : 0) + effects.xpBonus(effectiveStats(hid)))));
 }
 
 /** Lägger till XP exakt som den är (ingen bonus) till hjälten och områdets kunskap. */
@@ -184,7 +184,7 @@ export function runLength(run: RunState): number {
 /** Hjärtan i en bossstrid, uppdelat så att introt kan visa varifrån de kommer. */
 export function bossHearts(hid: string, potion: boolean) {
   const klass = getProfile(hid)?.heroClass === 'riddare' ? BOSS.riddareHearts : 0;
-  const skydd = effects.extraHearts(heroStats(hid));
+  const skydd = effects.extraHearts(effectiveStats(hid));
   const p = potion ? 1 : 0;
   return { base: BOSS.hearts, klass, skydd, potion: p, total: Math.min(BOSS.maxHearts, BOSS.hearts + klass + skydd + p) };
 }
@@ -192,7 +192,7 @@ export function bossHearts(hid: string, potion: boolean) {
 /** Skada per vanligt rätt svar mot en boss (utan snabbhet och fullträff), och ungefär hur många träffar som behövs. */
 export function bossPreview(hid: string, boss: BossDef) {
   const maxHp = boss.hp * BOSS_HP_SCALE;
-  const dmg = Math.min(effects.damage(heroStats(hid)), Math.floor(maxHp / minHits(boss.kind, boss.hp)));
+  const dmg = Math.min(effects.damage(effectiveStats(hid)), Math.floor(maxHp / minHits(boss.kind, boss.hp)));
   return { maxHp, dmg, hits: Math.ceil(maxHp / dmg) };
 }
 
@@ -284,7 +284,7 @@ export function recordAnswer(hid: string, run: RunState, node: PathNode, a: Answ
 /** Ett rätt svar slår till stigmonstret. Fullträffen slumpas ur seed + index, så en omladdning ger samma slag.
  *  Ett besegrat monster ger blad (inte när hjälten är trött) och nästa monster kliver fram. */
 function mobHit(hid: string, run: RunState, mob: MobState, ms: number): MobState {
-  const st = heroStats(hid);
+  const st = effectiveStats(hid);
   const ranger = getProfile(hid)?.heroClass === 'ranger';
   const crit = rngFrom(run.seed + run.index * 104729 + 17).next() < effects.critChance(st, ranger);
   const fast = ms < FAST_MS && effects.fastBonus(st) > 0;
@@ -302,7 +302,7 @@ function mobHit(hid: string, run: RunState, mob: MobState, ms: number): MobState
 /** Skada för ett rätt svar. Taket gör att ingen utrustning kan vinna med färre än minHits rätta svar. */
 export function bossHit(hid: string, run: RunState, boss: BossDef, ms: number): Hit {
   if (!run.hpScale) return { dmg: 1, crit: false }; // strid påbörjad före fas 3
-  const st = heroStats(hid);
+  const st = effectiveStats(hid);
   const ranger = getProfile(hid)?.heroClass === 'ranger';
   const crit = Math.random() < effects.critChance(st, ranger);
   const fast = ms < FAST_MS && effects.fastBonus(st) > 0;

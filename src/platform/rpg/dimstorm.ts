@@ -1,5 +1,5 @@
 import { getHeroState, getProfile, saveHeroState } from '../profiles';
-import { getInv, heroStats, type Stats } from './inventory';
+import { getInv, effectiveStats, type Stats } from './inventory';
 import type { Item } from './items';
 
 // Dimstormen: ett actionspel där hjälten står emot monster ur Glömskans dimma i några minuter.
@@ -84,7 +84,7 @@ export function stormLoadout(hid: string): Loadout {
     weapon: weaponOf(w), weaponIcon: w?.icon ?? '👊',
     off, offIcon: o?.icon ?? '',
     pet: pet?.icon ?? null,
-    ...stormNumbers(heroStats(hid), getProfile(hid)?.heroClass),
+    ...stormNumbers(effectiveStats(hid), getProfile(hid)?.heroClass),
   };
 }
 

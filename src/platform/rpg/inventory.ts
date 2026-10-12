@@ -55,6 +55,19 @@ export function heroStats(hid: string): Stats {
   return out;
 }
 
+/**
+ * Hur många poäng som behövs per effekt-poäng: på högre hjältenivå krävs fler poäng för samma effekt
+ * (nivå 1: ×1, nivå 10: ×2, nivå 19: ×3). Taken ligger kvar, så ny och bättre utrustning gör alltid nytta.
+ */
+export const statScale = (level: number) => 1 + (Math.max(1, level) - 1) / 9;
+
+/** Egenskaperna som de verkar i strider och minispel. Det som visas för barnet är alltid heroStats(). */
+export function effectiveStats(hid: string): Stats {
+  const f = statScale(getHeroState(hid).level);
+  const raw = heroStats(hid);
+  return Object.fromEntries(STATS.map((s) => [s.id, raw[s.id] / f])) as Stats;
+}
+
 export const effects = {
   /** Skada per rätt svar i bossstrid (bossens HP = träffar × 10). */
   damage: (s: Stats) => 10 + Math.min(4, Math.floor(s.kraft / 4)),
@@ -67,14 +80,15 @@ export const effects = {
   lootLuck: (s: Stats, ranger: boolean) => s.tur + (ranger ? 5 : 0),
 };
 
-const nextAt = (v: number, step: number, maxSteps: number) => (Math.floor(v / step) < maxSteps ? (Math.floor(v / step) + 1) * step : null);
-
-/** Vad en egenskap gör just nu, med hjältens egna siffror (visas när barnet trycker på den). */
-export function statExplain(stat: Stat, s: Stats, ranger: boolean): string {
+/** Vad en egenskap gör just nu, med hjältens egna siffror (visas när barnet trycker på den). raw = heroStats, scale = statScale(nivå). */
+export function statExplain(stat: Stat, raw: Stats, ranger: boolean, scale = 1): string {
+  const s = Object.fromEntries(STATS.map((x) => [x.id, raw[x.id] / scale])) as Stats;
+  // Nästa steg i barnets egna (visade) poäng.
+  const nextAt = (v: number, step: number, maxSteps: number) => (Math.floor(v / step) < maxSteps ? Math.ceil((Math.floor(v / step) + 1) * step * scale) : null);
   switch (stat) {
     case 'kraft': {
       const n = nextAt(s.kraft, 4, 4);
-      return `Varje rätt svar i en strid gör ${effects.damage(s)} skada (utan utrustning 10).${n ? ` Vid ${n} Kraft blir det ${effects.damage({ ...s, kraft: n })}.` : ' Det är max!'}`;
+      return `Varje rätt svar i en strid gör ${effects.damage(s)} skada (utan utrustning 10).${n ? ` Vid ${n} Kraft blir det ${effects.damage({ ...s, kraft: n / scale })}.` : ' Det är max!'}`;
     }
     case 'skydd': {
       const h = effects.extraHearts(s), n = nextAt(s.skydd, 6, 3);
@@ -128,7 +142,7 @@ export function openChest(hid: string, id: string): Item[] | null {
   const n = c.kind === 'pionjar' ? 2 : 1;
   if (spaceLeft(inv) < n) return null;
   const ranger = getProfile(hid)?.heroClass === 'ranger';
-  const tur = effects.lootLuck(heroStats(hid), ranger);
+  const tur = effects.lootLuck(effectiveStats(hid), ranger);
   const got: Item[] = [generateItem(c.seed, { ilvl: c.ilvl, minRarity: c.minRarity, tur })];
   if (c.kind === 'pionjar') {
     got.push(uniqueItem({

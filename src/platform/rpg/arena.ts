@@ -1,5 +1,5 @@
 import { getHeroState, getProfile, saveHeroState } from '../profiles';
-import { getInv, heroStats, type Stats } from './inventory';
+import { getInv, effectiveStats, type Stats } from './inventory';
 import type { Item } from './items';
 import { offOf, weaponOf, type OffKind, type WeaponKind } from './dimstorm';
 
@@ -126,7 +126,7 @@ export function duelLoadout(hid: string): DuelLoadout {
   const eq = (slot: Item['slot']) => inv.items.find((x) => x.id === inv.equipped[slot]);
   const w = eq('vapen'), o = eq('skold'), pet = eq('husdjur');
   const weapon = weaponOf(w), off = offOf(o);
-  return { weapon, weaponIcon: w?.icon ?? '👊', off, pet: pet?.icon ?? null, ...duelNumbers(heroStats(hid), weapon, off, getProfile(hid)?.heroClass) };
+  return { weapon, weaponIcon: w?.icon ?? '👊', off, pet: pet?.icon ?? null, ...duelNumbers(effectiveStats(hid), weapon, off, getProfile(hid)?.heroClass) };
 }
 
 /* ---------- polletter ---------- */
