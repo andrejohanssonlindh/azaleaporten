@@ -6,6 +6,7 @@ import { ANIMALS, CLASSES, type AnimalId, type ClassId } from '../content/heroes
 import { buyCosmetic, COSMETICS, getWardrobe, LOOK_SLOTS, owns, unlockText, wear, type Cosmetic } from '../platform/rpg/wardrobe';
 import { leaveToPicker } from '../session';
 import { HeroFigure } from './HeroFigure';
+import { ALL_LOOKS, LookFilter, lookMatch } from './LookFilter';
 import { BackBar, Screen } from './ui';
 
 // Skräddaren: köp utseende till hjältefiguren för kastanjer. Prova först – figuren högst upp visar hur det blir.
@@ -14,6 +15,7 @@ export function Skraddaren() {
   dataRev.value;
   const p = getProfile(heroId.value!);
   const [trying, setTrying] = useState<Cosmetic | null>(null);
+  const [f, setF] = useState(ALL_LOOKS);
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   const s = getHeroState(p.id);
   const w = getWardrobe(p.id);
@@ -28,10 +30,11 @@ export function Skraddaren() {
         {trying && <button class="btn small" onClick={() => setTrying(null)}>Sluta prova</button>}
       </section>
 
-      {LOOK_SLOTS.map((ls) => (
+      <LookFilter f={f} set={setF} />
+      {LOOK_SLOTS.filter((ls) => COSMETICS.some((c) => c.slot === ls.id && lookMatch(f, c))).map((ls) => (
         <section class="card" key={ls.id}>
           <h2>{ls.icon} {ls.name}</h2>
-          {COSMETICS.filter((c) => c.slot === ls.id).map((c) => {
+          {COSMETICS.filter((c) => c.slot === ls.id && lookMatch(f, c)).map((c) => {
             const has = owns(p.id, c, w);
             const worn = w.worn[c.slot] === c.id;
             return (

@@ -29,6 +29,7 @@ export function TopBar({ p }: { p: Profile }) {
       </button>
       <span class="row purses">
         {streakOf(p.id) > 0 && <span class="purse" title="Dagar i rad med alla uppdrag klara">🔥 {streakOf(p.id)}</span>}
+        {s.nycklar > 0 && <button class="purse" title="Spelnycklar: gör ett minispel till en skattrunda" onClick={() => go('spelon')}>🗝️ {s.nycklar}</button>}
         <span class="purse" title="Kastanjer">🌰 {s.kastanjer}</span>
       </span>
     </header>

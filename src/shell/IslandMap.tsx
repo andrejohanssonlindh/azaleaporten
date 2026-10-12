@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { dataRev, go, heroId, toast } from '../state';
-import { getProfile } from '../platform/profiles';
+import { getHeroState, getProfile } from '../platform/profiles';
 import { mistByArea } from '../platform/learning/skills';
 import { getArea, getPlay, nextOpenNode } from '../platform/rpg/progress';
 import { playable } from '../content/areas';
@@ -42,7 +42,7 @@ function Mist({ region, n }: { region: RegionId; n: number }) {
   );
 }
 
-function Island({ heroEmoji, mist }: { heroEmoji: string; mist: Partial<Record<RegionId, number>> }) {
+function Island({ heroEmoji, mist, keys }: { heroEmoji: string; mist: Partial<Record<RegionId, number>>; keys: number }) {
   return (
     <svg class="island" viewBox="0 0 400 520" role="group" aria-label="Karta över ön">
       <defs>
@@ -68,6 +68,13 @@ function Island({ heroEmoji, mist }: { heroEmoji: string; mist: Partial<Record<R
         {[0, 1, 2, 3].map((i) => <path key={i} d={`M342 30 L${342 + 13 * Math.cos((i * Math.PI) / 4)} ${30 + 13 * Math.sin((i * Math.PI) / 4)} M342 30 L${342 - 13 * Math.cos((i * Math.PI) / 4)} ${30 - 13 * Math.sin((i * Math.PI) / 4)}`} stroke="#e64980" stroke-width="1.2" />)}
         <path d="M336 50 L342 30 L348 50" stroke="#8d6e4a" stroke-width="2" fill="none" />
         <path d="M356 50 L364 36 L372 50 Z" fill="#ffd43b" stroke="#e8590c" stroke-width="1" />
+        {keys > 0 && (
+          <g class="isle-keys" aria-label={`${keys} ${keys === 1 ? 'spelnyckel' : 'spelnycklar'}`}>
+            <text x="318" y="20" font-size="18" text-anchor="middle" dominant-baseline="central">🗝️</text>
+            <circle class="isle-mist-badge" cx="331" cy="10" r="9" />
+            <text class="isle-mist-count" x="331" y="11" text-anchor="middle" dominant-baseline="central">{keys}</text>
+          </g>
+        )}
       </Spot>
 
       {/* Robotön: programmering */}
@@ -175,7 +182,7 @@ export function IslandMap() {
       <TopBar p={p} />
       <UpdateBanner />
       <KastanjGreeting p={p} compact />
-      <Island heroEmoji={animal(p.animal).emoji} mist={mist} />
+      <Island heroEmoji={animal(p.animal).emoji} mist={mist} keys={getHeroState(p.id).nycklar} />
       {cont && (
         <button class="btn primary big continue" onClick={() => go(`spela/${cont.areaId}/${cont.node.id}`)}>
           {cont.icon} Fortsätt: {cont.node.name}

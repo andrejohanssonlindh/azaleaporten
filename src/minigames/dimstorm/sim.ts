@@ -246,7 +246,8 @@ function levelCheck(g: Game) {
 
 /* ---------- vapnen ---------- */
 
-const WEAPON_CD: Record<WeaponKind, number> = { svard: 0.6, yxa: 1.0, stav: 0.75, bage: 0.5, hammare: 1.4, nava: 0.55 };
+// Närstrid slår hårdare än skott: man måste gå nära monstren för att träffa.
+const WEAPON_CD: Record<WeaponKind, number> = { svard: 0.6, yxa: 1.0, stav: 0.75, bage: 0.5, hammare: 1.25, nava: 0.55 };
 
 /** Försöker attackera. Returnerar false om inget monster var inom räckhåll (då väntar vapnet). */
 function attack(g: Game): boolean {
@@ -254,7 +255,7 @@ function attack(g: Game): boolean {
   switch (w) {
     case 'svard':
     case 'nava': {
-      const reach = (w === 'svard' ? 50 : 40) * rm, spread = w === 'svard' ? 1.15 : 1.0, base = w === 'svard' ? 12 : 10;
+      const reach = (w === 'svard' ? 50 : 40) * rm, spread = w === 'svard' ? 1.15 : 1.0, base = w === 'svard' ? 16 : 12;
       const t = nearest(g, h.x, h.y, reach + 22);
       if (!t) return false;
       const a0 = Math.atan2(t.y - h.y, t.x - h.x);
@@ -278,7 +279,7 @@ function attack(g: Game): boolean {
       g.fx.push({ kind: 'ring', x: h.x, y: h.y, r: reach, t: 0, ttl: 0.25, color: '#ffd43b' });
       for (const f of g.foes) {
         if (dist2(h.x, h.y, f.x, f.y) > (reach + f.r) ** 2) continue;
-        const { dmg, crit } = roll(g, 16 * (1 + 0.2 * g.ups.fler));
+        const { dmg, crit } = roll(g, 20 * (1 + 0.2 * g.ups.fler));
         hurt(g, f, dmg, crit, 150, h);
       }
       return true;
@@ -309,7 +310,7 @@ function attack(g: Game): boolean {
       g.fx.push({ kind: 'ring', x: h.x, y: h.y, r: reach, t: 0, ttl: 0.35, color: '#e8590c' });
       for (const f of g.foes) {
         if (dist2(h.x, h.y, f.x, f.y) > (reach + f.r) ** 2) continue;
-        const { dmg, crit } = roll(g, 11);
+        const { dmg, crit } = roll(g, 20);
         hurt(g, f, dmg, crit, 40, h);
         if (!f.boss) f.stun = Math.max(f.stun, 0.8 + 0.3 * g.ups.fler);
       }

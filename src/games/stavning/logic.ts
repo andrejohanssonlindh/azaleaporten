@@ -1,4 +1,5 @@
 import type { Rng } from '../../platform/rng';
+import { PAUS } from '../../platform/speech';
 import type { QuestionCtx, QuestionSpec } from '../../platform/rpg/types';
 import { avoid, core, deckPick, same } from '../../engines/ord/check';
 import type { Alt, Explained, OrdQ } from '../../engines/ord/types';
@@ -141,7 +142,7 @@ function ownQ(word: string, rng: Rng): SQ {
   const e = ownEntry(word);
   return {
     mode: `${VECKANS_MODE}${word}`, level: 1, skill: `sv.veckans.${word}`, rule: 'egen', answer: word, caseStrict: isCap(word),
-    kind: 'skriv', prompt: 'Lyssna och skriv veckans ord.', alts: rng.shuffle([{ text: word }, ...distractors(e)]), say: `${word}. ${word}.`,
+    kind: 'skriv', prompt: 'Lyssna och skriv veckans ord.', alts: rng.shuffle([{ text: word }, ...distractors(e)]), say: `${word}.${PAUS}${word}.`,
   };
 }
 
@@ -175,7 +176,7 @@ export function makeQ(spec: QuestionSpec, rng: Rng, ctx?: QuestionCtx): SQ {
   return {
     ...base, kind: 'skriv', sentence, alts,
     prompt: e.rule === 'stor' ? 'Lyssna och skriv ordet som fattas. Stor eller liten bokstav?' : 'Lyssna och skriv ordet som fattas.',
-    say: `${e.word}. ${e.sentence} ${e.word}.`,
+    say: `${e.word}.${PAUS}${e.sentence}${PAUS}${e.word}.`,
   };
 }
 

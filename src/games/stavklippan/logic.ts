@@ -1,4 +1,5 @@
 import type { Rng } from '../../platform/rng';
+import { PAUS } from '../../platform/speech';
 import type { QuestionCtx, QuestionSpec } from '../../platform/rpg/types';
 import { avoid, deckPick, mentions, same } from '../../engines/ord/check';
 import type { Alt, Explained, OrdQ } from '../../engines/ord/types';
@@ -194,7 +195,7 @@ export function makeQ(spec: QuestionSpec, rng: Rng, ctx?: QuestionCtx): KQ {
   }
   const alts = rng.shuffle([{ text: e.en }, ...wrong]);
   if (level === 0) return { ...base, kind: 'val', prompt: `Hur stavas "${e.sv}" på engelska?`, pic: e.pic || undefined, alts, say: e.en };
-  return { ...base, kind: 'skriv', prompt: `Lyssna och skriv på engelska: "${e.sv}"`, pic: e.pic || undefined, alts, say: `${e.en}. ${e.en}.` };
+  return { ...base, kind: 'skriv', prompt: `Lyssna och skriv på engelska: "${e.sv}"`, pic: e.pic || undefined, alts, say: `${e.en}.${PAUS}${e.en}.` };
 }
 
 export function specsForSkill(skill: string): QuestionSpec[] {

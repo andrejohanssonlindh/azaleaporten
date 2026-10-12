@@ -100,7 +100,7 @@ export const DUEL_WEAPONS: Record<WeaponKind, { name: string; does: string; dmg:
 };
 
 export const DUEL_OFFHANDS: Record<Exclude<OffKind, null>, string> = {
-  skold: 'blockerar helt, och efter en blockering är motståndaren yr',
+  skold: 'blockerar du precis när slaget kommer tar du ingen skada, och motståndaren blir yr',
   trollbok: 'laddar superslaget snabbare',
   lykta: 'lyser upp så att du ser slagen tidigare',
 };

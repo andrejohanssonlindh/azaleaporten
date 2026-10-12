@@ -3,13 +3,16 @@ import { ARENA, MOVES, OPPONENTS, type DuelLoadout, type MoveId } from '../../pl
 
 // Bossduellens motor: ren logik utan DOM. Tre banor (vänster, mitten, höger). Motståndaren laddar upp ett drag
 // och visar vilka banor det träffar; hjälten hoppar undan (en stund, sedan tillbaka till mitten) eller blockerar.
-// Ett slag som missar gör motståndaren yr, och då gör hjältens slag full skada.
+// Ett slag som missar gör motståndaren yr, och då gör hjältens slag full skada. Att hoppa undan är det säkra;
+// en parad med skölden kräver att man blockerar precis när slaget kommer.
 
 export type Lane = -1 | 0 | 1;
 export type FoeState = 'idle' | 'wind' | 'strike' | 'open';
 
 export const HOP_SECS = 0.7;
 export const BLOCK_SECS = 0.5;
+/** Skölden parerar bara ett slag som kommer så här kort efter att man blockerat; tidigare tar den bara udden av det. */
+export const PARRY_SECS = 0.35;
 const BLOCK_CD = 0.85;
 const STRIKE_SECS = 0.3;
 
@@ -144,7 +147,7 @@ function strike(d: Duel) {
   f.strikes++;
   const hit = f.lanes[h.lane + 1];
   let dodged = !hit;
-  if (hit && h.block > 0 && d.lo.parry) { dodged = true; say(d, '🛡️ Parerat!', 'hero', true); }
+  if (hit && h.block > 0 && d.lo.parry && h.block >= BLOCK_SECS - PARRY_SECS) { dodged = true; say(d, '🛡️ Parerat!', 'hero', true); }
   else if (hit) {
     const raw = o.atk * MOVES[f.move!].dmg * (0.9 + d.rng.next() * 0.2) - d.lo.armor;
     const n = Math.max(1, Math.round(h.block > 0 ? raw * 0.4 : raw));

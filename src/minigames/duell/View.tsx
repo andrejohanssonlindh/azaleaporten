@@ -45,7 +45,7 @@ export default function DuelGame({ hid, start, seed, onWin, onEnd }: {
           beaten.current.push({ foe: duel.foe.idx, blad });
           setUiBoth(duel.foe.idx >= OPPONENTS.length - 1 ? 'over' : 'between');
         } else if (duel.phase === 'lost') setUiBoth('over');
-      } else step(duel, dt);
+      } else for (const e of duel.fx) e.t += dt; // Motståndaren väntar tills man tryckt på Strid.
       setFrame((n) => n + 1);
     };
     raf = requestAnimationFrame(frame);
@@ -116,7 +116,14 @@ export default function DuelGame({ hid, start, seed, onWin, onEnd }: {
           <div class="storm-overlay">
             <h2>{o.icon} {o.name}</h2>
             <p>{o.tip}</p>
-            <p class="small">När banorna blir <b style={{ color: '#ff8787' }}>röda</b> kommer ett slag dit. Hoppa till en ruta som inte är röd precis innan den blir helt fylld. När motståndaren är yr 💫: slå så mycket du hinner!</p>
+            {beaten.current.length === 0 ? (
+              <ul class="duel-howto small">
+                <li>När en ruta blir <b style={{ color: '#ff8787' }}>röd</b> kommer ett slag dit. Hoppa ⬅️ ➡️ till en ruta som inte är röd, precis innan den blir helt fylld.</li>
+                <li>Missar slaget blir motståndaren yr 💫. Slå ⚔️ så mycket du hinner! Annars blockerar den dina slag.</li>
+                <li>🛡️ Blockera tar bort det mesta av skadan. Stampen träffar alla rutor, så den måste du blockera.{lo.parry ? ' Med en sköld: blockera precis när slaget kommer, så tar du ingen skada alls och motståndaren blir yr.' : ''}</li>
+                <li>Varje slag du klarar laddar ✨ Superslaget.</li>
+              </ul>
+            ) : <p class="small">Hoppa undan de röda rutorna och slå när den är yr 💫!</p>}
             <button class="btn primary big" onClick={() => setUiBoth('fight')}>⚔️ Strid!</button>
           </div>
         )}

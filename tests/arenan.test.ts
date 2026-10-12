@@ -83,6 +83,16 @@ describe('Bossduellen: striden', () => {
     expect(shield.foe.state).toBe('open');
   });
 
+  it('skölden parerar bara om man blockerar precis när slaget kommer', () => {
+    const d = newDuel(lo(0, 'svard', 'skold'), 0, 1);
+    d.foe.state = 'wind'; d.foe.move = 'slag'; d.foe.lanes = [...MOVES.slag.lanes]; d.foe.hitsLeft = 1; d.foe.t = 0; d.foe.dur = 1;
+    tick(d, 0.5);
+    press(d, 'block');
+    tick(d, 0.6);
+    expect(d.hero.hp).toBeLessThan(d.hero.maxHp);
+    expect(d.foe.state).not.toBe('open');
+  });
+
   it('finten byter sida halvvägs', () => {
     const d = newDuel(lo(0), 7, 1);
     d.foe.state = 'wind'; d.foe.move = 'finte'; d.foe.lanes = [...MOVES.finte.lanes]; d.foe.hitsLeft = 1; d.foe.t = 0; d.foe.dur = 1;

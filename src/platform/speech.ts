@@ -33,17 +33,38 @@ export const hasVoice = (lang: Lang = 'sv-SE') => !!voiceFor(lang);
 
 export const canSpeak = () => !!synth();
 
+/** Skriver om ord som rösten läser som förkortningar ("dam" blir annars "dekameter"). */
+const ALIAS: Partial<Record<Lang, Record<string, string>>> = {
+  'sv-SE': { dam: 'daam', damen: 'daamen', damer: 'daamer' },
+};
+export function sayable(text: string, lang: Lang): string {
+  const a = ALIAS[lang];
+  return a ? text.replace(/[A-Za-zÅÄÖåäö]+/g, (w) => a[w.toLowerCase()] ?? w) : text;
+}
+
+/** Pausmarkör: "ord. | En mening. | ord." läses i tre delar med en kort tystnad emellan. */
+export const PAUS = ' | ';
+const PAUS_MS = 650;
+let turn = 0;
+
 export function speak(text: string, lang: Lang = 'sv-SE', rate = 0.95) {
   try {
     const s = synth();
     if (!s) return;
     s.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang;
+    const my = ++turn;
+    const parts = text.split('|').map((p) => p.trim()).filter(Boolean);
     const v = voiceFor(lang, listVoices());
-    if (v) u.voice = v;
-    u.rate = rate;
-    s.speak(u);
+    const say = (i: number) => {
+      if (my !== turn || i >= parts.length) return;
+      const u = new SpeechSynthesisUtterance(sayable(parts[i], lang));
+      u.lang = lang;
+      if (v) u.voice = v;
+      u.rate = rate;
+      if (i + 1 < parts.length) u.onend = () => setTimeout(() => say(i + 1), PAUS_MS);
+      s.speak(u);
+    };
+    say(0);
   } catch {
     /* uppläsning saknas på enheten */
   }

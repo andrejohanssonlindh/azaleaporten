@@ -14,6 +14,7 @@ import { leaveToPicker } from '../session';
 import { bossName } from './AreaView';
 import { ItemCard } from './Loot';
 import { HeroFigure } from './HeroFigure';
+import { ALL_LOOKS, LookFilter, lookMatch } from './LookFilter';
 import { BackBar, Screen } from './ui';
 import { SparaHjalte } from './HjalteFil';
 
@@ -183,12 +184,14 @@ function HeroTab({ hid }: { hid: string }) {
 function WardrobeTab({ hid }: { hid: string }) {
   dataRev.value; // underkomponenter måste själva lyssna, annars hoppar signals över dem
   const w = getWardrobe(hid);
+  const [f, setF] = useState(ALL_LOOKS);
   return (
     <section class="card">
       <div class="center"><HeroFigure hid={hid} size={150} /></div>
-      {LOOK_SLOTS.map((ls) => {
-        const mine = COSMETICS.filter((c) => c.slot === ls.id && owns(hid, c, w));
-        const locked = COSMETICS.filter((c) => c.slot === ls.id && c.unlock && !owns(hid, c, w));
+      <LookFilter f={f} set={setF} />
+      {LOOK_SLOTS.filter((ls) => f.slot === 'alla' || f.slot === ls.id).map((ls) => {
+        const mine = COSMETICS.filter((c) => c.slot === ls.id && lookMatch(f, c) && owns(hid, c, w));
+        const locked = COSMETICS.filter((c) => c.slot === ls.id && lookMatch(f, c) && c.unlock && !owns(hid, c, w));
         return (
           <div key={ls.id}>
             <h3>{ls.icon} {ls.name}</h3>
