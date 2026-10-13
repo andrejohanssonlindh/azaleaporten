@@ -28,9 +28,9 @@ export const lessonForNode = (def: AreaDef, nodeId: string): LessonMeta | undefi
 export const lessonForSkill = (def: AreaDef, skill: string): LessonMeta | undefined =>
   def.lessons?.find((l) => l.skills?.some((s) => (s.endsWith('.') ? skill.startsWith(s) : skill === s)));
 
-/** Hur det har gått på lektionens banor den senaste tiden (de senaste svaren, oavsett runda). */
-export function recentNudge(hid: string, areaId: string, lesson: LessonMeta): Nudge {
-  const recent = getEvents(hid).filter((e) => e.a === areaId && lesson.nodes.includes(e.n)).slice(-LEKTION.window);
+/** Hur det har gått på lektionens banor den senaste tiden (de senaste svaren, oavsett runda). Skicka med events när många lektioner kollas. */
+export function recentNudge(hid: string, areaId: string, lesson: LessonMeta, events = getEvents(hid)): Nudge {
+  const recent = events.filter((e) => e.a === areaId && lesson.nodes.includes(e.n)).slice(-LEKTION.window);
   return nudgeFor(recent.map((e) => ({ correct: e.c })));
 }
 

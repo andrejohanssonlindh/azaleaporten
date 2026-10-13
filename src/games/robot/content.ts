@@ -47,6 +47,10 @@ export const KODSTIGEN: AreaDef = {
   kunskap: { name: 'Robotstyrning', icon: '🧭', titles: ['Robotförare', 'Robotkaptenen'] },
   texts: { cleared: 'Roboten kom hela vägen fram!', notYet: 'Nio rätt av tio behövs för att roboten ska hitta hem – försök igen!', back: 'Till stigen' },
   story: 'På Robotön rullar små robotar omkring som bara gör exakt det man säger åt dem. De behöver batterier för att orka, men de hittar inte själva. Bygg program som tar dem till 🔋 – steg för steg!',
+  lessons: [
+    { id: 'program-och-pilar', title: 'Program och pilar', icon: '⬆️', desc: 'En lista som roboten gör i ordning', nodes: ['forsta-stegen', 'vart-tar-den-vagen', 'runt-stenarna', 'langre-vagar', 'hoppetossan'], skills: ['prog.kod.pilar'] },
+    { id: 'robotens-hall', title: 'Robotens vänster', icon: '🤖', desc: 'Fram och svängar från robotens håll', nodes: ['fram-och-svang', 'robotens-vanster', 'svangar-och-stenar', 'spegeltrollet'], skills: ['prog.kod.svang'] },
+  ],
   eras: [
     { id: 'startrutan', name: 'Startrutan', icon: '🟩', fact: 'En robot gör precis det du säger – inte mer och inte mindre. Ett program är en lista med instruktioner.',
       nodes: [
@@ -115,6 +119,11 @@ export const LOOPVERKSTADEN: AreaDef = {
   kunskap: { name: 'Loopar', icon: '🔁', titles: ['Loopsnickaren', 'Loopverkstadens chef'] },
   texts: { cleared: 'Maskinerna snurrar som de ska!', notYet: 'Nio rätt av tio behövs för att få igång maskinerna – försök igen!', back: 'Till verkstaden' },
   story: 'I Loopverkstaden bygger robotarna saker – samma sak om och om igen. Men programmen blir alldeles för långa! Lär dig loopar, så kan ett kort program göra jättemycket.',
+  lessons: [
+    { id: 'loopar', title: 'Loopar', icon: '🔁', desc: 'Upprepa – och räkna varven', nodes: ['hur-manga-varv', 'folj-loopen', 'bygg-med-loop', 'varv-och-svangar', 'ekorren-ett-till'] },
+    { id: 'monster-i-loopen', title: 'Mönster i loopen', icon: '🔂', desc: 'Hela mönstret görs om varje varv', nodes: ['snurran', 'monster-i-loopen', 'trappan'] },
+    { id: 'loop-i-loop', title: 'Loop i loop', icon: '🪆', desc: 'Den inre loopen körs klart varje varv', nodes: ['loop-i-loopen', 'diamantloopen', 'bygg-loop-i-loop'] },
+  ],
   eras: [
     { id: 'transportbandet', name: 'Transportbandet', icon: '🔁', fact: 'En loop upprepar samma block flera gånger. I stället för ➡ ➡ ➡ ➡ kan du skriva 🔁 4 × ➡.',
       nodes: [
@@ -169,6 +178,9 @@ export const BUGGJAKTEN: AreaDef = {
   kunskap: { name: 'Felsökning', icon: '🐞', titles: ['Buggspanaren', 'Mästerdetektiven'] },
   texts: { cleared: 'Buggen är fångad!', notYet: 'Nio rätt av tio behövs för att fånga buggarna – försök igen!', back: 'Till buggjakten' },
   story: 'Små buggar har krupit in i robotarnas program, och nu krockar robotarna överallt. Testkör programmen, se var det går fel och hitta blocket som är buggigt!',
+  lessons: [
+    { id: 'hitta-buggen', title: 'Hitta buggen', icon: '🐞', desc: 'Felet sitter där roboten först går fel', nodes: ['forsta-buggen', 'ramlat-block', 'svangbuggen', 'langre-program', 'skyll-pa-sista-buggen', 'buggar-i-loopar'] },
+  ],
   eras: [
     { id: 'myrstacken', name: 'Myrstacken', icon: '🐜', fact: 'Ett fel i ett program kallas en bugg. Ordet blev känt när en riktig mal fastnade i en dator år 1947!',
       nodes: [

@@ -386,3 +386,10 @@ export function robotModule<Q extends RobotQ>(g: RobotGame<Q>): GameModule {
   };
 }
 
+
+/** Bilder till Klassrummet: en värld (och var roboten hamnar, om ett program ges) och ett program. */
+export function VarldBild({ world, prog }: { world: World; prog?: Prog }) {
+  const trace = prog ? run(world, prog) : null;
+  return <Grid world={world} trace={trace} frame={trace ? trace.states.length - 1 : 0} />;
+}
+export const ProgramBild = ({ prog, label }: { prog: Prog; label?: string }) => <ProgView prog={prog} label={label} />;

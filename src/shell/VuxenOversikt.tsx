@@ -1,4 +1,5 @@
-import { getProfile, type Profile } from '../platform/profiles';
+import { getHeroState, getProfile, type Profile } from '../platform/profiles';
+import { lessonKey, recentNudge } from '../platform/learning/lektioner';
 import { getEvents, type LogEvent } from '../platform/learning/events';
 import { dayOf, getSkills } from '../platform/learning/skills';
 import { minutesPerDay, sessions, skillColor, topErrors, type SkillColor } from '../platform/learning/stats';
@@ -12,6 +13,22 @@ import { Avatar } from './ui';
 // vanligaste felen och de senaste passen. Allt räknas ur det som redan sparas på enheten.
 
 const areaTitle = (a: string) => PLAYABLE[a]?.def.title ?? a;
+
+/** Lektioner barnet har gått igenom, och de som kan behövas (många fel på banorna nyligen, inte lästa). */
+function Lessons({ hid }: { hid: string }) {
+  const read = getHeroState(hid).lektioner;
+  const events = getEvents(hid);
+  const all = Object.values(PLAYABLE).flatMap((pl) => (pl.def.lessons ?? []).map((l) => ({ area: pl.def.areaId, l })));
+  const done = all.filter(({ area, l }) => read[lessonKey(area, l.id)]);
+  const need = all.filter(({ area, l }) => !read[lessonKey(area, l.id)] && recentNudge(hid, area, l, events) !== 'none');
+  if (!done.length && !need.length) return <p class="muted">Inga lektioner lästa än. De finns bredvid banorna i matteområdena (📖).</p>;
+  return (
+    <ul class="plain">
+      {need.length > 0 && <li><b>Kan behövas:</b> {need.map(({ area, l }) => `${l.title} (${areaTitle(area)})`).join(', ')}</li>}
+      {done.length > 0 && <li><b>Lästa ({done.length}):</b> {done.map(({ area, l }) => `${l.title} (${areaTitle(area)})`).join(', ')}</li>}
+    </ul>
+  );
+}
 const weekday = (day: string) => new Date(`${day}T12:00`).toLocaleDateString('sv-SE', { weekday: 'short' }).replace('.', '');
 const dateLong = (day: string) => new Date(`${day}T12:00`).toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' });
 /** Minuter, men "<1" när det har övats lite (så att en dag med övning aldrig ser tom ut). */
@@ -151,6 +168,8 @@ export function HeroOverview({ hid }: { hid: string }) {
       <SkillMap hid={hid} />
       <h3>Vanligaste felen</h3>
       {errs.length ? <ul class="plain">{errs.map(([a, e]) => <AreaErrors key={a} areaId={a} errs={e} />)}</ul> : <p class="muted">Inga återkommande fel än.</p>}
+      <h3>Klassrummet</h3>
+      <Lessons hid={hid} />
       <h3>Senaste passen</h3>
       <Sessions events={events} />
     </details>
