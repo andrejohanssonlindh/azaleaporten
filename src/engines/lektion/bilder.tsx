@@ -12,7 +12,7 @@ export function Tavla({ rader, label }: { rader: TavlaRad[]; label?: string }) {
     <div class="lb-board" role="img" aria-label={label ?? rader.map((r) => (typeof r === 'string' ? r : r[0])).join(', ')}>
       {rader.map((r, i) => {
         const [t, k] = typeof r === 'string' ? [r, ''] : r;
-        return <span key={i} class={k ? `lb-${k}` : ''} style={{ whiteSpace: 'pre' }}>{t}</span>;
+        return <span key={i} class={k ? `lb-${k}` : ''} style={{ whiteSpace: 'pre-wrap' }}>{t}</span>;
       })}
     </div>
   );

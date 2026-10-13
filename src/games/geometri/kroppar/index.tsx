@@ -1,4 +1,5 @@
 import { drillModule } from '../../../engines/drill/DrillView';
+import { LEKTIONER } from './lektioner';
 import type { DrillGame } from '../../../engines/drill/types';
 import { Fig, path, Txt, type Pt } from '../draw';
 import { diagnose, ERR, explain, hint, makeQ, notes, solution, SOLIDS, specsForSkill, type KQ } from './logic';
@@ -127,6 +128,6 @@ function Visual({ q }: { q: KQ; hint: boolean; done: boolean }) {
   }
 }
 
-export const kropparGame: DrillGame<KQ> = { id: 'kroppar', make: makeQ, specsForSkill, diagnose, explain, solution, hint, notes, Visual, errLabels: ERR };
+export const kropparGame: DrillGame<KQ> = { id: 'kroppar', make: makeQ, specsForSkill, diagnose, explain, solution, hint, notes, Visual, errLabels: ERR, lessons: LEKTIONER };
 
 export const kroppar = drillModule(kropparGame);

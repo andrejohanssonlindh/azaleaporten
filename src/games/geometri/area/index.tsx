@@ -1,4 +1,5 @@
 import { drillModule } from '../../../engines/drill/DrillView';
+import { LEKTIONER } from './lektioner';
 import type { DrillGame } from '../../../engines/drill/types';
 import { Cells, Fig, fit, Poly, RightMarks, SideLabels, sv, Txt, type Pt } from '../draw';
 import { diagnose, ERR, explain, hint, makeQ, notes, solution, specsForSkill, type AQ } from './logic';
@@ -96,6 +97,6 @@ function Visual({ q, hint: h }: { q: AQ; hint: boolean; done: boolean }) {
   }
 }
 
-export const areaGame: DrillGame<AQ> = { id: 'area', make: makeQ, specsForSkill, diagnose, explain, solution, hint, notes, Visual, errLabels: ERR };
+export const areaGame: DrillGame<AQ> = { id: 'area', make: makeQ, specsForSkill, diagnose, explain, solution, hint, notes, Visual, errLabels: ERR, lessons: LEKTIONER };
 
 export const area = drillModule(areaGame);

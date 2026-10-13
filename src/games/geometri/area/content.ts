@@ -47,6 +47,13 @@ export const BRYGGERIET: AreaDef = {
   kunskap: { name: 'Ytkraft', icon: '🟩', titles: ['Rutfyllare', 'Ytexpert'] },
   texts: { cleared: 'Golvet är lagt!', notYet: 'Minst 9 rätt för att lägga golvet – försök igen!', back: 'Till Bryggeriet' },
   story: 'I det gamla bryggeriet finns en skejtpark inomhus. Nu ska det läggas nya golv och ramper – men ingen vet hur stora ytorna är! Kantkrypet har bara mätt kanterna. Hjälp till att räkna ut arean. Nio rätt av tio, så är golvet lagt.',
+  lessons: [
+    { id: 'vad-ar-area', title: 'Vad är area?', icon: '🟩', desc: 'Rutor, rader gånger kolumner', nodes: ['rakna-rutor', 'rader-och-kolumner', 'kantkrypet', 'kluriga-ytor'], skills: ['ma.geo.area-rutor'] },
+    { id: 'rektangelns-area', title: 'Rektangelns area', icon: '▭', desc: 'Längd gånger bredd, och sidan som fattas', nodes: ['utan-rutor', 'sidan-som-fattas', 'stora-hallar', 'decimalgolvet'], skills: ['ma.geo.area-rektangel', 'ma.geo.area-saknad', 'ma.geo.area-decimal'] },
+    { id: 'halva-rutor', title: 'Halva rutor', icon: '◩', desc: 'Två halva blir en hel', nodes: ['halva-rutor', 'halva-rektangeln'], skills: ['ma.geo.area-halva'] },
+    { id: 'triangelns-area', title: 'Triangelns area', icon: '🔺', desc: 'En halv rektangel – och höjden står rakt upp', nodes: ['trianglar', 'dubbeldraken', 'hojden', 'sneda-tak'], skills: ['ma.geo.area-triangel'] },
+    { id: 'sammansatt', title: 'Sammansatta figurer', icon: '📐', desc: 'Dela upp i rektanglar', nodes: ['l-golvet'], skills: ['ma.geo.area-sammansatt'] },
+  ],
   eras: [
     { id: 'lagerhallen', name: 'Lagerhallen', icon: '📦', fact: 'Area är hur stor en yta är. Man kan mäta den i rutor: hur många rutor får plats?',
       nodes: [

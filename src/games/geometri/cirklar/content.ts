@@ -48,6 +48,12 @@ export const STAPELBADDSPARKEN: AreaDef = {
   kunskap: { name: 'Cirkelkraft', icon: '⭕', titles: ['Cirkelritare', 'Pi-kännare'] },
   texts: { cleared: 'Perfekt landning!', notYet: 'Minst 9 rätt för att landa – försök igen!', back: 'Till Stapelbäddsparken' },
   story: 'Stapelbäddsparken nere vid hamnen är den största parken av alla. Här finns bowlar, rundade ramper och hjul som snurrar – allt är cirklar! Här får du ta fram räknaren och formelkortet, precis som på ett riktigt prov. Nio rätt av tio, så landar du.',
+  lessons: [
+    { id: 'radie-diameter', title: 'Radie och diameter', icon: '⭕', desc: 'Från mitten eller tvärs över?', nodes: ['radie-och-diameter', 'diameterduvan', 'halva-centimetrar'], skills: ['ma.geo.radie-diameter'] },
+    { id: 'skala', title: 'Skala', icon: '📐', desc: 'Ritningar och förstoringar', nodes: ['ritningen', 'stora-ritningar', 'forstoring'], skills: ['ma.geo.skala', 'ma.geo.skala-forstoring'] },
+    { id: 'cirkelns-omkrets', title: 'Cirkelns omkrets', icon: '🛞', desc: 'π gånger diametern', nodes: ['runt-hjulet', 'fran-radien', 'piraten-pilos', 'hur-langt-rullar', 'baklanges'], skills: ['ma.geo.cirkel-omkrets'] },
+    { id: 'cirkelns-area', title: 'Cirkelns area', icon: '🟠', desc: 'π gånger radien gånger radien', nodes: ['cirkelns-yta', 'fran-diametern', 'halva-bowlar', 'blandade-bowlar'], skills: ['ma.geo.cirkel-area', 'ma.geo.cirkel-delar'] },
+  ],
   eras: [
     { id: 'hamnen', name: 'Hamnen', icon: '⚓', fact: 'Radien går från mitten till kanten. Diametern går tvärs över, genom mitten – den är två radier lång.',
       nodes: [

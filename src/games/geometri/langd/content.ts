@@ -47,6 +47,12 @@ export const OXIE: AreaDef = {
   kunskap: { name: 'Mätkraft', icon: '📏', titles: ['Måttbandsbärare', 'Millimeterjägare'] },
   texts: { cleared: 'Måttet stämmer!', notYet: 'Minst 9 rätt för att klara rampen – försök igen!', back: 'Till Oxie' },
   story: 'I Oxie skatepark mäts allt: ramper, räcken och hela banan runt. Men Mätmasken och Kantkrabban har mätt fel överallt, och nu passar ingenting! Hjälp till att mäta rätt. Nio rätt av tio klarar en ramp.',
+  lessons: [
+    { id: 'linjalen', title: 'Mäta med linjal', icon: '📏', desc: 'Från noll – och när det inte börjar på noll', nodes: ['fran-noll', 'mitt-pa-linjalen', 'matmasken', 'halva-centimetrar', 'millimeter'], skills: ['ma.geo.linjal', 'ma.geo.linjal-mm'] },
+    { id: 'enheter', title: 'Längdenheter', icon: '🔁', desc: 'Trappan: km, m, dm, cm och mm', nodes: ['enheterna', 'byt-enhet', 'stora-tal', 'decimaler'], skills: ['ma.geo.langdenheter', 'ma.geo.langdenheter-decimal'] },
+    { id: 'omkrets', title: 'Omkrets', icon: '🔲', desc: 'Gå runt hela figuren', nodes: ['runt-rampen', 'mitt-emot', 'kantkrabban', 'manga-sidor', 'l-formen'], skills: ['ma.geo.omkrets', 'ma.geo.omkrets-kluriga'] },
+    { id: 'sidan-som-fattas', title: 'Sidan som fattas', icon: '❓', desc: 'Räkna baklänges från omkretsen', nodes: ['sidan-som-fattas', 'stora-planen'], skills: ['ma.geo.omkrets-saknad'] },
+  ],
   eras: [
     { id: 'verkstaden', name: 'Verkstaden', icon: '🔧', fact: 'Längden är från där något börjar till där det slutar. Börjar det på noll kan du läsa av direkt.',
       nodes: [

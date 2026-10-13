@@ -1,4 +1,5 @@
 import { drillModule } from '../../../engines/drill/DrillView';
+import { LEKTIONER } from './lektioner';
 import type { DrillGame } from '../../../engines/drill/types';
 import { CornerDots, Fig, fit, Poly } from '../draw';
 import { diagnose, ERR, explain, hint, makeQ, NAMES, solution, specsForSkill, type FQ, type Shape } from './logic';
@@ -38,6 +39,6 @@ function Shapes({ q, hint: showHint, done }: { q: FQ; hint: boolean; done: boole
   return <Fig w={300} h={180} label={label}><One s={s} x={70} y={22} w={160} h={136} dots={dots} /></Fig>;
 }
 
-export const formerGame: DrillGame<FQ> = { id: 'former', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: Shapes, errLabels: ERR };
+export const formerGame: DrillGame<FQ> = { id: 'former', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: Shapes, errLabels: ERR, lessons: LEKTIONER };
 
 export const former = drillModule(formerGame);

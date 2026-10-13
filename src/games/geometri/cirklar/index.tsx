@@ -1,4 +1,5 @@
 import { drillModule } from '../../../engines/drill/DrillView';
+import { LEKTIONER } from './lektioner';
 import type { DrillGame } from '../../../engines/drill/types';
 import { Fig, round1, sv, Txt } from '../draw';
 import { diagnose, ERR, explain, hint, makeQ, notes, PI, solution, specsForSkill, type CQ } from './logic';
@@ -58,6 +59,6 @@ function Visual({ q, done }: { q: CQ; hint: boolean; done: boolean }) {
   return q.mode === 'skala' ? <Ritning q={q} /> : <Circle q={q} done={done} />;
 }
 
-export const cirklarGame: DrillGame<CQ> = { id: 'cirklar', make: makeQ, specsForSkill, diagnose, explain, solution, hint, notes, Visual, errLabels: ERR };
+export const cirklarGame: DrillGame<CQ> = { id: 'cirklar', make: makeQ, specsForSkill, diagnose, explain, solution, hint, notes, Visual, errLabels: ERR, lessons: LEKTIONER };
 
 export const cirklar = drillModule(cirklarGame);

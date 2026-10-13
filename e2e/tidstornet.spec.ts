@@ -19,6 +19,9 @@ async function newHero(page: Page) {
 
 /** Svarar på en flervalsfråga: provar alternativ tills den är klar (fel måste rättas). */
 async function answerChoice(page: Page) {
+  // Många fel i rad: Mästare Kastanj föreslår Klassrummet en gång (se klassrum.spec.ts).
+  const skip = page.getByRole('button', { name: 'Jag kör vidare' });
+  if (await skip.isVisible()) await skip.click();
   const next = page.getByRole('button', { name: /^(Nästa|Se resultat)$/ });
   for (let i = 0; i < 4 && !(await next.isVisible()); i++) {
     await page.locator('.choice:not([disabled])').first().click();

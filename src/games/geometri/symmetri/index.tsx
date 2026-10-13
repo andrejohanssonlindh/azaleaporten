@@ -1,4 +1,5 @@
 import { drillModule } from '../../../engines/drill/DrillView';
+import { LEKTIONER } from './lektioner';
 import type { DrillGame } from '../../../engines/drill/types';
 import { Cells, Fig, fitter, Poly, Txt, type Pt } from '../draw';
 import { diagnose, ERR, explain, hint, makeQ, mirror, solution, specsForSkill, type SQ } from './logic';
@@ -132,6 +133,6 @@ function Visual({ q, done }: { q: SQ; hint: boolean; done: boolean }) {
   }
 }
 
-export const symmetriGame: DrillGame<SQ> = { id: 'symmetri', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual, errLabels: ERR };
+export const symmetriGame: DrillGame<SQ> = { id: 'symmetri', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual, errLabels: ERR, lessons: LEKTIONER };
 
 export const symmetri = drillModule(symmetriGame);

@@ -47,6 +47,13 @@ export const FLUFFY: AreaDef = {
   kunskap: { name: 'Formkraft', icon: '🔷', titles: ['Formspanare', 'Formgeni'] },
   texts: { cleared: 'Rampen är din!', notYet: 'Minst 9 rätt för att klara rampen – försök igen!', back: 'Till Fluffy' },
   story: 'Fluffy är den första skejtparken i Betongbukten. Varje ramp och kant har sin form – men Snurrsnigeln har vridit på allt, så ingen vet vad som är vad! Lär dig känna igen formerna. Nio rätt av tio, så klarar du rampen.',
+  lessons: [
+    { id: 'horn-och-sidor', title: 'Hörn och sidor', icon: '📍', desc: 'Räkna runt – utan att räkna dubbelt', nodes: ['fyra-former', 'rakna-horn', 'hitta-formen', 'grodan-dubbelhopp'], skills: ['ma.geo.former-grund', 'ma.geo.horn', 'ma.geo.sortera'] },
+    { id: 'manghorningar', title: 'Månghörningar', icon: '⬡', desc: 'Namnet räknar hörnen', nodes: ['manga-horn', 'horn-och-sidor'], skills: ['ma.geo.manghorningar'] },
+    { id: 'vridna-former', title: 'Snett och vint', icon: '🌀', desc: 'En form byter inte namn när den snurrar', nodes: ['snett-och-vint', 'ar-det-en', 'snurrsnigeln', 'sneda-former'], skills: ['ma.geo.former-vridna'] },
+    { id: 'fyrhorningar', title: 'Fyrhörningarna', icon: '🔶', desc: 'Kvadrat, rektangel, romb, parallellogram och parallelltrapets', nodes: ['fyrhorningar'], skills: ['ma.geo.fyrhorningar'] },
+    { id: 'inat-horn', title: 'Hörn som pekar inåt', icon: '⭐', desc: 'Stjärnor och pilar', nodes: ['kluriga-horn', 'stjarnor-och-kors'], skills: ['ma.geo.horn-kluriga'] },
+  ],
   eras: [
     { id: 'entren', name: 'Entrén', icon: '🛹', fact: 'En cirkel är rund och har inga hörn. En triangel har tre hörn. En kvadrat och en rektangel har fyra.',
       nodes: [

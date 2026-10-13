@@ -47,6 +47,13 @@ export const SIBBARP: AreaDef = {
   kunskap: { name: 'Vinkelkraft', icon: '📐', titles: ['Vinkelspanare', 'Gradskivans hjälte'] },
   texts: { cleared: 'Snyggt landat!', notYet: 'Minst 9 rätt för att landa tricket – försök igen!', back: 'Till Sibbarp' },
   story: 'I Sibbarp, nere vid havet, ligger den stora bowlen. Varje kant och varje snurr är en vinkel – och de som kan sina vinklar landar sina trick. Men Bläckfisken och Sälen har trasslat till allt! Nio rätt av tio, så landar du tricket.',
+  lessons: [
+    { id: 'vinklarnas-namn', title: 'Vinklarnas namn', icon: '📐', desc: 'Spetsig, rät och trubbig', nodes: ['vinklarnas-namn', 'vinklar-at-alla-hall'], skills: ['ma.geo.vinkel-namn'] },
+    { id: 'jamfor-vinklar', title: 'Vilken vinkel är störst?', icon: '⚖️', desc: 'Benen spelar ingen roll', nodes: ['storst-vinkel', 'blackfisken-langarm', 'lurade-ben'], skills: ['ma.geo.vinkel-jamfor'] },
+    { id: 'varv', title: 'Varv och grader', icon: '🔄', desc: 'Ett helt varv är 360°', nodes: ['kvarts-och-halva', 'stora-snurrar', 'trickens-namn'], skills: ['ma.geo.varv'] },
+    { id: 'gradskivan', title: 'Gradskivan', icon: '🌗', desc: 'Följ raden som börjar på noll', nodes: ['gradskivan', 'bada-skalorna', 'salen-bakfram', 'femgradare'], skills: ['ma.geo.gradskiva'] },
+    { id: 'vinkelsummor', title: 'Vinklar som fattas', icon: '🔺', desc: '180° på en linje och i en triangel, 360° runt', nodes: ['rak-linje', 'triangelns-vinklar', 'fyrhorningar-och-trianglar', 'runt-en-punkt'], skills: ['ma.geo.vinklar-linje', 'ma.geo.vinklar-triangel', 'ma.geo.vinklar-runt'] },
+  ],
   eras: [
     { id: 'strandkanten', name: 'Strandkanten', icon: '🏖️', fact: 'En rät vinkel är som hörnet på ett papper. Spetsig är mindre, trubbig är större.',
       nodes: [

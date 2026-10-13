@@ -47,6 +47,13 @@ export const SVAMPEN: AreaDef = {
   kunskap: { name: 'Spegelkraft', icon: '🪞', titles: ['Spegelspanare', 'Spegelmagiker'] },
   texts: { cleared: 'Spegelblankt!', notYet: 'Minst 9 rätt för att klara rampen – försök igen!', back: 'Till Svampen' },
   story: 'Under den stora svampen ligger en skejtpark där allt är symmetriskt – ramperna, räckena, till och med graffitin. Men Kopiekatten har bytt ut speglarna mot kopior! Hjälp till att få ordning på speglar och mönster. Nio rätt av tio klarar en ramp.',
+  lessons: [
+    { id: 'spegla', title: 'Spegla', icon: '🪞', desc: 'En spegelbild vänder håll – ruta för ruta', nodes: ['spegelbilden', 'kopiekatten', 'storre-speglar', 'at-alla-hall'], skills: ['ma.geo.spegla'] },
+    { id: 'symmetrilinjer', title: 'Symmetrilinjer', icon: '✂️', desc: 'Vik på mitten – och akta dig för diagonalen', nodes: ['symmetrisk', 'symmetrilinjer', 'flamingon-snedvik', 'fler-linjer'], skills: ['ma.geo.symmetrisk', 'ma.geo.symmetrilinjer'] },
+    { id: 'monster-upprepas', title: 'Mönster som upprepas', icon: '🔁', desc: 'Hitta biten, och räkna långt fram', nodes: ['monster-som-upprepas', 'langre-monster', 'stora-monster'], skills: ['ma.geo.monster-upprepa'] },
+    { id: 'vaxande-monster', title: 'Växande mönster', icon: '🌱', desc: 'Start plus steg gånger figur', nodes: ['vaxande-monster', 'figur-tio', 'langt-fram'], skills: ['ma.geo.monster-vaxande'] },
+    { id: 'spegla-koordinat', title: 'Spegla i koordinatsystem', icon: '📍', desc: 'Lika långt på andra sidan linjen', nodes: ['spegla-punkter', 'upp-och-ner'], skills: ['ma.geo.spegla-koordinat'] },
+  ],
   eras: [
     { id: 'spegeldammen', name: 'Spegeldammen', icon: '🪞', fact: 'En symmetrilinje delar en figur i två halvor som är varandras spegelbilder. Vik längs linjen – halvorna hamnar precis på varandra.',
       nodes: [

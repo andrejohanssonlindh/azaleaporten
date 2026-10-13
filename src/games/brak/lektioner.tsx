@@ -33,11 +33,12 @@ export const LEKTIONER: Record<string, Lesson> = {
       text: 'Glufsgrisen tror att 1/8 är större än 1/4, för 8 är större än 4. Men tänk på en paj! Delar du den i 8 bitar blir varje bit mindre än om du delar den i 4.',
       pic: <Rad><Pie f={{ n: 1, d: 4 }} size={100} /><Stor>&gt;</Stor><Pie f={{ n: 1, d: 8 }} size={100} /></Rad>,
       tips: 'Ju större nämnare, desto mindre bitar. Fråga dig: vill jag dela kalaspajen med 4 eller med 8 kompisar?',
+      prova: { mode: 'jamfor', level: 1 },
     },
     {
       title: 'Mer eller mindre än en halv?',
       text: 'En halv är hälften av bitarna. 4/8 är precis en halv, för 4 är hälften av 8. Då är 5/8 mer än en halv och 3/8 mindre.',
-      prova: { mode: 'jamfor', level: 1 },
+      prova: { mode: 'jamfor', level: 2 },
     },
   ] },
 

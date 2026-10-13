@@ -96,7 +96,7 @@ export const LEKTIONER: Record<string, Lesson> = {
     {
       title: 'Minus med tiondelar',
       text: '1,3 − 0,5: gör om till tiondelar. 1,3 är 13 tiondelar. 13 − 5 = 8 tiondelar = 0,8.',
-      prova: { mode: 'decimal', level: 1 },
+      prova: { mode: 'decimal', level: 2 },
     },
   ] },
 };

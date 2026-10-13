@@ -47,6 +47,13 @@ export const KROKSBACK: AreaDef = {
   kunskap: { name: 'Rymdkraft', icon: '📦', titles: ['Kubstaplare', 'Volymvirtuos'] },
   texts: { cleared: 'Blocket står!', notYet: 'Minst 9 rätt för att bygga klart – försök igen!', back: 'Till Kroksbäck' },
   story: 'I Kroksbäcks park är allt byggt i 3D: lådor, block, rör och pyramider att skejta på. Men Ugglan Framsida tror att bara det hon ser finns, och Plusormen har räknat fel på alla lådor. Hjälp till att bygga rätt! Nio rätt av tio, så står blocket.',
+  lessons: [
+    { id: 'kropparna', title: 'Kropparna', icon: '🎲', desc: 'Kub, klot, cylinder, kon och fler', nodes: ['kropparna', 'fler-kroppar', 'vardagskroppar'], skills: ['ma.geo.kroppar-namn', 'ma.geo.kroppar-vardag'] },
+    { id: 'kubens-delar', title: 'Sidoytor, kanter och hörn', icon: '🧊', desc: 'Glöm inte baksidan', nodes: ['kubens-delar', 'kanter-och-horn'], skills: ['ma.geo.kroppar-delar'] },
+    { id: 'rakna-kuber', title: 'Räkna kuber', icon: '🧱', desc: 'Lager för lager', nodes: ['bygg-med-kuber', 'ugglan-framsida', 'storre-block', 'trappan'], skills: ['ma.geo.volym-kuber'] },
+    { id: 'volym', title: 'Rätblockets volym', icon: '📏', desc: 'Längd gånger bredd gånger höjd', nodes: ['ratblockets-volym', 'plusormen', 'stora-lador', 'akvariet'], skills: ['ma.geo.volym-ratblock', 'ma.geo.volym-liter'] },
+    { id: 'liter', title: 'Liter och milliliter', icon: '🥛', desc: 'l, dl, cl, ml och dm³', nodes: ['liter-och-deciliter', 'ml-och-cl', 'kubik'], skills: ['ma.geo.volymenheter'] },
+  ],
   eras: [
     { id: 'lador', name: 'Lådorna', icon: '📦', fact: 'En kropp har tre dimensioner: längd, bredd och höjd. En kub är som en tärning – alla kanter lika långa.',
       nodes: [
