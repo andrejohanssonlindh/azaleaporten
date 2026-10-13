@@ -1,3 +1,4 @@
+import { Fragment } from 'preact';
 import { useEffect } from 'preact/hooks';
 import { dataRev, go, heroId, toast } from '../state';
 import { getProfile } from '../platform/profiles';
@@ -15,6 +16,8 @@ import { skillLabel } from '../content/skills';
 import { preloadGame } from './useGame';
 import { VECKANS_AREA } from '../platform/learning/veckans';
 import { VeckansCard } from './Veckans';
+import { LessonSign } from './Klassrum';
+import type { LessonMeta } from '../platform/rpg/types';
 
 // Ett område som en stig genom epoker: banor och bossar i tur och ordning.
 
@@ -38,6 +41,12 @@ export function AreaView({ id }: { id: string }) {
   const k = kunskapLevel(prog.xp);
   const due = dueSkills(p.id, id);
   let i = 0;
+  // Varje lektion står på stigen före den första banan den hör till.
+  const signs = new Map<string, LessonMeta[]>();
+  for (const l of area.lessons ?? []) {
+    const first = area.eras.flatMap((e) => e.nodes).find((n) => l.nodes.includes(n.id));
+    if (first) signs.set(first.id, [...(signs.get(first.id) ?? []), l]);
+  }
 
   const tap = (n: PathNode) => {
     const st = nodeStatus(area, prog, n.id);
@@ -85,18 +94,31 @@ export function AreaView({ id }: { id: string }) {
                 </div>
               );
               return (
-                <div class="node-row" key={n.id}>
+                <Fragment key={n.id}>
+                {signs.get(n.id)?.map((l) => <LessonSign key={l.id} hid={p.id} areaId={id} meta={l} />)}
+                <div class="node-row">
                   <div class="nl">{right ? label : null}</div>
                   <button class={`node ${st}${isBoss ? ' boss' : ''}${isBoss && n.kind === 'mastare' ? ' mastare' : ''}`} onClick={() => tap(n)} aria-label={`${name} (${st === 'locked' ? 'låst' : st === 'done' ? 'klar' : 'öppen'})`}>
                     {st === 'locked' ? '🔒' : n.icon}
                   </button>
                   <div class="nl">{right ? null : label}</div>
                 </div>
+                </Fragment>
               );
             })}
           </div>
         </section>
       ))}
+
+      {(area.lessons?.length ?? 0) > 0 && (
+        <section class="card lab-links">
+          <h2>📖 Klassrummet</h2>
+          <p class="muted">Lektioner som visar hur man kan tänka. Läs dem när du vill – före en bana, eller när något känns klurigt.</p>
+          <div class="lesson-list">
+            {area.lessons!.map((l) => <LessonSign key={l.id} hid={p.id} areaId={id} meta={l} />)}
+          </div>
+        </section>
+      )}
 
       <section class="card lab-links">
         {area.gameId === 'klocka' ? (

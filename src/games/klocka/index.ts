@@ -3,6 +3,7 @@ import { makeQ, MAX_LEVEL, type KQ, type Mode, type Trap } from './logic/questio
 import { phraseKind } from './logic/language';
 import { QuestionView } from './ui/QuestionView';
 import { ERR } from './logic/diagnose';
+import { LEKTIONER } from './lektioner';
 
 // Klockspelet som frågefabrik för plattformen (Tidstornet).
 
@@ -22,4 +23,5 @@ export const klocka: GameModule = {
   },
   errLabel: (tag) => ERR[tag],
   View: QuestionView,
+  lessons: LEKTIONER,
 };

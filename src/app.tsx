@@ -14,6 +14,7 @@ import { Ovning } from './shell/Ovning';
 import { Uppdrag } from './shell/Uppdrag';
 import { Biblioteket } from './shell/Biblioteket';
 import { LabbView } from './shell/LabbView';
+import { KlassrumPage } from './shell/Klassrum';
 import { Gard } from './shell/Gard';
 import { ChestModal, Smedjan } from './shell/Loot';
 import { Vuxen } from './shell/Vuxen';
@@ -78,6 +79,7 @@ export function App() {
   else if (page === 'uppdrag') view = <Uppdrag key={a ?? ''} tab={a} />;
   else if (page === 'biblioteket') view = <Biblioteket />;
   else if (page === 'labb' && a) view = <LabbView key={a} areaId={a} tab={b ?? ''} />;
+  else if (page === 'klassrum' && a && b) view = <KlassrumPage key={path} areaId={a} lessonId={b} />;
   else view = <IslandMap />;
 
   return (

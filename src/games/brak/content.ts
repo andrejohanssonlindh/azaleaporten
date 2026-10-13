@@ -47,6 +47,13 @@ export const BRAKBAGERIET: AreaDef = {
   kunskap: { name: 'Bråkkraft', icon: '🥧', titles: ['Bråkbagare', 'Bråkgeni'] },
   texts: { cleared: 'Nybakat!', notYet: 'Degen behöver minst 9 rätt för att jäsa – försök igen!', back: 'Till bageriet' },
   story: 'I Bråkbageriet delas allt i bitar: pajer, tårtor och chokladkakor. Men bagarlärlingarna har blandat ihop beställningarna! Hjälp dem dela rätt – nio rätt av tio, så är plåten klar.',
+  lessons: [
+    { id: 'vad-ar-ett-brak', title: 'Vad är ett bråk?', icon: '🥧', desc: 'Täljare och nämnare', nodes: ['halvor-och-fjardedelar', 'fler-bitar'], skills: ['ma.brak.namnge'] },
+    { id: 'jamfor-brak', title: 'Vilken bit är störst?', icon: '⚖️', desc: 'Jämför bråk – fler bitar är mindre bitar', nodes: ['samma-bitar', 'storst-bit', 'glufsgrisen', 'nastan-hela'], skills: ['ma.brak.jamfor-namnare', 'ma.brak.jamfor-taljare', 'ma.brak.jamfor-halv'] },
+    { id: 'del-av', title: 'Del av ett antal', icon: '🥯', desc: 'Dela med nämnaren, gånger med täljaren', nodes: ['del-av-bullarna', 'del-av-mer', 'manga-delar-av'], skills: ['ma.brak.del-av'] },
+    { id: 'lika-stora', title: 'Lika stora bråk', icon: '🟰', desc: 'Förlänga och förkorta', nodes: ['lika-stora', 'stora-likheter'], skills: ['ma.brak.likvardiga'] },
+    { id: 'plus-med-brak', title: 'Plus och minus med bråk', icon: '➕', desc: 'Nämnaren är bitarnas storlek', nodes: ['lagg-ihop-bitar', 'tartmusen', 'ta-bort-bitar'], skills: ['ma.brak.addera', 'ma.brak.subtrahera'] },
+  ],
   eras: [
     { id: 'disken', name: 'Disken', icon: '🧁', fact: 'Ett bråk som 3/4 betyder: delat i 4 lika stora bitar, och 3 av dem.',
       nodes: [

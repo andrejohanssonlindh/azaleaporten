@@ -18,12 +18,14 @@ import { playable, regionProgress } from '../content/areas';
 import { personaFor } from '../content/bosses';
 import { region as regionById } from '../content/world';
 import { leaveToPicker } from '../session';
-import { Portrait, Screen, Stars } from './ui';
+import { Mentor, Portrait, Screen, Stars } from './ui';
 import { ItemCard } from './Loot';
 import { getInv } from '../platform/rpg/inventory';
 import { stigmonster } from '../content/monsters';
 import { HeroFigure } from './HeroFigure';
 import { Loading, useGame } from './useGame';
+import { findLesson, LessonLayer, NudgeAsk, NudgeBar, type LessonAt } from './Klassrum';
+import { lessonDone, nudgeFor } from '../platform/learning/lektioner';
 
 // Spelskärmen: en runda (10 frågor), en repetition (5 frågor) eller en bossstrid.
 
@@ -85,6 +87,9 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
   const [hintIdx, setHintIdx] = useState<number | null>(null);
   const [bossLine, setBossLine] = useState<string>('');
   const [confirmQuit, setConfirmQuit] = useState(false);
+  /** Klassrummets lektion som ligger över rundan, och om Mästare Kastanj redan har frågat (stark) i den här rundan. */
+  const [lessonOpen, setLessonOpen] = useState<LessonAt | null>(null);
+  const [asked, setAsked] = useState(false);
   const q = useMemo(() => (run && node && pl ? currentQuestion(run, node, game) : null), [run?.seed, run?.index]);
 
   if (!p) { queueMicrotask(leaveToPicker); return null; }
@@ -94,10 +99,13 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
   const boss = node.type === 'boss' ? node : null;
   const face = boss ? bossFace(areaId, boss, p.grade) : null;
   const back = practice || review ? 'ovning' : area.region ? `region/${area.region.id}` : `omrade/${areaId}`;
+  // Lektionen för den här banan (eller frågans färdighet). Veckans ord har ingen.
+  const lesson = run && q && run.kind !== 'veckans' ? findLesson(areaId, node.id, game.skillOf(q), game.areaOf?.(q)) : null;
+  const lessonAfter = lesson && run ? { at: lesson, nudge: nudgeFor(run.results) } : null;
 
   /* ---------- resultat ---------- */
   if (outcome) {
-    return <Result o={outcome} news={news} big={big} areaId={areaId} node={node} face={face} practice={practice || review}
+    return <Result o={outcome} news={news} big={big} areaId={areaId} node={node} face={face} practice={practice || review} lesson={lessonAfter}
       onAgain={review ? null : () => { setOutcome(null); setNews(null); setBig(null); setBossLine(''); setRun(veckans ? resumeOrStart(p.id, areaId, node, kind) : boss && !practice ? null : startRun(p.id, area, node, kind)); }} />;
   }
 
@@ -215,8 +223,19 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
   }
 
   const len = runLength(run);
+  const nudge = lesson ? nudgeFor(run.results) : 'none';
+  const read = !!lesson && lessonDone(p.id, lesson.areaId, lesson.meta.id);
+  // Stark: Mästare Kastanj frågar en gång, före nästa fråga (frågan visas inte än, så inget svar kan räknas två gånger).
+  if (lesson && nudge === 'stark' && !asked && !answered && !lessonOpen) {
+    return (
+      <Screen class="play">
+        <NudgeAsk at={lesson} read={read} onOpen={() => { setAsked(true); setLessonOpen(lesson); }} onSkip={() => setAsked(true)} />
+      </Screen>
+    );
+  }
   return (
     <Screen class="play">
+      {lessonOpen && <LessonLayer at={lessonOpen} onClose={() => setLessonOpen(null)} />}
       <header class="play-head">
         <div class="play-title">
           <small>{review ? `🌫️ ${area.title}` : veckans ? `📝 ${area.title}` : practice ? '🎯 Övningsängen' : `${era!.icon} ${era!.name}`}</small>
@@ -255,6 +274,8 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
         </>
       )}
 
+      {lesson && <NudgeBar nudge={nudge} at={lesson} read={read} onOpen={() => setLessonOpen(lesson)} />}
+
       {canHint && (
         <button class="tool" onClick={() => { if (useHint(p.id)) setHintIdx(run.index); }}>💡 Ledtråd ({hintsLeft(p.id)} kvar idag)</button>
       )}
@@ -287,7 +308,7 @@ function MobStrip({ hid, run, answered }: { hid: string; run: RunState; answered
   );
 }
 
-function Result({ o, news, big, areaId, node, face, practice, onAgain }: { o: Outcome; news: QuestNews | null; big: BigNews | null; areaId: string; node: PathNode; face: BossFace | null; practice: boolean; onAgain: (() => void) | null }) {
+function Result({ o, news, big, areaId, node, face, practice, lesson, onAgain }: { o: Outcome; news: QuestNews | null; big: BigNews | null; areaId: string; node: PathNode; face: BossFace | null; practice: boolean; lesson: { at: LessonAt; nudge: ReturnType<typeof nudgeFor> } | null; onAgain: (() => void) | null }) {
   const hid = heroId.value!;
   const pl = playable(areaId)!;
   const next = nextOpenNode(pl.def, getArea(hid, areaId));
@@ -374,6 +395,7 @@ function Result({ o, news, big, areaId, node, face, practice, onAgain }: { o: Ou
             {big.errandDone && <p>{big.errandDone.icon} <b>{big.errandDone.who}:</b> "{big.errandDone.thanks}" +25 🌰 och en uppdragskista.</p>}
           </div>
         )}
+        {lesson && lesson.nudge !== 'none' && <ResultLesson at={lesson.at} strong={lesson.nudge === 'stark' || (o.kind === 'boss' && !o.bossWon)} hid={hid} />}
         {o.tired && <p class="note">Hjälten är trött för idag – inga fler kastanjer, men allt du lär dig räknas!</p>}
         <div class="row center-row">
           <button class="btn" onClick={() => go(back)}>{practice ? 'Tillbaka' : pl.def.texts.back}</button>
@@ -384,5 +406,27 @@ function Result({ o, news, big, areaId, node, face, practice, onAgain }: { o: Ou
         </div>
       </div>
     </Screen>
+  );
+}
+
+/** Efter en runda med många fel: Mästare Kastanj föreslår lektionen (tydligare när det gick riktigt tungt). */
+function ResultLesson({ at, strong, hid }: { at: LessonAt; strong: boolean; hid: string }) {
+  const read = lessonDone(hid, at.areaId, at.meta.id);
+  const open = () => go(`klassrum/${at.areaId}/${at.meta.id}`);
+  if (!strong) {
+    return (
+      <button class="lesson-nudge mild" onClick={open}>
+        <span aria-hidden="true">📖</span><span>{read ? 'Titta i lektionen igen' : 'I Klassrummet finns en lektion'}: <b>{at.meta.title}</b></span>
+      </button>
+    );
+  }
+  return (
+    <div class="result-lesson">
+      <Mentor compact text={read
+        ? `Det här är fortfarande klurigt. Läs lektionen om ${at.meta.title.toLowerCase()} en gång till och prova några själv – sen går det lättare!`
+        : `Det här är klurigt! Innan du försöker igen: gå till Klassrummet, så visar jag hur man tänker med ${at.meta.title.toLowerCase()}.`}>
+        <div class="row mentor-actions"><button class="btn primary" onClick={open}>📖 Till Klassrummet</button></div>
+      </Mentor>
+    </div>
   );
 }

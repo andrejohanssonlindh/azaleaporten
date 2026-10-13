@@ -47,6 +47,12 @@ export const MYNTMARKNADEN: AreaDef = {
   kunskap: { name: 'Handelskraft', icon: '🪙', titles: ['Marknadsräknare', 'Växelvirtuos'] },
   texts: { cleared: 'Kassan stämmer!', notYet: 'Kassan behöver minst 9 rätt för att stämma – försök igen!', back: 'Till marknaden' },
   story: 'Vid foten av Talbergen ligger Myntmarknaden, där alla handlar med kronor. Men handlarna har blandat ihop kassorna! Hjälp dem räkna pengar och ge rätt växel – nio rätt av tio får en kassa att stämma.',
+  lessons: [
+    { id: 'rakna-pengar', title: 'Räkna pengar', icon: '🪙', desc: 'Värdet, inte antalet – störst först', nodes: ['mynten', 'myntskatan', 'sedlarna', 'stora-sedlar'], skills: ['ma.pengar.mynt', 'ma.pengar.sedlar'] },
+    { id: 'lagg-ihop-priser', title: 'Lägg ihop priser', icon: '🧾', desc: 'Tiotal och ental, och avrunda för att kolla', nodes: ['sma-inkop', 'kassan', 'storhandla'], skills: ['ma.pengar.summa'] },
+    { id: 'vaxel', title: 'Växel', icon: '🔄', desc: 'Räkna uppåt från priset', nodes: ['vaxel-pa-tian', 'vaxla-tillbaka', 'tvattbjornen', 'hundralappen', 'stora-kopet'], skills: ['ma.pengar.vaxel', 'ma.pengar.vaxel-stor'] },
+    { id: 'styckpris', title: 'Många av samma', icon: '🧁', desc: 'Styckpris gånger antal', nodes: ['manga-av-samma'], skills: ['ma.pengar.styckpris'] },
+  ],
   eras: [
     { id: 'torget', name: 'Torget', icon: '🧺', fact: 'I Sverige finns mynt på 1, 2, 5 och 10 kronor. Tiokronan är minst av de guldiga – men värd mest!',
       nodes: [

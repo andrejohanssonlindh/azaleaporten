@@ -143,5 +143,6 @@ export function drillModule<Q extends DrillQ>(g: DrillGame<Q>): GameModule {
     specsForSkill: (s) => g.specsForSkill(s),
     errLabel: (tag) => errLabel(g as unknown as DrillGame<DrillQ>, tag),
     View: makeDrillView(g),
+    lessons: g.lessons,
   };
 }

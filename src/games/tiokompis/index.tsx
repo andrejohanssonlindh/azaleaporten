@@ -1,4 +1,5 @@
 import { drillModule } from '../../engines/drill/DrillView';
+import { LEKTIONER } from './lektioner';
 import type { DrillGame } from '../../engines/drill/types';
 import { diagnose, ERR, explain, hint, makeQ, solution, specsForSkill, type TQ } from './logic';
 
@@ -34,6 +35,6 @@ function TenFrames({ q, hint: showHint }: { q: TQ; hint: boolean; done: boolean 
   );
 }
 
-export const tiokompisGame: DrillGame<TQ> = { id: 'tiokompis', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: TenFrames, errLabels: ERR };
+export const tiokompisGame: DrillGame<TQ> = { id: 'tiokompis', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: TenFrames, errLabels: ERR, lessons: LEKTIONER };
 
 export const tiokompis = drillModule(tiokompisGame);

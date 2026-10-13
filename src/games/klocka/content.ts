@@ -64,6 +64,16 @@ export const TIDSTORNET: AreaDef = {
   story: 'Tidsmaskinen högst upp i Tidstornet har gått sönder, och nu visar klockorna fel i alla tidsåldrar! Res genom tiden, läs klockorna rätt och ladda tidsmaskinen – nio rätt av tio tar dig vidare.',
   // Varje bana lägger till en sak i taget (se LEVELS i logic/questions.ts). En boss möter nivån n och
   // nivån n+1 i andra halvan av striden, så den står alltid efter banorna som övar n+1.
+  lessons: [
+    { id: 'visarna', title: 'Klockans visare', icon: '🕐', desc: 'Timvisaren och minutvisaren', nodes: ['minutvisaren'] },
+    { id: 'hel-och-halv', title: 'Hel och halv', icon: '🌗', desc: 'Halv fyra kommer före fyra', nodes: ['forsta-orden', 'ord-blir-siffror', 'halvsaurus'], skills: ['ma.tid.hel', 'ma.tid.halv'] },
+    { id: 'kvart', title: 'Kvart över och kvart i', icon: '🍰', desc: 'En fjärdedel av varvet', nodes: ['kvarten', 'kvart-siffror', 'las-klockan'], skills: ['ma.tid.kvart'] },
+    { id: 'over-och-i', title: 'Över och i', icon: '↔️', desc: 'Högra halvan över, vänstra halvan i', nodes: ['tjugo', 'tjugo-siffror', 'femminutare', 'fem-siffror', 'fem-i-taget', 'mumien'], skills: ['ma.tid.over', 'ma.tid.i'] },
+    { id: 'kvallen', title: 'Eftermiddag och kväll', icon: '🌙', desc: 'Lägg till 12 efter tolv på dagen', nodes: ['kvallen', 'kvallsord', 'nattkorpen'] },
+    { id: 'hur-lange', title: 'Hur lång tid?', icon: '⏳', desc: 'Hoppa till hela timmen först', nodes: ['hur-lange', 'langre-resor', 'tidsresan'], skills: ['ma.tid.emellan'] },
+    { id: 'fem-i-halv', title: 'Fem i halv', icon: '🔔', desc: 'Halv som mittpunkt', nodes: ['halvvagen', 'kluriga-ord'], skills: ['ma.tid.over-halv', 'ma.tid.i-halv'] },
+    { id: 'varje-minut', title: 'Varje minut', icon: '🔎', desc: 'Räkna de små strecken', nodes: ['varje-minut', 'ordmastaren', 'minutlasaren'] },
+  ],
   eras: [
     { id: 'dinosaurier', name: 'Dinosauriernas tid', icon: '🦕', fact: 'För 66 miljoner år sedan fanns inga klockor alls – men nu har du med dig en!',
       nodes: [

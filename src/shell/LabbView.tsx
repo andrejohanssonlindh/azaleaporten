@@ -8,6 +8,8 @@ import { randomSeed, rngFrom } from '../platform/rng';
 import type { AreaDef, GameModule, StageDef } from '../platform/rpg/types';
 import { BackBar, Screen } from './ui';
 import { Loading, useGame, useLoaded } from './useGame';
+import { LessonLayer, NudgeBar, type LessonAt } from './Klassrum';
+import { lessonDone, lessonForNode, nudgeFor } from '../platform/learning/lektioner';
 
 const loadKlockLabb = () => import('../games/klocka/ui/Labb');
 
@@ -31,17 +33,27 @@ function FreeStages({ def, game }: { def: AreaDef; game: GameModule }) {
   const [sel, setSel] = useState(stages[0]);
   const [n, setN] = useState(0);
   const [score, setScore] = useState({ ok: 0, all: 0 });
+  const [answers, setAnswers] = useState<{ correct: boolean }[]>([]);
+  const [lessonOpen, setLessonOpen] = useState<LessonAt | null>(null);
   const q = useMemo(() => game.makeQuestion(sel.spec, rngFrom(randomSeed())), [sel, n]);
   const View = game.View;
+  const meta = lessonForNode(def, sel.id);
+  const lesson: LessonAt | null = meta ? { areaId: def.areaId, meta } : null;
+  const nudge = nudgeFor(answers);
   return (
     <div class="labb">
       <div class="seg" role="group" aria-label="Vad vill du öva på?">
-        {stages.map((s) => <button key={s.id} class={sel.id === s.id ? 'on' : ''} onClick={() => { setSel(s); setN((x) => x + 1); }}>{s.icon} {s.name}</button>)}
+        {stages.map((s) => <button key={s.id} class={sel.id === s.id ? 'on' : ''} onClick={() => { setSel(s); setN((x) => x + 1); setAnswers([]); }}>{s.icon} {s.name}</button>)}
       </div>
       <p class="note">{sel.desc}</p>
+      {lessonOpen && <LessonLayer at={lessonOpen} onClose={() => setLessonOpen(null)} />}
+      {lesson && (nudge !== 'none'
+        ? <NudgeBar nudge={nudge} at={lesson} read={lessonDone(heroId.value ?? '', lesson.areaId, lesson.meta.id)} onOpen={() => setLessonOpen(lesson)} />
+        : <button class="btn small lesson-link" onClick={() => setLessonOpen(lesson)}>📖 Lektion: {lesson.meta.title}</button>)}
       <View key={`${sel.id}-${n}`} q={q} hint={false}
         onAnswer={(r) => {
           setScore((s) => ({ ok: s.ok + (r.correct ? 1 : 0), all: s.all + 1 }));
+          setAnswers((a) => [...a, { correct: r.correct }].slice(-10));
           learnFree(def, game, q, r);
         }}
         onDone={() => setN((x) => x + 1)} />

@@ -60,6 +60,15 @@ export const TABELLGRUVAN: AreaDef = {
   kunskap: { name: 'Tabellkraft', icon: '⛏️', titles: ['Tabellgrävare', 'Gångergeni'] },
   texts: { cleared: 'Kristallerna glittrar!', notYet: 'Gruvvagnen behöver minst 9 kristaller – försök igen!', back: 'Till gruvan' },
   story: 'Djupt inne i Talbergen ligger Tabellgruvan, full av glittrande tabellkristaller. Gräv dig nedåt gång för gång – nio rätt av tio lyser upp nästa gruvgång.',
+  lessons: [
+    { id: 'vad-ar-ganger', title: 'Vad är gånger?', icon: '✖️', desc: 'Grupper, hopp och knep för 2, 5 och 10', nodes: ['tvaan-femman-tian', 'plusrattan'], skills: ['ma.mult.2', 'ma.mult.5', 'ma.mult.10'] },
+    { id: 'vad-ar-delat', title: 'Vad är delat med?', icon: '🍪', desc: 'Dela lika, hur många grupper, och gånger baklänges', nodes: ['dela-lika', 'dela-i-tre-och-fyra'], skills: ['ma.div.'] },
+    { id: 'gomda-talet', title: 'Det gömda talet', icon: '🔦', desc: 'När ett av talen fattas: 3 · ? = 12', nodes: ['gomda-kristaller', 'djupa-gomstallen'] },
+    { id: 'noll-och-ett', title: 'Noll och ett', icon: '🦇', desc: 'Reglerna Nollfladdermusen blandar ihop', nodes: ['nollfladdermusen'], skills: ['ma.mult.0', 'ma.mult.1', 'ma.div.0', 'ma.div.1'] },
+    { id: 'svara-tabellerna', title: 'Knep för de svåra tabellerna', icon: '🪨', desc: 'Dubbla, börja från femman, nian och grannarna', nodes: ['de-svara-tabellerna', 'dela-pa-djupet', 'gangerspindeln'], skills: ['ma.mult.'] },
+    { id: 'elvan-tolvan', title: 'Elvan och tolvan', icon: '💍', desc: 'Tian plus lite till', nodes: ['elvan-och-tolvan', 'dela-med-elva-och-tolv'] },
+    { id: 'fyra-fakta', title: 'Fyra fakta på en gång', icon: '👑', desc: 'Gånger och delat är en familj', nodes: ['hela-tabellen', 'dela-allt', 'gruvvagnsracet', 'gruvmastaren'] },
+  ],
   eras: [
     { id: 'gruvoppningen', name: 'Gruvöppningen', icon: '⛏️', fact: 'Gånger är snabb plus: 3 · 5 är samma som 5 + 5 + 5.',
       nodes: [

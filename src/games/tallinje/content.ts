@@ -47,6 +47,13 @@ export const TALLINJEBRON: AreaDef = {
   kunskap: { name: 'Linjekraft', icon: '📏', titles: ['Linjegångare', 'Tallinjens lots'] },
   texts: { cleared: 'Plankorna sitter!', notYet: 'Bron behöver minst 9 plankor på rätt plats – försök igen!', back: 'Till bron' },
   story: 'Tallinjebron är en lång hängbro där varje planka har ett tal. En storm har blandat ihop plankorna! Hitta rätt plats för talen – nio rätt av tio spikar fast nästa spann.',
+  lessons: [
+    { id: 'las-tallinjen', title: 'Läsa tallinjen', icon: '📏', desc: 'Vad är ett streck värt?', nodes: ['tal-till-20', 'tal-till-100', 'tal-till-1000'], skills: ['ma.tallinje.las-20', 'ma.tallinje.las-100', 'ma.tallinje.las-1000'] },
+    { id: 'avrunda', title: 'Avrunda', icon: '🎯', desc: 'Närmast vinner – mitt emellan går uppåt', nodes: ['avrunda-tiotal', 'velpaddan', 'avrunda-hundratal', 'avrunda-decimaltal'], skills: ['ma.avrunda.'] },
+    { id: 'negativa', title: 'Tal under noll', icon: '🌡️', desc: 'Negativa tal och termometern, förbi noll i två steg', nodes: ['under-noll', 'termometern', 'kalla-natter', 'isbjornen-minus', 'minus-i-minus'], skills: ['ma.negativa.'] },
+    { id: 'tiondelar', title: 'Tiondelar', icon: '🔍', desc: 'Tio tiondelar är en hel', nodes: ['tiondelar'], skills: ['ma.tallinje.las-tiondelar'] },
+    { id: 'decimal-rakning', title: 'Räkna med tiondelar', icon: '➕', desc: 'Plus och minus med decimaltal', nodes: ['decimal-plus', 'over-heltalet', 'decimal-minus'], skills: ['ma.decimal.'] },
+  ],
   eras: [
     { id: 'forsta-spannet', name: 'Första spannet', icon: '🪵', fact: 'På en tallinje blir talen större åt höger. Mellan två siffror kan det finnas många streck.',
       nodes: [

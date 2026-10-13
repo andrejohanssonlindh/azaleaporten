@@ -47,6 +47,16 @@ export const TIOKOMPISBRON: AreaDef = {
   kunskap: { name: 'Räknekraft', icon: '➕', titles: ['Snabbräknare', 'Huvudräkningshjälte'] },
   texts: { cleared: 'Bron håller!', notYet: 'Bron behöver minst 9 hela plankor – försök igen!', back: 'Till bron' },
   story: 'Tiokompisbron går över den vilda Talforsen. Men brotrollen har knyckt plankor, och nu fattas det tal överallt! Laga bron bit för bit – nio rätt av tio lägger en ny planka på plats.',
+  lessons: [
+    { id: 'tiokompisar', title: 'Tiokompisar', icon: '🤝', desc: 'Talen som blir 10 tillsammans', nodes: ['tiokompisar', 'plus-till-20', 'minus-till-20'], skills: ['ma.add.tiokompisar', 'ma.add.inom-20', 'ma.sub.inom-20'] },
+    { id: 'over-tian', title: 'Plus över tian', icon: '🌊', desc: 'Fyll upp tian först', nodes: ['over-tian', 'tiotapparen'], skills: ['ma.add.over-tio'] },
+    { id: 'minus-over-tian', title: 'Minus över tian', icon: '↩️', desc: 'Ner till tian först – eller räkna uppåt', nodes: ['tillbaka-over-tian'], skills: ['ma.sub.over-tio'] },
+    { id: 'vad-fattas', title: 'Talet som fattas', icon: '❓', desc: 'Räkna uppåt med tian som mellanstation', nodes: ['vad-fattas', 'hal-i-bron'], skills: ['ma.add.saknad-term', 'ma.sub.saknad-term'] },
+    { id: 'hundrakompisar', title: 'Hundrakompisar', icon: '💯', desc: 'Talen som blir 100 tillsammans', nodes: ['hundrakompisar', 'kluriga-kompisar'], skills: ['ma.add.hundrakompisar'] },
+    { id: 'stora-kliv', title: 'Stora kliv', icon: '🦘', desc: 'Över och under nästa tiotal', nodes: ['stora-kliv', 'stora-kliv-tillbaka'], skills: ['ma.add.tvasiffrigt-ental', 'ma.sub.tvasiffrigt-ental'] },
+    { id: 'lana-en-tia', title: 'Låna en tia', icon: '🔄', desc: 'Minus när entalen inte räcker', nodes: ['baklangesbavern', 'lana-en-tia'], skills: ['ma.sub.tvasiffrigt'] },
+    { id: 'tiotal-och-ental', title: 'Tiotal och ental', icon: '🧱', desc: 'Räkna dem för sig – och glöm inte nya tian', nodes: ['tiotal-och-ental'], skills: ['ma.add.tvasiffrigt'] },
+  ],
   eras: [
     { id: 'brofastet', name: 'Brofästet', icon: '🪵', fact: 'Tiokompisar är två tal som blir 10 tillsammans, som 3 och 7. De håller alltid ihop!',
       nodes: [

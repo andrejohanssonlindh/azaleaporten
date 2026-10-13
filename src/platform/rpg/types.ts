@@ -1,4 +1,4 @@
-import type { ComponentType } from 'preact';
+import type { ComponentChildren, ComponentType } from 'preact';
 import type { Rng } from '../rng';
 
 // Plattformens äventyrsmodell: ett område (t.ex. Tidstornet) består av epoker med banor och bossar.
@@ -59,6 +59,39 @@ export interface EraDef {
   nodes: PathNode[];
 }
 
+/**
+ * En lektion i Klassrummet: en frivillig genomgång bredvid banorna som tränar samma sak.
+ * Själva innehållet (Lesson) ligger i spelets kod och laddas med spelet. Id:t är permanent (sparas när den är läst).
+ */
+export interface LessonMeta {
+  id: string;
+  title: string;
+  icon: string;
+  /** En kort rad om vad lektionen visar. */
+  desc: string;
+  /** Banor (och bossar) som lektionen hör till. Den visas på stigen före den första av dem. */
+  nodes: string[];
+  /** Färdigheter som lektionen förklarar (exakta id:n, eller en början som slutar med punkt, t.ex. 'ma.div.'). Hittar lektionen i repetition och regionbossar; den första som passar vinner. */
+  skills?: string[];
+}
+
+/** En sida i en lektion. */
+export interface LessonPage {
+  title: string;
+  /** Brödtext; tom rad = nytt stycke. */
+  text: string;
+  /** En bild som förklarar. */
+  pic?: ComponentChildren;
+  /** Ett räkneexempel som visas ett steg i taget ("Visa nästa steg"). */
+  steps?: string[];
+  /** "Tänk på"-ruta. */
+  tips?: string;
+  /** Prova själv: en riktig fråga ur spelet. Räknas inte – här får man göra fel. */
+  prova?: QuestionSpec;
+}
+
+export interface Lesson { pages: LessonPage[] }
+
 export interface AreaDef {
   areaId: string;
   gameId: string;
@@ -71,6 +104,8 @@ export interface AreaDef {
   /** Ord på resultatskärmen, i områdets tema. */
   texts: { cleared: string; notYet: string; back: string };
   eras: EraDef[];
+  /** Klassrummets lektioner (innehållet finns i GameModule.lessons). */
+  lessons?: LessonMeta[];
 }
 
 export interface FirstAnswer { correct: boolean; ms: number; errTag?: string; hint: boolean }
@@ -99,6 +134,8 @@ export interface GameModule {
   /** Kort beskrivning av en felkod (bossintro, statistik). */
   errLabel(tag: string): string | undefined;
   View: ComponentType<QuestionViewProps>;
+  /** Klassrummets lektioner, efter LessonMeta.id. */
+  lessons?: Record<string, Lesson>;
 }
 
 export const allNodes = (a: AreaDef): PathNode[] => a.eras.flatMap((e) => e.nodes);

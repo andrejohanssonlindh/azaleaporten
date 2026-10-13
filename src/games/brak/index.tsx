@@ -1,4 +1,5 @@
 import { drillModule } from '../../engines/drill/DrillView';
+import { LEKTIONER } from './lektioner';
 import type { DrillGame } from '../../engines/drill/types';
 import { diagnose, ERR, explain, hint, makeQ, solution, specsForSkill, type BQ, type F } from './logic';
 
@@ -51,6 +52,6 @@ function Bakery({ q, hint: showHint }: { q: BQ; hint: boolean; done: boolean }) 
   return null;
 }
 
-export const brakGame: DrillGame<BQ> = { id: 'brak', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: Bakery, errLabels: ERR };
+export const brakGame: DrillGame<BQ> = { id: 'brak', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: Bakery, errLabels: ERR, lessons: LEKTIONER };
 
 export const brak = drillModule(brakGame);

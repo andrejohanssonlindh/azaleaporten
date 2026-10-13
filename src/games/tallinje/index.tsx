@@ -1,4 +1,5 @@
 import { drillModule } from '../../engines/drill/DrillView';
+import { LEKTIONER } from './lektioner';
 import type { DrillGame } from '../../engines/drill/types';
 import { fmtNum } from '../../engines/drill/check';
 import { diagnose, ERR, explain, hint, makeQ, solution, specsForSkill, type Line, type LQ } from './logic';
@@ -37,6 +38,6 @@ function Visual({ q, done }: { q: LQ; hint: boolean; done: boolean }) {
   return <div class="numline-wrap"><NumberLine line={q.line} showMark={done || !!q.line.markLabel || q.mode === 'negativa' && q.level > 0} /></div>;
 }
 
-export const tallinjeGame: DrillGame<LQ> = { id: 'tallinje', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual, errLabels: ERR };
+export const tallinjeGame: DrillGame<LQ> = { id: 'tallinje', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual, errLabels: ERR, lessons: LEKTIONER };
 
 export const tallinje = drillModule(tallinjeGame);

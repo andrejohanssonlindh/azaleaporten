@@ -1,4 +1,5 @@
 import { drillModule } from '../../engines/drill/DrillView';
+import { LEKTIONER } from './lektioner';
 import type { DrillGame } from '../../engines/drill/types';
 import { COINS, diagnose, ERR, explain, hint, kr, makeQ, solution, specsForSkill, type PQ } from './logic';
 
@@ -40,6 +41,6 @@ function Market({ q }: { q: PQ; hint: boolean; done: boolean }) {
   );
 }
 
-export const pengarGame: DrillGame<PQ> = { id: 'pengar', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: Market, errLabels: ERR };
+export const pengarGame: DrillGame<PQ> = { id: 'pengar', make: makeQ, specsForSkill, diagnose, explain, solution, hint, Visual: Market, errLabels: ERR, lessons: LEKTIONER };
 
 export const pengar = drillModule(pengarGame);

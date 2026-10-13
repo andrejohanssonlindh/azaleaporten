@@ -95,3 +95,18 @@ export const MOB = { hp: 50, blad: 1 };
 /** Spelnycklar: hittas ibland när en vanlig bana eller bossstrid är klar (aldrig när hjälten är trött).
  *  En nyckel startar en skattrunda i ett minispel, där upp till chestsPerRun skattkistor dyker upp. */
 export const KEYS = { stageChance: 0.08, bossChance: 0.3, max: 5, chestsPerRun: 3 };
+
+/**
+ * Klassrummet: när föreslås en lektion? Räknas på första svaren i rundan (eller de senaste svaren på banorna
+ * lektionen hör till). mild = en liten knapp ovanför frågan; stark = Mästare Kastanj frågar en gång mellan två frågor.
+ * Lektionen ger XP en gång (aldrig kastanjer): den ska kännas värd att öppna, inte gå att samla på.
+ */
+export const LEKTION = {
+  /** Mild: fler än 20 % fel, och minst två fel. */
+  mild: { rate: 0.2, min: 2 },
+  /** Stark: hälften eller mer fel, och minst tre fel. */
+  stark: { rate: 0.5, min: 3 },
+  /** Hur många av de senaste svaren som räknas utanför en runda (stigen). */
+  window: 10,
+  xp: 10,
+};

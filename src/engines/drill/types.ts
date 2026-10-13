@@ -1,6 +1,6 @@
 import type { ComponentType } from 'preact';
 import type { Rng } from '../../platform/rng';
-import type { QuestionSpec } from '../../platform/rpg/types';
+import type { Lesson, QuestionSpec } from '../../platform/rpg/types';
 
 // Drillmotorn: frågor där svaret är ett heltal som skrivs i en ruta i en uppställning,
 // t.ex. "8 + 5 = ?" eller "7 · ? = 56". Spelet levererar generering, diagnos och förklaringar;
@@ -56,4 +56,6 @@ export interface DrillGame<Q extends DrillQ = DrillQ> {
   notes?(q: Q): Note[];
   /** Etiketter för spelets felkoder (bossintro och statistik). */
   errLabels: Record<string, string>;
+  /** Klassrummets lektioner (se LessonMeta i områdets innehåll). */
+  lessons?: Record<string, Lesson>;
 }
