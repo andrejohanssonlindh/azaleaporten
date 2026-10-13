@@ -1,5 +1,8 @@
 import type { ComponentChildren } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
 import { dataRev, go, heroId, toast } from '../state';
+import { allSteg, grownSince, markSeen, type Steg } from '../platform/rpg/vaxt';
+import { BetongbuktenGrowth, OrdskogenGrowth, RobotonGrowth, TalbergenGrowth, VasteronGrowth } from './IslandGrowth';
 import { getHeroState, getProfile } from '../platform/profiles';
 import { mistByArea } from '../platform/learning/skills';
 import { getArea, getPlay, nextOpenNode } from '../platform/rpg/progress';
@@ -42,7 +45,17 @@ function Mist({ region, n }: { region: RegionId; n: number }) {
   );
 }
 
-function Island({ heroEmoji, mist, keys }: { heroEmoji: string; mist: Partial<Record<RegionId, number>>; keys: number }) {
+interface IslandProps {
+  heroEmoji: string;
+  mist: Partial<Record<RegionId, number>>;
+  keys: number;
+  steg: Record<RegionId, Steg>;
+  /** Stegen hjälten hade sett innan kartan öppnades (nyare lager poppar fram). */
+  seen: Record<string, number>;
+}
+
+function Island({ heroEmoji, mist, keys, steg, seen }: IslandProps) {
+  const g = (r: RegionId) => ({ steg: steg[r], seen: seen[r] ?? 0 });
   return (
     <svg class="island" viewBox="0 0 400 520" role="group" aria-label="Karta över ön">
       <defs>
@@ -82,6 +95,7 @@ function Island({ heroEmoji, mist, keys }: { heroEmoji: string; mist: Partial<Re
         <ellipse cx="364" cy="482" rx="30" ry="15" fill="#f4e3b5" />
         <ellipse cx="364" cy="480" rx="23" ry="10" fill="#ced4da" />
         <text x="364" y="478" font-size="18" text-anchor="middle" dominant-baseline="central">🤖</text>
+        <RobotonGrowth {...g('roboton')} />
       </Spot>
 
       {/* båtrutt till Västerön */}
@@ -98,6 +112,7 @@ function Island({ heroEmoji, mist, keys }: { heroEmoji: string; mist: Partial<Re
         <path d="M50 300 L52 282" stroke="#8d6e4a" stroke-width="3" />
         <path d="M52 282 q-10 -2 -14 4 M52 282 q10 -3 14 3 M52 282 q-4 -8 -12 -8 M52 282 q4 -8 12 -7" stroke="#2f9e44" stroke-width="3" fill="none" stroke-linecap="round" />
         <rect x="66" y="282" width="7" height="20" fill="#fff" /><rect x="66" y="288" width="7" height="4" fill="#e03131" /><path d="M65 282 l4.5 -6 l4.5 6 z" fill="#e03131" />
+        <VasteronGrowth {...g('vasteron')} />
       </Spot>
 
       {/* Talbergen + Tidstornet */}
@@ -110,6 +125,7 @@ function Island({ heroEmoji, mist, keys }: { heroEmoji: string; mist: Partial<Re
         <rect x="300" y="96" width="20" height="56" fill="#7048e8" />
         <path d="M296 98 L310 76 L324 98 Z" fill="#5f3dc4" />
         <circle cx="310" cy="112" r="7" fill="#fff" /><path d="M310 112 V107 M310 112 H314" stroke="#212529" stroke-width="1.6" stroke-linecap="round" />
+        <TalbergenGrowth {...g('talbergen')} />
       </Spot>
 
       {/* Ordskogen */}
@@ -117,6 +133,7 @@ function Island({ heroEmoji, mist, keys }: { heroEmoji: string; mist: Partial<Re
         {[[130, 300], [152, 284], [174, 300], [140, 262], [168, 258], [120, 330], [158, 318], [186, 326], [196, 280]].map(([x, y], i) => (
           <g key={i}><path d={`M${x} ${y} l12 -30 l12 30 z`} fill={i % 2 ? '#2b8a3e' : '#2f9e44'} /><rect x={x + 10} y={y} width="4" height="6" fill="#8d6e4a" /></g>
         ))}
+        <OrdskogenGrowth {...g('ordskogen')} />
       </Spot>
 
       {/* Betongbukten */}
@@ -126,6 +143,7 @@ function Island({ heroEmoji, mist, keys }: { heroEmoji: string; mist: Partial<Re
         <path d="M335 420 a22 22 0 0 0 -22 -22 v22 z" fill="#adb5bd" stroke="#868e96" />
         <ellipse cx="300" cy="392" rx="14" ry="7" fill="#868e96" />
         <text x="298" y="415" font-size="16" text-anchor="middle">🛹</text>
+        <BetongbuktenGrowth {...g('betongbukten')} />
       </Spot>
 
       {/* Övningsängen */}
@@ -166,7 +184,21 @@ function Island({ heroEmoji, mist, keys }: { heroEmoji: string; mist: Partial<Re
 
 export function IslandMap() {
   dataRev.value;
-  const p = getProfile(heroId.value!);
+  const hid = heroId.value;
+  // Vad hjälten hade sett när kartan öppnades: det som har vuxit sedan dess poppar fram, en gång.
+  const [seen] = useState(() => (hid ? { ...getHeroState(hid).oSteg } : {}));
+  useEffect(() => {
+    if (!hid || !getProfile(hid)) return;
+    const now = allSteg(hid);
+    const grown = grownSince(hid, now);
+    if (!grown.length) return;
+    markSeen(hid, now);
+    const names = grown.map((r) => REGIONS.find((x) => x.id === r)!.name);
+    const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} och ${names[names.length - 1]}`;
+    toast(names.length === 1 ? `🌱 ${list} har vuxit! Titta på kartan.` : `🌱 Ön har vuxit: ${list}!`);
+  }, [hid]);
+
+  const p = hid ? getProfile(hid) : null;
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   const last = getPlay(p.id).last;
   const mist: Partial<Record<RegionId, number>> = {};
@@ -182,7 +214,7 @@ export function IslandMap() {
       <TopBar p={p} />
       <UpdateBanner />
       <KastanjGreeting p={p} compact />
-      <Island heroEmoji={animal(p.animal).emoji} mist={mist} keys={getHeroState(p.id).nycklar} />
+      <Island heroEmoji={animal(p.animal).emoji} mist={mist} keys={getHeroState(p.id).nycklar} steg={allSteg(p.id)} seen={seen} />
       {cont && (
         <button class="btn primary big continue" onClick={() => go(`spela/${cont.areaId}/${cont.node.id}`)}>
           {cont.icon} Fortsätt: {cont.node.name}

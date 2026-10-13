@@ -474,6 +474,21 @@ button.slot { background: transparent; color: inherit; }
 .isle-keys .isle-mist-badge { fill: #e8590c; }
 @keyframes isle-key-bob { 50% { transform: translateY(-3px); } }
 @media (prefers-reduced-motion: no-preference) { .isle-keys { animation: isle-key-bob 2s ease-in-out infinite; } }
+/* Ön växer (IslandGrowth.tsx): nya lager poppar fram en gång, lampor tindrar. */
+@media (prefers-reduced-motion: no-preference) {
+  .isle-grow.isle-new { animation: isle-grow 1.4s ease-out .3s both; transform-box: fill-box; transform-origin: center bottom; }
+  @keyframes isle-grow {
+    from { transform: scale(.1); opacity: 0; filter: drop-shadow(0 0 6px #fff); }
+    55% { transform: scale(1.25); opacity: 1; filter: drop-shadow(0 0 6px #fff); }
+    to { transform: scale(1); filter: none; }
+  }
+  .isle-twinkle { animation: isle-twinkle 1.6s ease-in-out infinite alternate; }
+  @keyframes isle-twinkle { from { opacity: .35; } to { opacity: 1; } }
+  .isle-blink { animation: isle-blink 1.2s steps(2, jump-none) infinite; }
+  @keyframes isle-blink { from { opacity: 1; } to { opacity: .25; } }
+  .isle-beam { animation: isle-twinkle 2.4s ease-in-out infinite alternate; }
+  .isle-flame { animation: isle-twinkle .3s linear infinite alternate; }
+}
 @media (prefers-reduced-motion: no-preference) {
   .isle-mist { animation: mist-drift 6s ease-in-out infinite alternate; }
   @keyframes mist-drift { from { transform: translateX(-3px); } to { transform: translateX(3px); } }
