@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { GameModule, QuestionViewProps } from '../../platform/rpg/types';
 import { canSpeak, hasVoice, speak, voices } from '../../platform/speech';
-import { parseAnswer } from '../drill/check';
+import { fmtNum, parseAnswer } from '../drill/check';
+import { honest, lagat } from './chart';
 import { diagnoseAny, errLabel, explainAny, isRight, joinVals, splitVals } from './check';
 import { ChartView, PlockBild } from './ChartView';
 import type { DiagramGame, DiagramQ, Explained } from './types';
@@ -25,6 +26,9 @@ export function makeDiagramView<Q extends DiagramQ>(g: DiagramGame<Q>) {
     const [wrong, setWrong] = useState<string[]>([]);
     const [warn, setWarn] = useState('');
     const [vals, setVals] = useState<number[]>(() => q.chart.kat.map(() => q.chart.axel.min));
+    // laga: var axeln börjar, eller staplarnas bredd, som barnet har ställt in.
+    const [start, setStart] = useState(() => q.chart.lur?.axelStart ?? 0);
+    const [bredd, setBredd] = useState<number[]>(() => q.chart.lur?.bredd ?? q.chart.kat.map(() => 1));
     const t0 = useRef(performance.now());
     const inputRef = useRef<HTMLInputElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null);
@@ -59,12 +63,15 @@ export function makeDiagramView<Q extends DiagramQ>(g: DiagramGame<Q>) {
 
     const done = phase === 'done';
     const wasWrong = tries > 0;
-    const shows = q.kind === 'las' || q.kind === 'bygg';
+    const shows = q.kind === 'las' || q.kind === 'bygg' || q.kind === 'laga';
+    const lagaGiven = q.laga === 'axel' ? `a:${start}` : `b:${bredd.join(',')}`;
+    const lagad = q.kind === 'laga' ? (done ? honest(q.chart) : lagat(q.chart, lagaGiven)) : q.chart;
     const next = () => onDone(wasWrong ? (tries >= 3 && shows ? 'shown' : 'self') : undefined);
     const feedback = done ? (wasWrong ? 'Rätt! Nu stämmer det.' : 'Rätt! Bra jobbat!') : phase === 'fixing' ? (tries > 1 ? 'Fortfarande fel' : 'Fel') : '';
     const task = q.kind === 'val' || q.kind === 'sant' ? 'Välj ett annat alternativ.'
       : q.kind === 'tryck' ? 'Tryck någon annanstans.'
         : q.kind === 'bygg' ? (tries >= 3 ? 'Så här ska det se ut. Bygg likadant för att gå vidare.' : 'Ändra och rätta igen.')
+          : q.kind === 'laga' ? (tries >= 3 ? (q.laga === 'axel' ? 'Låt axeln börja på 0 och rätta igen.' : 'Gör alla staplar lika breda och rätta igen.') : 'Ändra och rätta igen.')
           : tries >= 3 ? `Rätt svar är ${q.answer}. Skriv in det för att gå vidare.` : 'Rätta svaret för att gå vidare.';
     const speakable = canSpeak() && hasVoice('sv-SE');
 
@@ -76,13 +83,40 @@ export function makeDiagramView<Q extends DiagramQ>(g: DiagramGame<Q>) {
           {speakable && <button type="button" class="speak" onClick={() => speak(q.prompt)} aria-label="Läs upp">🔊</button>}
         </div>
 
-        {q.kalla && <ChartView chart={q.kalla} />}
+        {q.rubrik && <p class="dia-rubrik">{q.rubrik}</p>}
+        {q.kalla && !q.bredvid && <ChartView chart={q.kalla} />}
         {q.bild && <PlockBild bild={q.bild} label={q.chart.titel} />}
 
-        {q.kind === 'bygg'
-          ? <ChartView chart={q.chart} vals={done ? splitVals(q.answer) : vals} edit={done ? undefined : setVal} showVals={done && q.chart.typ === 'stapel'} />
-          : <ChartView chart={q.chart} onTap={q.kind === 'tryck' && !done ? check : undefined} off={q.kind === 'tryck' ? wrong : undefined}
-            hit={done ? q.visa : undefined} showVals={done && q.chart.typ === 'stapel'} />}
+        {q.chart.kat.length > 0 && <div class={q.bredvid ? 'dia-bredvid' : undefined}>
+          {q.kalla && q.bredvid && <ChartView chart={q.kalla} />}
+          {q.kind === 'bygg'
+            ? <ChartView chart={q.chart} vals={done ? splitVals(q.answer) : vals} edit={done ? undefined : setVal} showVals={done && vals.length > 0 && (q.chart.typ === 'stapel' || q.chart.typ === 'linje')} />
+            : q.kind === 'laga'
+              ? <ChartView chart={lagad} onTap={q.laga === 'bredd' && !done ? (part) => { const i = Number(part.slice(1)); if (part.startsWith('k')) setBredd((b) => b.map((x, k) => (k === i ? 1 : x))); } : undefined} />
+              : <ChartView chart={q.chart} onTap={q.kind === 'tryck' && !done ? check : undefined} off={q.kind === 'tryck' ? wrong : undefined}
+                hit={done ? q.visa : undefined} showVals={done && (q.chart.typ === 'stapel' || q.chart.typ === 'linje') && !q.chart.lur} />}
+        </div>}
+
+        {q.kind === 'laga' && !done && q.laga === 'axel' && (
+          <div class="dia-laga" role="group" aria-label="Var axeln börjar">
+            <span>Axeln börjar på <b>{fmtNum(start)}</b></span>
+            <button type="button" class="btn small" aria-label="Flytta ner axelns början" disabled={start <= 0} onClick={() => setStart((x) => Math.max(0, x - q.chart.axel.steg))}>▼</button>
+            <button type="button" class="btn small" aria-label="Flytta upp axelns början" disabled={start >= q.chart.axel.max - 2 * q.chart.axel.steg} onClick={() => setStart((x) => x + q.chart.axel.steg)}>▲</button>
+          </div>
+        )}
+        {q.kind === 'laga' && !done && q.laga === 'bredd' && (
+          <div class="dia-laga">
+            <span>Tryck på en stapel som är för bred, så blir den vanlig.</span>
+            <button type="button" class="btn small" onClick={() => setBredd(q.chart.lur?.bredd ?? q.chart.kat.map(() => 1))}>Börja om</button>
+          </div>
+        )}
+        {q.kind === 'laga' && !done && (
+          <div class="row center-row"><button type="button" class="btn primary" onClick={() => check(lagaGiven)}>Rätta</button></div>
+        )}
+
+        {done && q.sanning && q.chart.lur && q.kind !== 'laga' && (
+          <div class="dia-facit dia-sanning"><p class="dia-sanning-rubrik">🔍 Sanningen</p><ChartView chart={honest(q.chart)} showVals={q.chart.typ !== 'cirkel'} /></div>
+        )}
 
         {q.kind === 'bygg' && phase === 'fixing' && tries >= 3 && (
           <div class="dia-facit"><ChartView chart={{ ...q.chart, titel: 'Så här ska det se ut' }} showVals /></div>

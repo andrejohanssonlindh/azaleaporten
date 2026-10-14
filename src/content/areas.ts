@@ -33,7 +33,7 @@ import { LOGIKSLINGAN } from '../games/logik/content';
 import { BUGGJAKTEN, KODSTIGEN, LOOPVERKSTADEN } from '../games/robot/content';
 import { PYTHONHAMNEN } from '../games/python/content';
 import { ROBOTFABRIKEN } from '../games/roboton';
-import { FAGELTORNET, SKORDEMARKNADEN } from '../games/diagram/content';
+import { FAGELTORNET, OMROSTNINGSTORGET, SKORDEMARKNADEN, VADERSTATIONEN } from '../games/diagram/content';
 import { BALLONGRESAN, FLAGGMASTEN, GLOBEN, HUVUDSTADSEXPRESSEN, KARTRUMMET, SVERIGERESAN } from '../games/geografi/content';
 import { OBSERVATORIET } from '../games/kompasson';
 
@@ -72,6 +72,8 @@ const AREAS: Record<string, Playable> = {
   pythonhamnen: { def: PYTHONHAMNEN, load: () => import('../games/python').then((m) => m.python) },
   fageltornet: { def: FAGELTORNET, load: () => import('../games/diagram').then((m) => m.fageltornet) },
   skordemarknaden: { def: SKORDEMARKNADEN, load: () => import('../games/diagram').then((m) => m.skordemarknaden) },
+  vaderstationen: { def: VADERSTATIONEN, load: () => import('../games/diagram').then((m) => m.vaderstationen) },
+  omrostningstorget: { def: OMROSTNINGSTORGET, load: () => import('../games/diagram').then((m) => m.omrostningstorget) },
   kartrummet: { def: KARTRUMMET, load: () => import('../games/geografi').then((m) => m.kartrummet) },
   globen: { def: GLOBEN, load: () => import('../games/geografi').then((m) => m.globen) },
   sverigeresan: { def: SVERIGERESAN, load: () => import('../games/geografi').then((m) => m.sverigeresan) },

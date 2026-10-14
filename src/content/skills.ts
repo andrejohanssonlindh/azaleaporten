@@ -106,6 +106,16 @@ const STAT: Record<string, string> = {
   streck: 'streckdiagram', 'streck-rita': 'att rita streck', tabell: 'tabeller', 'tabell-jamfor': 'att jämföra i tabeller',
   stapel: 'stapeldiagram', 'stapel-skala': 'skalan i stapeldiagram', 'stapel-jamfor': 'att jämföra staplar', 'stapel-rita': 'att bygga stapeldiagram',
   bild: 'bilddiagram', 'bild-halv': 'halva bilder i bilddiagram',
+  linje: 'linjediagram', 'linje-forandring': 'när linjen ökar och minskar', 'linje-tva': 'två linjer i samma diagram',
+  'linje-rita': 'att rita linjediagram', diagramtyp: 'vilket diagram som passar',
+  cirkel: 'cirkeldiagram', 'cirkel-procent': 'procent i cirkeldiagram', 'cirkel-jamfor': 'staplar och cirklar',
+  medel: 'medelvärde', 'medel-diagram': 'medelvärde i diagram', median: 'median', typvarde: 'typvärde',
+  variationsbredd: 'variationsbredd', lagesmatt: 'vilket lägesmått som är vilket',
+  'lura.axel': 'axlar som inte börjar på noll', 'lura.skala': 'ojämna skalor', 'lura.bredd': 'staplar som är olika breda',
+  'lura.yta': 'bilder som lurar med ytan', 'lura.olika': 'diagram med olika skalor', 'lura.enhet': 'diagram utan tal',
+  'lura.rubrik': 'rubriker som inte stämmer', 'lura.utsnitt': 'diagram som bara visar en bit', 'lura.summerad': 'totalen som ser ut som ökning',
+  'lura.hundra': 'cirklar som blir mer än 100 %', 'lura.urval': 'när för få har svarat', 'lura.perperson': 'totalt och per person',
+  'lura.samband': 'samband och orsak',
 };
 const GEOGRAFI: Record<string, string> = {
   'karta.vaderstreck': 'väderstrecken', 'karta.riktning': 'vad som ligger åt vilket håll', 'karta.symboler': 'kartsymboler',

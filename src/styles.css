@@ -9,6 +9,8 @@
   --fm: #1c7ed6; --fm-bg: #e7f5ff; --em: #b35c00; --em-bg: #fff4e6;
   --geo-fill: #ffe8cc; --geo-stroke: #e8590c; --geo-fill2: #ffd8a8; --geo-hit: #b2f2bb; --geo-blue: #1c7ed6; --geo-grid: #e9ecef; --geo-water: #a5d8ff;
   --dia-bar: #f08c00; --dia-bar2: #1c7ed6; --dia-grid: #e3d6c0; --dia-axis: #7a6a58; --dia-hit: #2b8a3e; --dia-hit-bg: #d3f9d8;
+  --dia-p0: #f08c00; --dia-p1: #1c7ed6; --dia-p2: #f6c90e; --dia-p3: #9c36b5; --dia-p4: #20c997; --dia-p5: #e8590c;
+  --dia-tidning: #f8f3e8;
   --kar-hav: #a5d8ff; --kar-land: #f4e3b5; --kar-bakland: #e9e2d0; --kar-kant: #a08a6a; --kar-sjo: #74c0fc; --kar-papper: #fffdf8;
   --kar-lyser: #ff922b; --kar-vald: #d6336c; --kar-skog: #69db7c; --kar-aker: #ffe066; --kar-hojd1: #8ce99a; --kar-hojd2: #e9c46a; --kar-hojd3: #9c6644; --kar-fraga: #1c7ed6;
   --font: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
@@ -23,6 +25,8 @@
     --fm: #74c0fc; --fm-bg: #1a2a3a; --em: #ffc078; --em-bg: #3a2a1a;
     --geo-fill: #4a2f1c; --geo-stroke: #ff922b; --geo-fill2: #6b3f1e; --geo-hit: #2b5a34; --geo-blue: #74c0fc; --geo-grid: #3a3248; --geo-water: #1c4a6e;
     --dia-bar: #ffa94d; --dia-bar2: #74c0fc; --dia-grid: #3a3248; --dia-axis: #b3a796; --dia-hit: #69db7c; --dia-hit-bg: #1f3d26;
+    --dia-p0: #ffa94d; --dia-p1: #4dabf7; --dia-p2: #ffe066; --dia-p3: #cc5de8; --dia-p4: #38d9a9; --dia-p5: #ff8787;
+    --dia-tidning: #2c2638;
     --kar-hav: #1c3a5a; --kar-land: #6b5a3e; --kar-bakland: #3d3548; --kar-kant: #b3a796; --kar-sjo: #2f6fa8; --kar-papper: #251f31;
     --kar-lyser: #ffa94d; --kar-vald: #f06595; --kar-skog: #2f9e44; --kar-aker: #b08900; --kar-hojd1: #2b8a3e; --kar-hojd2: #a07c2c; --kar-hojd3: #6b4423; --kar-fraga: #4dabf7;
     --shadow: 0 2px 0 rgba(0, 0, 0, .3), 0 10px 26px rgba(0, 0, 0, .25);
@@ -1215,6 +1219,29 @@ button.dia-bild-rad { cursor: pointer; }
 .dia-plock-ikon { font-size: 24px; }
 .dia-facit { border: 2px dashed var(--dia-hit); border-radius: 14px; padding: 6px 8px; margin: 6px 0; }
 .dia-rand { stroke: var(--card); stroke-width: 2.5; }
+.dia-line { fill: none; stroke: var(--dia-bar); stroke-width: 3; stroke-linejoin: round; }
+.dia-line.s1 { stroke: var(--dia-bar2); stroke-dasharray: 7 4; }
+.dia-punkt.s0 { fill: var(--dia-bar); stroke: var(--card); stroke-width: 2; }
+.dia-punkt.s1 { fill: var(--dia-bar2); stroke: var(--card); stroke-width: 2; }
+.dia-svg .hit .dia-punkt { stroke: var(--dia-hit); stroke-width: 3; }
+.dia-svg .off .dia-punkt, .dia-svg .off .dia-bit { opacity: .35; }
+.dia-bit { stroke: var(--card); stroke-width: 2; }
+.dia-bit.p0 { fill: var(--dia-p0); } .dia-bit.p1 { fill: var(--dia-p1); } .dia-bit.p2 { fill: var(--dia-p2); }
+.dia-bit.p3 { fill: var(--dia-p3); } .dia-bit.p4 { fill: var(--dia-p4); } .dia-bit.p5 { fill: var(--dia-p5); }
+.dia-svg .hit .dia-bit { stroke: var(--dia-hit); stroke-width: 4; }
+.dia-bit-ikon { font-size: 20px; pointer-events: none; }
+.dia-ytbild { pointer-events: none; }
+.dia-lista { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 6px 0; }
+.dia-lapp { display: inline-flex; flex-direction: column; align-items: center; min-width: 52px; padding: 6px 8px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); }
+.dia-lapp b { font-size: 22px; font-variant-numeric: tabular-nums; }
+.dia-lapp small { font-size: 12px; color: var(--muted); }
+.dia-lapp.hit { border-color: var(--dia-hit); background: var(--dia-hit-bg); }
+.dia-rubrik { font-family: Georgia, "Times New Roman", serif; font-weight: 900; font-size: 21px; line-height: 1.2; text-align: center; margin: 4px 0 8px; padding: 10px 12px; background: var(--dia-tidning); border-top: 4px double var(--ink); border-bottom: 4px double var(--ink); }
+.dia-bredvid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dia-bredvid .dia-titel { font-size: 13px; }
+.dia-laga { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; margin: 6px 0; }
+.dia-laga .btn.small { min-width: 44px; min-height: 44px; }
+.dia-sanning-rubrik { font-weight: 800; margin: 2px 0 0; text-align: center; }
 
 /* ---------- kartor (Kompassön) ---------- */
 .kar-svg { width: 100%; max-width: 480px; max-height: 62vh; height: auto; display: block; margin: 4px auto 10px; border-radius: 14px; border: 2px solid var(--line); }

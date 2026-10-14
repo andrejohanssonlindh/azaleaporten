@@ -1,4 +1,5 @@
 import { parseAnswer, sameNumber } from '../drill/check';
+import { distortion, lagat } from './chart';
 import type { DiagramGame, DiagramQ, Explained } from './types';
 
 // Rättning som gäller alla diagramspel. Felkoderna här är permanenta.
@@ -21,6 +22,7 @@ export function isRight(q: DiagramQ, given: string): boolean {
     const a = splitVals(q.answer), g = splitVals(given);
     return a.length === g.length && a.every((x, i) => sameNumber(x, g[i]));
   }
+  if (q.kind === 'laga') return /^[ab]:/.test(given) && distortion(lagat(q.chart, given)) < 1.1;
   return given === q.answer;
 }
 

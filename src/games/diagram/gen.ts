@@ -52,7 +52,10 @@ export function distinct(n: number, lo: number, hi: number, step: number, rng: R
   return rng.shuffle(pool).slice(0, n);
 }
 
-export function chartOf(t: Tema, idx: number[], v: number[], typ: Chart['typ'], axel: Chart['axel'], extra: Partial<Chart> = {}): Chart {
+/** Det ett diagram behöver av ett tema. */
+export type Namn = Pick<Tema, 'titel' | 'enhet' | 'katNamn' | 'kat'>;
+
+export function chartOf(t: Namn, idx: number[], v: number[], typ: Chart['typ'], axel: Chart['axel'], extra: Partial<Chart> = {}): Chart {
   return {
     typ, titel: t.titel, enhet: t.enhet, katNamn: t.katNamn,
     kat: idx.map((i) => t.kat[i].namn), ikoner: idx.map((i) => t.kat[i].ikon),
@@ -75,8 +78,10 @@ export function cands(answer: number, list: [number, string][]): Record<string, 
 export const grannar = (v: number[], i: number): [number, string][] =>
   [v[i - 1], v[i + 1]].filter((x) => x !== undefined).map((x) => [x, 'fel-stapel']);
 
-const del = (c: Chart) => (c.typ === 'stapel' ? 'stapel' : 'rad');
-const dela = (c: Chart) => (c.typ === 'stapel' ? 'staplarna' : 'raderna');
+/** Vad en del av diagrammet heter: stapel, punkt, bit eller rad (och i bestämd form, och flera). */
+export const del = (c: Chart) => (c.typ === 'stapel' ? 'stapel' : c.typ === 'linje' ? 'punkt' : c.typ === 'cirkel' ? 'bit' : 'rad');
+export const delen = (c: Chart) => (c.typ === 'stapel' ? 'stapeln' : c.typ === 'linje' ? 'punkten' : c.typ === 'cirkel' ? 'biten' : 'raden');
+export const dela = (c: Chart) => (c.typ === 'stapel' ? 'staplarna' : c.typ === 'linje' ? 'punkterna' : c.typ === 'cirkel' ? 'bitarna' : 'raderna');
 
 /* ---------- frågor som finns i flera lägen ---------- */
 
@@ -91,11 +96,15 @@ export function mestQ(b: Base, t: Tema, chart: Chart, which: 'mest' | 'minst', t
   const tips = chart.typ === 'tabell' ? `Jämför talen i tabellen. Vilket är ${storst ? 'störst' : 'minst'}?`
     : chart.typ === 'streck' ? `Vilken rad har ${storst ? 'flest' : 'färst'} streck?`
       : chart.typ === 'bild' ? `Vilken rad har ${storst ? 'flest' : 'färst'} bilder?`
-        : chart.liggande ? `Vilken stapel är ${storst ? 'längst' : 'kortast'}?` : `Vilken stapel är ${storst ? 'högst' : 'lägst'}?`;
-  const los = `${chart.kat[right]}: ${fmtNum(v[right])} ${t.enhet}. Det är ${storst ? 'mest' : 'minst'} av alla.`;
+        : chart.typ === 'cirkel' ? `Vilken bit av cirkeln är ${storst ? 'störst' : 'minst'}?`
+          : chart.typ === 'linje' ? `Vilken punkt ligger ${storst ? 'högst' : 'lägst'}?`
+            : chart.liggande ? `Vilken stapel är ${storst ? 'längst' : 'kortast'}?` : `Vilken stapel är ${storst ? 'högst' : 'lägst'}?`;
+  const los = chart.etikett === 'ingen'
+    ? `${chart.kat[right]} har den ${storst ? 'största' : 'minsta'} biten.`
+    : `${chart.kat[right]}: ${fmtNum(v[right])} ${t.enhet}. Det är ${storst ? 'mest' : 'minst'} av alla.`;
   if (tryck) {
     return {
-      ...b, kind: 'tryck', prompt: `${q} Tryck på ${chart.typ === 'stapel' ? 'stapeln' : 'raden'}.`, chart, answer: `k${right}`,
+      ...b, kind: 'tryck', prompt: `${q} Tryck på ${delen(chart)}.`, chart, answer: `k${right}`,
       misses: Object.fromEntries(v.map((_, j) => [`k${j}`, tagOf(j)]).filter(([k]) => k !== `k${right}`)), visa: [right], los, tips,
     };
   }
@@ -168,16 +177,19 @@ export function streckBygg(b: Base, t: Tema, idx: number[], v: number[], rng: Rn
   };
 }
 
-/** Bygg staplar från en tabell. */
-export function stapelBygg(b: Base, t: Tema, idx: number[], v: number[], step: number): DQ {
+/** Bygg staplar (eller sätt ut punkterna i ett linjediagram) från en tabell. */
+export function stapelBygg(b: Base, t: Namn, idx: number[], v: number[], step: number, typ: 'stapel' | 'linje' = 'stapel'): DQ {
   const axel = axisFor(Math.max(Math.max(...v) + step, 5 * step), step);
-  const chart = chartOf(t, idx, v, 'stapel', axel);
+  const chart = chartOf(t, idx, v, typ, axel);
+  const d = typ === 'linje' ? 'punkt' : 'stapel';
   return {
     ...b, kind: 'bygg', chart, answer: joinVals(v),
-    prompt: 'Bygg staplarna så att de visar talen i tabellen. Tryck i diagrammet, eller använd pilarna.',
+    prompt: typ === 'linje'
+      ? 'Sätt ut punkterna så att linjen visar talen i tabellen. Tryck i diagrammet, eller använd pilarna.'
+      : 'Bygg staplarna så att de visar talen i tabellen. Tryck i diagrammet, eller använd pilarna.',
     kalla: chartOf(t, idx, v, 'tabell', axel),
     los: `${chart.kat.map((k, i) => `${k}: ${fmtNum(v[i])}`).join(', ')}.`,
-    tips: step === 1 ? 'Varje streck på axeln är ett steg. Bygg en stapel i taget och kolla talet vid axeln.' : 'Kolla först hur mycket varje streck på axeln är värt. Bygg sedan en stapel i taget.',
+    tips: step === 1 ? `Varje streck på axeln är ett steg. Sätt en ${d} i taget och kolla talet vid axeln.` : `Kolla först hur mycket varje streck på axeln är värt. Sätt sedan en ${d} i taget.`,
   };
 }
 
@@ -202,7 +214,7 @@ export function explain(tag: string, q: DQ): Explained {
     case 'fel-stapel':
       return q.kind === 'bygg'
         ? { title: 'Rätt tal, fel ställe', text: `Talen finns med, men några har hamnat på fel ${del(c)}. Kolla namnet på varje ${del(c)} mot tabellen.` }
-        : { title: `Fel ${del(c)}`, text: `Du läste av en annan ${del(c)}. Leta först upp rätt namn, och följ sedan ${c.typ === 'stapel' ? 'stapeln' : 'raden'}.` };
+        : { title: `Fel ${del(c)}`, text: `Du läste av en annan ${del(c)}. Leta först upp rätt namn, och följ sedan ${delen(c)}.` };
     case 'rutor-inte-varde':
       return { title: 'Läs skalan', text: 'Du räknade rutorna. Men varje ruta är inte värd ett! Titta på talen vid axeln: hur mycket ökar de för varje streck?' };
     case 'mellan-linjer':
@@ -224,7 +236,7 @@ export function explain(tag: string, q: DQ): Explained {
     case 'raknade-fel':
       return { title: 'Räkna igen', text: 'Nästan! En rad har ett streck för mycket eller för lite. Räkna en gång till, rad för rad.' };
     case 'fel-hojd':
-      return { title: 'Kolla höjden', text: 'Nästan! En stapel är ett steg för hög eller för låg. Jämför varje stapel med talet i tabellen.' };
+      return { title: 'Kolla höjden', text: `Nästan! En ${del(c)} är ett steg för hög eller för låg. Jämför varje ${del(c)} med talet i tabellen.` };
     default:
       return { title: 'Inte riktigt', text: `Prova igen. ${q.tips}` };
   }
@@ -232,8 +244,19 @@ export function explain(tag: string, q: DQ): Explained {
 
 /* ---------- spelet ---------- */
 
+/** Ett områdes egna felkoder: etiketterna och förklaringarna (som aldrig säger svaret). */
+export interface Extra {
+  err: Record<string, string>;
+  explain(tag: string, q: DQ): Explained | undefined;
+}
+
+/** Felkoden för ett diagram som inte är lagat än: knepet finns kvar. */
+function diagnoseLaga(q: DQ): string {
+  return q.laga === 'axel' ? 'axel-inte-noll' : 'bredd-lurar';
+}
+
 /** Ett diagramspel av en frågegenerator. make får ge null; då dras ny data (frågan blir ändå densamma för samma seed). */
-export function diagramGame(id: string, gen: (spec: QuestionSpec, rng: Rng, ctx?: QuestionCtx) => DQ | null, specsForSkill: (skill: string) => QuestionSpec[]): DiagramGame<DQ> {
+export function diagramGame(id: string, gen: (spec: QuestionSpec, rng: Rng, ctx?: QuestionCtx) => DQ | null, specsForSkill: (skill: string) => QuestionSpec[], extra?: Extra): DiagramGame<DQ> {
   return {
     id,
     make(spec, rng, ctx) {
@@ -243,11 +266,11 @@ export function diagramGame(id: string, gen: (spec: QuestionSpec, rng: Rng, ctx?
       }
       throw new Error(`${id}: ingen fråga för ${JSON.stringify(spec)}`);
     },
-    diagnose: (q, given) => (q.kind === 'bygg' ? diagnoseBygg(q, given) : q.cand?.[given]),
-    explain: (tag, q) => explain(tag, q),
+    diagnose: (q, given) => (q.kind === 'bygg' ? diagnoseBygg(q, given) : q.kind === 'laga' ? diagnoseLaga(q) : q.cand?.[given]),
+    explain: (tag, q) => extra?.explain(tag, q) ?? explain(tag, q),
     solution: (q) => q.los,
     hint: (q) => q.tips,
     specsForSkill,
-    errLabels: ERR,
+    errLabels: { ...ERR, ...extra?.err },
   };
 }

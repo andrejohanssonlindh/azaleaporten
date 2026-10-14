@@ -96,8 +96,8 @@ export const REGIONS: Region[] = [
     areas: [
       { id: 'fageltornet', name: 'Fågeltornet', icon: '🐦', desc: 'Räkna fåglar med streck och tabeller.', grades: [1, 3], status: 'open' },
       { id: 'skordemarknaden', name: 'Skördemarknaden', icon: '🌾', desc: 'Stapeldiagram och bilddiagram.', grades: [1, 4], status: 'open' },
-      { id: 'vaderstationen', name: 'Väderstationen', icon: '🌦️', desc: 'Linjediagram: hur ändras vädret?', grades: [3, 6], status: 'soon' },
-      { id: 'omrostningstorget', name: 'Omröstningstorget', icon: '🗳️', desc: 'Cirkeldiagram: vem fick flest röster?', grades: [3, 6], status: 'soon' },
+      { id: 'vaderstationen', name: 'Väderstationen', icon: '🌦️', desc: 'Linjediagram: hur ändras vädret?', grades: [3, 6], status: 'open' },
+      { id: 'omrostningstorget', name: 'Omröstningstorget', icon: '🗳️', desc: 'Cirkeldiagram: vem fick flest röster?', grades: [3, 6], status: 'open' },
       { id: 'vagmastarens-bod', name: 'Vågmästarens bod', icon: '⚖️', desc: 'Medelvärde, median och typvärde.', grades: [4, 6], status: 'soon' },
       { id: 'spegelsalen', name: 'Spegelsalen', icon: '🪞', desc: 'Diagram som lurar ögat. Hitta knepet!', grades: [4, 6], status: 'soon' },
       { id: 'skvallerpressen', name: 'Skvallerpressen', icon: '📰', desc: 'Rubriker som lurar. Stämmer det verkligen?', grades: [4, 6], status: 'soon' },

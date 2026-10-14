@@ -127,6 +127,117 @@ export const BATAR: Tema = {
   alla: 'Hur många båtar kom sammanlagt?',
 };
 
+export const LEK: Tema = {
+  id: 'lek', titel: 'Klassens favoritlek på rasten', katNamn: 'Lek', enhet: 'röster',
+  kat: [s('Kurragömma', 'kurragömma', '🙈'), s('Fotboll', 'fotboll', '⚽'), s('Hopprep', 'hopprep', '🪢'), s('Kull', 'kull', '🏃'), s('Gunga', 'gungan', '🛝'), s('Klättra', 'klätterställningen', '🧗')],
+  las: (k) => `Hur många röstade på ${k.p}?`,
+  mest: 'Vilken lek fick flest röster?',
+  minst: 'Vilken lek fick färst röster?',
+  fler: (a, b) => `Hur många fler röstade på ${a.p} än på ${b.p}?`,
+  alla: 'Hur många röstade sammanlagt?',
+};
+
+export const SKOLVAG: Tema = {
+  id: 'skolvag', titel: 'Hur barnen kommer till skolan', katNamn: 'Sätt', enhet: 'barn',
+  kat: [s('Går', 'går', '🚶'), s('Cyklar', 'cyklar', '🚲'), s('Buss', 'åker buss', '🚌'), s('Bil', 'åker bil', '🚗'), s('Sparkcykel', 'åker sparkcykel', '🛴')],
+  las: (k) => `Hur många barn ${k.p} till skolan?`,
+  mest: 'Hur kommer flest barn till skolan?',
+  minst: 'Hur kommer färst barn till skolan?',
+  fler: (a, b) => `Hur många fler barn ${a.p} än ${b.p}?`,
+  alla: 'Hur många barn är det sammanlagt?',
+};
+
+/* ---------- linjediagram (Väderstationen) ---------- */
+
+/** Ett linjediagram: något som ändras över tid. form: dag = upp till en topp och ner igen; vaxt = ökar hela tiden. */
+export interface Linje {
+  id: string;
+  titel: string;
+  katNamn: string;
+  enhet: string;
+  svarEnhet?: string;
+  /** Tidpunkterna. p = i en fråga, t.ex. 'klockan 10' eller 'i maj'. */
+  kat: Sak[];
+  /** Talet som står i tidpunktens namn (klockslaget, veckan). Den som svarar med det har läst av fel axel. */
+  x?: number[];
+  form: 'dag' | 'vaxt';
+  /** När var det mest och minst? */
+  mest: string;
+  minst: string;
+  las(k: Sak): string;
+  /** När var värdet så här? (v = talet med enhet). */
+  nar(v: string): string;
+  /** "steg temperaturen" och "sjönk temperaturen". */
+  okade: string;
+  minskade: string;
+  /** Hur mycket ökade det från a till b? */
+  hurMycket(a: Sak, b: Sak): string;
+  /** Två linjer i samma diagram: linjernas namn, läs av en linje, och hur mycket mer den första var. */
+  serier?: [string, string];
+  lasSerie?(serie: number, k: Sak): string;
+  skillnad?(k: Sak): string;
+  med(v: number): string;
+}
+
+const klockan = (h: number) => s(`Kl ${h}`, `klockan ${h}`, '');
+
+export const TEMP: Linje = {
+  id: 'temp', titel: 'Temperaturen vid Väderstationen', katNamn: 'Tid', enhet: 'grader', svarEnhet: 'grader',
+  kat: [6, 8, 10, 12, 14, 16, 18].map(klockan), x: [6, 8, 10, 12, 14, 16, 18], form: 'dag',
+  mest: 'När var det varmast?', minst: 'När var det kallast?',
+  las: (k) => `Hur varmt var det ${k.p}?`,
+  nar: (v) => `När var det ${v}?`,
+  okade: 'steg temperaturen', minskade: 'sjönk temperaturen',
+  hurMycket: (a, b) => `Hur många grader steg temperaturen från ${a.p} till ${b.p}?`,
+  serier: ['I dalen', 'På berget'],
+  lasSerie: (i, k) => `Hur varmt var det ${i === 0 ? 'i dalen' : 'på berget'} ${k.p}?`,
+  skillnad: (k) => `Hur många grader varmare var det i dalen än på berget ${k.p}?`,
+  med: (v) => `${v} grader`,
+};
+
+export const SOLROS: Linje = {
+  id: 'solros', titel: 'Solrosens höjd', katNamn: 'Vecka', enhet: 'cm', svarEnhet: 'cm',
+  kat: [1, 2, 3, 4, 5, 6, 7].map((n) => s(`Vecka ${n}`, `vecka ${n}`, '')), x: [1, 2, 3, 4, 5, 6, 7], form: 'vaxt',
+  mest: 'Vilken vecka var solrosen högst?', minst: 'Vilken vecka var solrosen lägst?',
+  las: (k) => `Hur hög var solrosen ${k.p}?`,
+  nar: (v) => `Vilken vecka var solrosen ${v} hög?`,
+  okade: 'växte solrosen', minskade: 'krympte solrosen',
+  hurMycket: (a, b) => `Hur många cm växte solrosen från ${a.p} till ${b.p}?`,
+  serier: ['Solrosen', 'Majsen'],
+  lasSerie: (i, k) => `Hur hög var ${i === 0 ? 'solrosen' : 'majsen'} ${k.p}?`,
+  skillnad: (k) => `Hur många cm högre var solrosen än majsen ${k.p}?`,
+  med: (v) => `${v} cm`,
+};
+
+const manad = (namn: string) => s(namn, `i ${namn.toLocaleLowerCase('sv')}`, '');
+
+export const BADPLATS: Linje = {
+  id: 'badplats', titel: 'Besökare på badplatsen', katNamn: 'Månad', enhet: 'besökare',
+  kat: ['April', 'Maj', 'Juni', 'Juli', 'Augusti', 'September', 'Oktober'].map(manad), form: 'dag',
+  mest: 'Vilken månad kom flest besökare?', minst: 'Vilken månad kom färst besökare?',
+  las: (k) => `Hur många besökte badplatsen ${k.p}?`,
+  nar: (v) => `Vilken månad hade badplatsen ${v}?`,
+  okade: 'ökade antalet besökare', minskade: 'minskade antalet besökare',
+  hurMycket: (a, b) => `Hur många fler besökare kom ${b.p} än ${a.p}?`,
+  med: (v) => `${v} besökare`,
+};
+
+export const SNO: Linje = {
+  id: 'sno', titel: 'Snödjupet på Talbergen', katNamn: 'Månad', enhet: 'cm', svarEnhet: 'cm',
+  kat: ['Oktober', 'November', 'December', 'Januari', 'Februari', 'Mars', 'April'].map(manad), form: 'dag',
+  mest: 'Vilken månad var snön djupast?', minst: 'Vilken månad var snön grundast?',
+  las: (k) => `Hur djup var snön ${k.p}?`,
+  nar: (v) => `Vilken månad var snön ${v} djup?`,
+  okade: 'ökade snödjupet', minskade: 'minskade snödjupet',
+  hurMycket: (a, b) => `Hur många cm djupare var snön ${b.p} än ${a.p}?`,
+  med: (v) => `${v} cm`,
+};
+
+export const LINJER = [TEMP, SOLROS, BADPLATS, SNO];
+
+/** Omröstningstorgets teman (röster och delar av en helhet). */
+export const ROSTER = [DJUR, GLASS, LEK, SKOLVAG];
+
 /** Fågeltornets teman (saker man räknar med streck). */
 export const TORNET = [FAGLAR, DJUR, FRUKT, KRYP];
 /** Teman med saker att räkna på en bild. */

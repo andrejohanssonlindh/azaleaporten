@@ -8,9 +8,10 @@ import type { Chart } from './chart';
 
 /**
  * las = läs av / räkna ut och skriv ett tal; val = välj bland alternativ; sant = Sant / Falskt / Går inte att veta;
- * tryck = tryck på en del av diagrammet (en stapel, en rad); bygg = bygg diagrammet (staplar eller streck).
+ * tryck = tryck på en del av diagrammet (en stapel, en rad, en bit, axeln); bygg = bygg diagrammet (staplar,
+ * streck eller punkter); laga = laga ett diagram som lurar (flytta axelns början, gör staplarna lika breda).
  */
-export type DiagramKind = 'las' | 'val' | 'sant' | 'tryck' | 'bygg';
+export type DiagramKind = 'las' | 'val' | 'sant' | 'tryck' | 'bygg' | 'laga';
 
 /** Ett svarsalternativ. err = felkoden om barnet väljer det (saknas = rätt svar). */
 export interface Alt { text: string; err?: string }
@@ -28,8 +29,8 @@ export interface DiagramQ {
   /** Diagrammet. Vid bygg: diagrammet som ska byggas (barnet ser det utan värden). */
   chart: Chart;
   /**
-   * Rätt svar. las: talet; val och sant: alternativets text; tryck: delens id ('k2' = kategori 2);
-   * bygg: värdena med komma emellan.
+   * Rätt svar. las: talet; val och sant: alternativets text; tryck: delens id ('k2' = kategori 2, 'axel' = axelns tal);
+   * bygg: värdena med komma emellan; laga: ett lagat läge ('a:0' eller 'b:1,1,1'; alla lägen som inte förvränger räknas).
    */
   answer: string;
   /** las: ordet efter rutan, t.ex. 'fåglar'. */
@@ -44,6 +45,14 @@ export interface DiagramQ {
   bild?: Plock[];
   /** Kategorier som lyser när frågan är klar (det frågan handlade om). */
   visa?: number[];
+  /** En tidningsrubrik över diagrammet (Skvallerpressen). */
+  rubrik?: string;
+  /** Kalla visas bredvid diagrammet (två diagram att jämföra), inte ovanför. */
+  bredvid?: boolean;
+  /** När frågan är klar visas diagrammet utan knep ("Visa sanningen"). */
+  sanning?: boolean;
+  /** laga: vad barnet lagar. */
+  laga?: 'axel' | 'bredd';
 }
 
 export interface Explained { title: string; text: string }
