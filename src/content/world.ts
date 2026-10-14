@@ -60,8 +60,8 @@ export const REGIONS: Region[] = [
       { id: 'stavningstrasket', name: 'Stavningsträsket', icon: '🐸', desc: 'Hör ordet och stava rätt.', grades: [1, 6], status: 'open' },
       { id: 'rimbacken', name: 'Rimbäcken', icon: '🎶', desc: 'Rim, motsatser och synonymer.', grades: [1, 4], status: 'open' },
       { id: 'meningssmedjan', name: 'Meningssmedjan', icon: '⚒️', desc: 'Punkt, frågetecken och meningar som håller.', grades: [1, 6], status: 'open' },
-      { id: 'ordklassernas-tempel', name: 'Ordklassernas tempel', icon: '🏛️', desc: 'Substantiv, verb och adjektiv.', grades: [3, 6], status: 'soon' },
-      { id: 'berattelsebiblioteket', name: 'Berättelsebiblioteket', icon: '📚', desc: 'Läs korta berättelser och svara.', grades: [2, 6], status: 'soon' },
+      { id: 'ordklassernas-tempel', name: 'Ordklassernas tempel', icon: '🏛️', desc: 'Substantiv, verb och adjektiv – och hur orden böjs.', grades: [2, 6], status: 'open' },
+      { id: 'berattelsebiblioteket', name: 'Berättelsebiblioteket', icon: '📚', desc: 'Läs korta texter och svara.', grades: [2, 6], status: 'open' },
     ],
   },
   {

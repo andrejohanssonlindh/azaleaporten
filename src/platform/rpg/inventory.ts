@@ -292,6 +292,7 @@ const PET_STAT: Record<string, Stat> = {
   'radie-diameter': 'snabbhet', 'glomde-pi': 'tur',
   'enkel-konsonant': 'kraft', 'sj-ljud': 'klurighet', sarskrivning: 'tur',
   tvartom: 'snabbhet', bokstavligt: 'visdom', punkt: 'skydd', 'komma-och': 'tur',
+  'fel-ordklass': 'klurighet', 'starkt-verb': 'kraft', 'inte-i-texten': 'visdom', 'fel-detalj': 'snabbhet',
   liknar: 'klurighet', 'falsk-van': 'tur', bokstavsljud: 'snabbhet', 'teen-ty': 'kraft', 'half-past': 'kraft', 'past-to': 'skydd',
   'som-svenska': 'visdom', 'tyst-bokstav': 'klurighet', 'glomt-s': 'kraft', 'svensk-ordfoljd': 'skydd',
   'harmar-sista': 'klurighet', 'missar-inte': 'visdom', 'ett-steg': 'snabbhet', 'vanster-hoger': 'skydd',

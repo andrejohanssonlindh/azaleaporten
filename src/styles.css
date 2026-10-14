@@ -927,6 +927,12 @@ button.stat.on { border-color: var(--accent); }
 .ord-head .speak { top: -8px; right: 0; }
 .ord-head.only-speak { min-height: 34px; }
 .ord-sentence { font-size: 22px; line-height: 1.7; margin: 6px 0 12px; white-space: pre-line; }
+/* Berättelsebiblioteket: texten ovanför frågan. */
+.las-text { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 14px 18px; margin: 4px 0 12px; text-align: left; font-size: 18px; line-height: 1.6; max-width: 640px; margin-inline: auto; }
+.las-text h3 { margin: 0 0 8px; font-size: 20px; text-transform: none; letter-spacing: 0; color: var(--ink); }
+.las-text p { margin: 0 0 6px; }
+.las-dikt p { margin: 0; font-style: italic; }
+.las-annons { border: 3px dashed var(--line); }
 .ord-gap { display: inline-block; min-width: 3.2em; border-bottom: 3px solid var(--accent); margin: 0 4px; font-weight: 800; line-height: 1.2; }
 .ord-gap.filled { color: var(--ok); border-color: var(--ok); }
 .ord-gap.box { min-width: 1.6em; min-height: 1.4em; border: 3px dashed var(--accent); border-radius: 10px; padding: 2px 6px; text-align: center; color: var(--accent); vertical-align: middle; }

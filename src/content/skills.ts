@@ -58,6 +58,17 @@ const MENING: Record<string, string> = {
   punkt: 'stor bokstav och punkt', grans: 'var en mening slutar', tecken: 'punkt, frågetecken och utropstecken',
   ordfoljd: 'ordföljd', samband: 'sambandsord', komma: 'kommatecken', anforing: 'anföring',
 };
+const ORDKLASS: Record<string, string> = {
+  substantiv: 'substantiv', verb: 'verb', adjektiv: 'adjektiv', pronomen: 'pronomen (ordklassen)', preposition: 'prepositioner',
+};
+const BOJN: Record<string, string> = {
+  genus: 'en- och ett-ord', plural: 'plural', bestamd: 'bestämd form', tempus: 'verbens tider', starka: 'starka verb',
+  komparation: 'att jämföra (stor – större – störst)', pronomen: 'pronomen i rätt form (han – honom, de – dem)',
+};
+const LAS: Record<string, string> = {
+  raden: 'att hitta svaret i texten', mellan: 'att läsa mellan raderna', ord: 'ords betydelse i en text',
+  huvudtanke: 'vad en text handlar om', texttyp: 'olika sorters texter',
+};
 const GLOSOR: Record<string, string> = {
   farger: 'färger på engelska', siffror: 'siffror på engelska', djur: 'djur på engelska', familj: 'familjen på engelska',
   kroppen: 'kroppen på engelska', mat: 'mat på engelska', klader: 'kläder på engelska', skolan: 'skolord på engelska',
@@ -99,6 +110,9 @@ export function skillLabel(skill: string): string {
   if (svTopic === 'veckans') return `veckans ord "${svRest}"`;
   if (svTopic === 'ord' && ORD[svRest]) return ORD[svRest];
   if (svTopic === 'mening' && MENING[svRest]) return MENING[svRest];
+  if (svTopic === 'ordklass' && ORDKLASS[svRest]) return ORDKLASS[svRest];
+  if (svTopic === 'bojn' && BOJN[svRest]) return BOJN[svRest];
+  if (svTopic === 'las' && LAS[svRest]) return LAS[svRest];
   const [, enTopic, enRest] = /^en\.([a-z]+)\.(.+)$/.exec(skill) ?? [];
   if (enTopic === 'glosor' && GLOSOR[enRest]) return GLOSOR[enRest];
   if (enTopic === 'lyssna' && LYSSNA[enRest]) return LYSSNA[enRest];

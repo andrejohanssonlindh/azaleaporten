@@ -60,6 +60,12 @@ export const ARENDEN: Arende[] = [
   { id: 'uppfinnaren', who: 'Uppfinnaren Ugo', icon: '🧑‍🔬', areaId: 'kodstigen', n: 3,
     story: 'Min nya robot har rymt till Robotön, och den hittar inte hem till laddaren! Kan du styra den åt mig på Kodstigen?',
     thanks: 'Pip pip! Där är den – fulladdad och glad. Tack, robotförare!' },
+  { id: 'tempelvakten', who: 'Tempelvakten Sortera', icon: '🏛️', areaId: 'ordklassernas-tempel', n: 3,
+    story: 'Ordklassblandaren har varit framme igen! Verben ligger i substantivens sal och adjektiven har gömt sig. Hjälper du mig att sortera dem?',
+    thanks: 'Varje ord i sin egen sal. Templet har aldrig varit så prydligt!' },
+  { id: 'bokbussen', who: 'Bokbussen Berit', icon: '🚌', areaId: 'berattelsebiblioteket', n: 3,
+    story: 'Jag ska köra ut böcker till hela ön, men jag vet inte vilka som är spännande! Kan du läsa några åt mig i Berättelsebiblioteket?',
+    thanks: 'Nu vet jag precis vilka böcker alla vill ha. Tut tut, tack!' },
 ];
 
 export const arende = (id: string | null | undefined) => ARENDEN.find((a) => a.id === id);

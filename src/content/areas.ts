@@ -20,6 +20,9 @@ import { STAPELBADDSPARKEN } from '../games/geometri/cirklar/content';
 import { STAVNINGSTRASKET } from '../games/stavning/content';
 import { RIMBACKEN } from '../games/rim/content';
 import { MENINGSSMEDJAN } from '../games/mening/content';
+import { ORDKLASSERNAS_TEMPEL } from '../games/ordklass/content';
+import { BERATTELSEBIBLIOTEKET } from '../games/berattelse/content';
+import { ORDSKOGENS_HJARTA } from '../games/ordskogen';
 import { GLOSVIKEN } from '../games/glosor/content';
 import { HAMNEN } from '../games/hamnen/content';
 import { BIG_BEN_TORNET } from '../games/bigben/content';
@@ -52,6 +55,8 @@ const AREAS: Record<string, Playable> = {
   stavningstrasket: { def: STAVNINGSTRASKET, load: () => import('../games/stavning').then((m) => m.stavning) },
   rimbacken: { def: RIMBACKEN, load: () => import('../games/rim').then((m) => m.rim) },
   meningssmedjan: { def: MENINGSSMEDJAN, load: () => import('../games/mening').then((m) => m.mening) },
+  'ordklassernas-tempel': { def: ORDKLASSERNAS_TEMPEL, load: () => import('../games/ordklass').then((m) => m.ordklass) },
+  berattelsebiblioteket: { def: BERATTELSEBIBLIOTEKET, load: () => import('../games/berattelse').then((m) => m.berattelse) },
   glosviken: { def: GLOSVIKEN, load: () => import('../games/glosor').then((m) => m.glosor) },
   hamnen: { def: HAMNEN, load: () => import('../games/hamnen').then((m) => m.hamnen) },
   'big-ben-tornet': { def: BIG_BEN_TORNET, load: () => import('../games/bigben').then((m) => m.bigben) },
@@ -74,6 +79,7 @@ export const PLAYABLE: Record<string, Playable> = {
   ...AREAS,
   talbergen: { def: TALBERGEN_TOPPEN, load: async () => regionGame('talbergen', await gamesOf('talbergen')) },
   betongbukten: { def: BETONGBUKTENS_TOPP, load: async () => regionGame('betongbukten', await gamesOf('betongbukten')) },
+  ordskogen: { def: ORDSKOGENS_HJARTA, load: async () => regionGame('ordskogen', await gamesOf('ordskogen')) },
   vasteron: { def: VASTERONS_FYR, load: async () => regionGame('vasteron', await gamesOf('vasteron')) },
   roboton: { def: ROBOTFABRIKEN, load: async () => regionGame('roboton', await gamesOf('roboton')) },
 };
