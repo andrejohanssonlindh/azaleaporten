@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Azaleaporten: a free, adventure/RPG-themed practice app (matematik, svenska, engelska) for school kids, hosted on GitHub Pages at `https://andrejohanssonlindh.github.io/azaleaporten/`. No backend: all progress lives in the browser's `localStorage` on each device. UI text, comments and many identifiers are **Swedish**; keep new user-facing text Swedish and child-friendly.
 
-The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phases 1–4 are done (platform, Tidstornet, loot/gear, the learning loop), plus all of Talbergen (six areas and the region boss), all of Betongbukten (seven skateparks and the region boss), all of Västerön (engelska, five areas and the region boss), all of Robotön (programmering, five areas and the region boss), all of Ordskogen (svenska, five areas and the region boss) and the village from Phase 5. **Current status and the next mission are in `STATUS.md`. Read it first.**
+The full roadmap is `../PLAN.md` (outside the repo, because it mentions private details). Phases 1–4 are done (platform, Tidstornet, loot/gear, the learning loop), plus all of Talbergen (six areas and the region boss), all of Betongbukten (seven skateparks and the region boss), all of Västerön (engelska, five areas and the region boss), all of Robotön (programmering, five areas and the region boss), all of Ordskogen (svenska, five areas and the region boss) and the village from Phase 5. **Diagramdalen** (statistik) and **Kompassön** (geografi) are on the map as `soon` regions (plans in `../PLAN.md` §14f/§14g; Diagramdalen is built first). **Current status and the next mission are in `STATUS.md`. Read it first.**
 
 ## Commands
 

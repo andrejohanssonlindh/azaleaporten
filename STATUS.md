@@ -4,6 +4,7 @@
 
 ## Done
 
+- **Diagramdalen and Kompassön on the map** (2026-10-14, plans in PLAN.md §14f/§14g): two new `soon` regions with all their areas listed as "Snart". **Diagramdalen** (statistik: Fågeltornet, Skördemarknaden, Väderstationen, Omröstningstorget, Vågmästarens bod, Spegelsalen, Skvallerpressen) replaces the "Dimmiga dalen" fog spot on the main island; **Kompassön** (geografi: Kartrummet, Globen, Sverigeresan, Ballongresan, Huvudstadsexpressen, Flaggmasten) is a new island in the north-west with a balloon route. Both have region banners. The ids are permanent from now on.
 - **Ordskogen complete** (2026-10-14, plan in PLAN.md §14c): the last two areas and the region boss, all on the ord engine as it was.
   - **🏛️ Ordklassernas tempel** (`src/games/ordklass/`, content in `ord.ts`): tap a word class in a sentence (`markera`; every word of that class counts; sentences annotated `"Katten:s sover:v på:r …"`), "which word class is X?", en/ett with a matching adjective (`ett stort hus`), plural (incl. irregular ones like möss/fötter), bestämd form, tempus (Igår / Varje dag / Jag har …), strong verbs, komparation (incl. större/bättre), pronoun form (han/honom, de/dem). 6 eras, 16 stages. Monsters Ordklassblandaren (`fel-ordklass`) and Gådde-gåsen (`starkt-verb`); Mästare Templets orakel (generic persona Oraklet Ordalia). Skills `sv.ordklass.*`, `sv.bojn.*`. Words that look the same in plural (ett glas – två glas) are left out of plural questions, since the question would show the answer. Markera prompts say "Vilket ord är …?" rather than "Tryck på …", because "på" can itself be the answer.
   - **📚 Berättelsebiblioteket** (`src/games/berattelse/`, texts in `texter.ts`): 18 texts set on the island (10 short for åk 2–3, 8 longer), six kinds (berättelse, faktatext, instruktion, brev, dikt, annons). Every text has questions på raden ×2, mellan raderna ×2, ordets betydelse and huvudtanke; texttyp is generated. The text is shown in a card above the question (the game's `Visual`); in a run all questions about one text come in a row (`deck()` in `logic.ts`). Generous `thrMs` (40–60 s). Monsters Bokmalen Gissa (`inte-i-texten`) and Skumläsar-Skatan (`fel-detalj`); Mästare Bibliotekarien (generic persona Bibliotekarie Bläddra). Skills `sv.las.*`.
@@ -154,7 +155,9 @@ Tests: `npm test` (Vitest, 275 tests; `tests/betongbukten.test.ts` covers the ge
 
 ## Next mission
 
-Ordskogen is complete, so every region on the island has all its areas and a region boss. Pick the next thing with the user (PLAN.md order; ideas: lessons in Klassrummet for Ordklassernas tempel, which is grammar and suits worked examples; read-aloud of the library texts for younger readers; the hero figure in the top bar). Still to verify on the kids' real devices: a Swedish and an English voice on the Windows PCs (Chrome may not list voices that Edge sees).
+**Diagramdalen D0: the diagram engine** (PLAN.md §14f): `src/engines/diagram/` with `chart.ts` (the `Chart` + `Lur` model, `distortion()`), `ChartView.tsx` (all chart types as SVG, "Visa sanningen"), and the new kinds `tryck`/`bygg`/`laga`. First check whether one GameModule can mix drill-, ord- and diagram-kind questions. Then D1 Fågeltornet + Skördemarknaden. Kompassön comes after Diagramdalen (landskap data: `perliedman/svenska-landskap`, CC0). Still to verify on the kids' real devices: a Swedish and an English voice on the Windows PCs (Chrome may not list voices that Edge sees).
+
+Before that the next idea list was: lessons in Klassrummet for Ordklassernas tempel, read-aloud of the library texts for younger readers, the hero figure in the top bar.
 
 Older options:
 

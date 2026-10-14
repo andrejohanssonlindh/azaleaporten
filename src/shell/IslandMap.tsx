@@ -14,7 +14,8 @@ import { Screen, TopBar, UpdateBanner } from './ui';
 import { KastanjGreeting } from './Kastanj';
 
 // Ön: startskärmen efter porten. Allt detaljerat ligger ett tryck bort.
-// Reserverade platser (dimman) är till för framtida ämnen. Spelön har minispelen, Robotön har programmering.
+// Reserverade platser (dimman) är till för framtida ämnen. Spelön har minispelen, Robotön har programmering,
+// Kompassön geografi och Diagramdalen (på huvudön) statistik.
 
 function Spot({ label, onClick, x, y, children, cls = '' }: { label: string; onClick: () => void; x: number; y: number; children: ComponentChildren; cls?: string }) {
   const w = label.length * 7.4 + 22;
@@ -33,7 +34,8 @@ function Spot({ label, onClick, x, y, children, cls = '' }: { label: string; onC
 const fog = () => toast('🌫️ Dimman ligger tät här. Något nytt väntar – snart!');
 
 /** Glömskans dimma över en region på kartan, med antal saker att repetera. */
-const MIST_AT: Record<RegionId, [number, number]> = { talbergen: [236, 140], ordskogen: [160, 282], vasteron: [56, 292], betongbukten: [300, 404], roboton: [362, 452] };
+const MIST_AT: Record<RegionId, [number, number]> = { talbergen: [236, 140], ordskogen: [160, 282], vasteron: [56, 292], betongbukten: [300, 404], roboton: [362, 452],
+  diagramdalen: [166, 424], kompasson: [58, 144] };
 function Mist({ region, n }: { region: RegionId; n: number }) {
   const [x, y] = MIST_AT[region];
   return (
@@ -64,7 +66,7 @@ function Island({ heroEmoji, mist, keys, steg, seen }: IslandProps) {
       </defs>
       <rect width="400" height="520" fill="url(#isle-sea)" />
       <g stroke="#fff" stroke-opacity=".45" stroke-width="2" fill="none" stroke-linecap="round">
-        {[[30, 40], [90, 110], [20, 200], [370, 200], [380, 330], [30, 410], [120, 500], [300, 505], [200, 30]].map(([x, y], i) => (
+        {[[30, 40], [96, 66], [24, 232], [370, 200], [380, 330], [30, 410], [120, 500], [300, 505], [200, 30]].map(([x, y], i) => (
           <path key={i} d={`M${x} ${y} q6 -5 12 0 q6 5 12 0`} />
         ))}
       </g>
@@ -96,6 +98,29 @@ function Island({ heroEmoji, mist, keys, steg, seen }: IslandProps) {
         <ellipse cx="364" cy="480" rx="23" ry="10" fill="#ced4da" />
         <text x="364" y="478" font-size="18" text-anchor="middle" dominant-baseline="central">🤖</text>
         <RobotonGrowth {...g('roboton')} />
+      </Spot>
+
+      {/* ballongrutt till Kompassön */}
+      <path d="M117 176 Q106 162 95 157" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="4 6" />
+
+      {/* Kompassön: geografi */}
+      <Spot label="Kompassön" x={58} y={190} onClick={() => go('region/kompasson')}>
+        <ellipse cx="58" cy="154" rx="36" ry="20" fill="#f4e3b5" />
+        <ellipse cx="58" cy="152" rx="29" ry="14" fill="#94d82d" />
+        {/* observatoriet */}
+        <rect x="32" y="140" width="18" height="13" fill="#fff4e6" stroke="#868e96" stroke-width=".8" />
+        <path d="M31 140 a10 10 0 0 1 20 0 z" fill="#748ffc" stroke="#4263eb" stroke-width=".8" />
+        <path d="M44 134 L54 126" stroke="#495057" stroke-width="2.5" stroke-linecap="round" />
+        {/* jordgloben */}
+        <path d="M70 156 v-4 M64 158 h12" stroke="#8d6e4a" stroke-width="2" stroke-linecap="round" />
+        <circle cx="70" cy="142" r="9" fill="#4dabf7" stroke="#1971c2" stroke-width="1" />
+        <path d="M65 138 q3 -3 6 0 q-1 4 -4 3 z M71 145 q3 -1 4 2 q-2 3 -4 1 z" fill="#51cf66" />
+        <path d="M60 140 a11 11 0 0 0 20 6" fill="none" stroke="#e8590c" stroke-width="1.2" />
+        {/* luftballongen */}
+        <circle cx="88" cy="110" r="10" fill="#ff6b6b" />
+        <path d="M88 100 q-5 10 0 20 q5 -10 0 -20" fill="#ffd43b" />
+        <path d="M80 115 L85 126 M96 115 L91 126" stroke="#8d6e4a" stroke-width=".8" />
+        <rect x="84.5" y="125" width="7" height="5" rx="1" fill="#8d6e4a" />
       </Spot>
 
       {/* båtrutt till Västerön */}
@@ -146,6 +171,20 @@ function Island({ heroEmoji, mist, keys, steg, seen }: IslandProps) {
         <BetongbuktenGrowth {...g('betongbukten')} />
       </Spot>
 
+      {/* Diagramdalen: statistik */}
+      <Spot label="Diagramdalen" x={164} y={462} onClick={() => go('region/diagramdalen')}>
+        <path d="M126 446 Q146 414 168 438 Q186 416 208 446 Z" fill="#69db7c" />
+        <path d="M144 444 V418 M144 444 H176" stroke="#495057" stroke-width="1.2" fill="none" />
+        <rect x="148" y="432" width="6" height="12" fill="#4dabf7" />
+        <rect x="157" y="422" width="6" height="22" fill="#ff922b" />
+        <rect x="166" y="428" width="6" height="16" fill="#ffd43b" />
+        {/* spegeltältet */}
+        <path d="M182 446 L194 426 L206 446 Z" fill="#fff" stroke="#e03131" stroke-width="1" />
+        <path d="M188 446 L194 426 L200 446" fill="#e03131" />
+        <path d="M194 426 V420" stroke="#495057" stroke-width="1" />
+        <path d="M194 420 l6 2 l-6 2 z" fill="#e64980" />
+      </Spot>
+
       {/* Övningsängen */}
       <Spot label="Övningsängen" x={232} y={392} onClick={() => go('ovning')}>
         <ellipse cx="232" cy="352" rx="36" ry="20" fill="#d8f5a2" />
@@ -169,10 +208,6 @@ function Island({ heroEmoji, mist, keys, steg, seen }: IslandProps) {
       <g class="isle-fog" role="button" tabIndex={0} aria-label="Dimmiga höglandet" onClick={fog}>
         {[[330, 248, 18], [348, 262, 16], [318, 268, 15], [340, 236, 13]].map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} />)}
         <text x="335" y="256" text-anchor="middle" dominant-baseline="central">?</text>
-      </g>
-      <g class="isle-fog" role="button" tabIndex={0} aria-label="Dimmiga dalen" onClick={fog}>
-        {[[160, 420, 16], [178, 432, 14], [146, 434, 13]].map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} />)}
-        <text x="162" y="428" text-anchor="middle" dominant-baseline="central">?</text>
       </g>
       <g class="isle-fog" role="button" tabIndex={0} aria-label="Dimmiga udden" onClick={fog}>
         {[[150, 140, 15], [166, 150, 13], [136, 152, 12]].map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} />)}

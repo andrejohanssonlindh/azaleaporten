@@ -11,7 +11,7 @@ export interface Area {
   status: 'open' | 'soon';
 }
 
-export type RegionId = 'talbergen' | 'ordskogen' | 'vasteron' | 'betongbukten' | 'roboton';
+export type RegionId = 'talbergen' | 'ordskogen' | 'vasteron' | 'betongbukten' | 'roboton' | 'diagramdalen' | 'kompasson';
 
 export interface Region {
   id: RegionId;
@@ -86,6 +86,35 @@ export const REGIONS: Region[] = [
       { id: 'loopverkstaden', name: 'Loopverkstaden', icon: '🔁', desc: 'Gör samma sak många gånger: loopar.', grades: [2, 5], status: 'open' },
       { id: 'buggjakten', name: 'Buggjakten', icon: '🐞', desc: 'Hitta felet i robotens instruktioner.', grades: [2, 6], status: 'open' },
       { id: 'pythonhamnen', name: 'Pythonhamnen', icon: '🐍', desc: 'Läs dina första rader Python.', grades: [4, 6], status: 'open' },
+    ],
+  },
+  {
+    // Planerad (PLAN.md §14f): läsa och tolka diagram, lägesmått, och till sist diagram som lurar.
+    id: 'diagramdalen', name: 'Diagramdalen', subject: 'Statistik', icon: '📊',
+    tagline: 'En dal där alla räknar allt: fåglarna vid tornet, skörden på marknaden, vädret och rösterna på torget. Längst in står tivolits spegelsal, där diagrammen sträcker och krymper sig – och tidningen som alltid har en rubrik som låter för bra för att vara sann.',
+    sky: ['#f59f00', '#fff3bf', '#5c940d'],
+    areas: [
+      { id: 'fageltornet', name: 'Fågeltornet', icon: '🐦', desc: 'Räkna fåglar med streck och tabeller.', grades: [1, 3], status: 'soon' },
+      { id: 'skordemarknaden', name: 'Skördemarknaden', icon: '🌾', desc: 'Stapeldiagram och bilddiagram.', grades: [1, 4], status: 'soon' },
+      { id: 'vaderstationen', name: 'Väderstationen', icon: '🌦️', desc: 'Linjediagram: hur ändras vädret?', grades: [3, 6], status: 'soon' },
+      { id: 'omrostningstorget', name: 'Omröstningstorget', icon: '🗳️', desc: 'Cirkeldiagram: vem fick flest röster?', grades: [3, 6], status: 'soon' },
+      { id: 'vagmastarens-bod', name: 'Vågmästarens bod', icon: '⚖️', desc: 'Medelvärde, median och typvärde.', grades: [4, 6], status: 'soon' },
+      { id: 'spegelsalen', name: 'Spegelsalen', icon: '🪞', desc: 'Diagram som lurar ögat. Hitta knepet!', grades: [4, 6], status: 'soon' },
+      { id: 'skvallerpressen', name: 'Skvallerpressen', icon: '📰', desc: 'Rubriker som lurar. Stämmer det verkligen?', grades: [4, 6], status: 'soon' },
+    ],
+  },
+  {
+    // Planerad (PLAN.md §14g): kartkunskap, världsdelar, Sverige, länder, huvudstäder och flaggor.
+    id: 'kompasson', name: 'Kompassön', subject: 'Geografi', icon: '🧭',
+    tagline: 'En ö långt ute i havet, dit man flyger med luftballong. I observatoriet snurrar en jättelik jordglob. Härifrån reser man över Sverige, genom alla världsdelar och till ländernas huvudstäder.',
+    sky: ['#1971c2', '#d0ebff', '#f4e3b5'],
+    areas: [
+      { id: 'kartrummet', name: 'Kartrummet', icon: '🗺️', desc: 'Väderstreck, kartsymboler och skala.', grades: [1, 6], status: 'soon' },
+      { id: 'globen', name: 'Globen', icon: '🌍', desc: 'Världsdelar och hav. Var ligger landet?', grades: [1, 6], status: 'soon' },
+      { id: 'sverigeresan', name: 'Sverigeresan', icon: '🦢', desc: 'Flyg över Sverige: städer, sjöar och landskap.', grades: [1, 6], status: 'soon' },
+      { id: 'ballongresan', name: 'Ballongresan', icon: '🎈', desc: 'Peka ut länderna på kartan.', grades: [3, 6], status: 'soon' },
+      { id: 'huvudstadsexpressen', name: 'Huvudstadsexpressen', icon: '🚂', desc: 'Vad heter landets huvudstad?', grades: [3, 6], status: 'soon' },
+      { id: 'flaggmasten', name: 'Flaggmasten', icon: '🚩', desc: 'Vilket land har flaggan?', grades: [1, 6], status: 'soon' },
     ],
   },
 ];
