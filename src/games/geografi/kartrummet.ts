@@ -68,7 +68,7 @@ function vaderstreck(b: Base, rng: Rng, ctx?: QuestionCtx, trap?: string): GQ {
   const opts = b.level === 0 ? [0, 2, 4, 6] : [0, 1, 2, 3, 4, 5, 6, 7];
   const wrong: Alt[] = opts.filter((j) => j !== i).map((j) => ({ text: STRECK[j], err: j === spegel(i) ? 'ost-vast' : 'fel-vaderstreck' }));
   return {
-    ...b, kind: 'val', prompt: 'Åt vilket väderstreck pekar den röda pilen?',
+    ...b, kind: 'val', prompt: 'Åt vilket väderstreck pekar den blå pilen?',
     karta: { w: 160, h: 160, hav: false, ytor: [], ros: { x: 80, y: 80, r: 52, pil: KORT[i] }, titel: 'Kompassros' },
     answer: STRECK[i], alts: valj(rng, { text: STRECK[i] }, wrong, b.level === 0 ? 3 : 3, [trap, 'ost-vast']),
     los: `Pilen pekar mot ${STRECK[i]}. Medsols från norr: norr, nordost, öster, sydost, söder, sydväst, väster, nordväst.`,

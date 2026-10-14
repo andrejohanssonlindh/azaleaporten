@@ -100,10 +100,12 @@ export function RosRit({ ros }: { ros: Ros }) {
     <g class="kar-ros" aria-hidden="true">
       <circle class="kar-ros-bg" cx={x} cy={y} r={r * 1.18} />
       {RIKTNINGAR.map((d, i) => {
-        const a = ((vrid + i * 45) * Math.PI) / 180, len = i % 2 ? r * 0.62 : r;
-        const tx = x + Math.sin(a) * len, ty = y - Math.cos(a) * len;
-        const sx = Math.cos(a) * r * 0.14, sy = Math.sin(a) * r * 0.14;
+        // Pilen som frågan gäller är blå, längre och bredare (norr är röd, som på en riktig kompass).
         const on = ros.pil === d;
+        const a = ((vrid + i * 45) * Math.PI) / 180, len = on ? r * 1.08 : i % 2 ? r * 0.62 : r;
+        const tx = x + Math.sin(a) * len, ty = y - Math.cos(a) * len;
+        const bred = on ? 0.2 : 0.14;
+        const sx = Math.cos(a) * r * bred, sy = Math.sin(a) * r * bred;
         return (
           <g key={d}>
             <polygon class={`kar-ros-pil${d === 'N' ? ' norr' : ''}${on ? ' on' : ''}${i % 2 ? ' liten' : ''}`} points={`${x + sx},${y + sy} ${tx},${ty} ${x - sx},${y - sy}`} />

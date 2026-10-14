@@ -10,7 +10,7 @@
   --geo-fill: #ffe8cc; --geo-stroke: #e8590c; --geo-fill2: #ffd8a8; --geo-hit: #b2f2bb; --geo-blue: #1c7ed6; --geo-grid: #e9ecef; --geo-water: #a5d8ff;
   --dia-bar: #f08c00; --dia-bar2: #1c7ed6; --dia-grid: #e3d6c0; --dia-axis: #7a6a58; --dia-hit: #2b8a3e; --dia-hit-bg: #d3f9d8;
   --kar-hav: #a5d8ff; --kar-land: #f4e3b5; --kar-bakland: #e9e2d0; --kar-kant: #a08a6a; --kar-sjo: #74c0fc; --kar-papper: #fffdf8;
-  --kar-lyser: #ff922b; --kar-vald: #d6336c; --kar-skog: #69db7c; --kar-aker: #ffe066; --kar-hojd1: #8ce99a; --kar-hojd2: #e9c46a; --kar-hojd3: #9c6644;
+  --kar-lyser: #ff922b; --kar-vald: #d6336c; --kar-skog: #69db7c; --kar-aker: #ffe066; --kar-hojd1: #8ce99a; --kar-hojd2: #e9c46a; --kar-hojd3: #9c6644; --kar-fraga: #1c7ed6;
   --font: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
   color-scheme: light dark;
 }
@@ -24,7 +24,7 @@
     --geo-fill: #4a2f1c; --geo-stroke: #ff922b; --geo-fill2: #6b3f1e; --geo-hit: #2b5a34; --geo-blue: #74c0fc; --geo-grid: #3a3248; --geo-water: #1c4a6e;
     --dia-bar: #ffa94d; --dia-bar2: #74c0fc; --dia-grid: #3a3248; --dia-axis: #b3a796; --dia-hit: #69db7c; --dia-hit-bg: #1f3d26;
     --kar-hav: #1c3a5a; --kar-land: #6b5a3e; --kar-bakland: #3d3548; --kar-kant: #b3a796; --kar-sjo: #2f6fa8; --kar-papper: #251f31;
-    --kar-lyser: #ffa94d; --kar-vald: #f06595; --kar-skog: #2f9e44; --kar-aker: #b08900; --kar-hojd1: #2b8a3e; --kar-hojd2: #a07c2c; --kar-hojd3: #6b4423;
+    --kar-lyser: #ffa94d; --kar-vald: #f06595; --kar-skog: #2f9e44; --kar-aker: #b08900; --kar-hojd1: #2b8a3e; --kar-hojd2: #a07c2c; --kar-hojd3: #6b4423; --kar-fraga: #4dabf7;
     --shadow: 0 2px 0 rgba(0, 0, 0, .3), 0 10px 26px rgba(0, 0, 0, .25);
   }
 }
@@ -1264,7 +1264,7 @@ button.dia-bild-rad { cursor: pointer; }
 .kar-ros-pil { fill: var(--muted); }
 .kar-ros-pil.liten { opacity: .7; }
 .kar-ros-pil.norr { fill: #e03131; }
-.kar-ros-pil.on { fill: var(--kar-vald); opacity: 1; }
+.kar-ros-pil.on { fill: var(--kar-fraga); opacity: 1; stroke: var(--ink); stroke-width: 1.2; stroke-linejoin: round; }
 .kar-ros-text { font: 900 13px var(--font); fill: var(--ink); }
 .kar-ros-text.liten { font-size: 10px; }
 .kar-ros-mitt { fill: var(--ink); }
