@@ -104,17 +104,17 @@ export const REGIONS: Region[] = [
     ],
   },
   {
-    // Planerad (PLAN.md §14g): kartkunskap, världsdelar, Sverige, länder, huvudstäder och flaggor.
+    // Geografi (PLAN.md §14g): kartkunskap, världsdelar, Sverige, länder, huvudstäder och flaggor.
     id: 'kompasson', name: 'Kompassön', subject: 'Geografi', icon: '🧭',
     tagline: 'En ö långt ute i havet, dit man flyger med luftballong. I observatoriet snurrar en jättelik jordglob. Härifrån reser man över Sverige, genom alla världsdelar och till ländernas huvudstäder.',
     sky: ['#1971c2', '#d0ebff', '#f4e3b5'],
     areas: [
-      { id: 'kartrummet', name: 'Kartrummet', icon: '🗺️', desc: 'Väderstreck, kartsymboler och skala.', grades: [1, 6], status: 'soon' },
-      { id: 'globen', name: 'Globen', icon: '🌍', desc: 'Världsdelar och hav. Var ligger landet?', grades: [1, 6], status: 'soon' },
-      { id: 'sverigeresan', name: 'Sverigeresan', icon: '🦢', desc: 'Flyg över Sverige: städer, sjöar och landskap.', grades: [1, 6], status: 'soon' },
-      { id: 'ballongresan', name: 'Ballongresan', icon: '🎈', desc: 'Peka ut länderna på kartan.', grades: [3, 6], status: 'soon' },
-      { id: 'huvudstadsexpressen', name: 'Huvudstadsexpressen', icon: '🚂', desc: 'Vad heter landets huvudstad?', grades: [3, 6], status: 'soon' },
-      { id: 'flaggmasten', name: 'Flaggmasten', icon: '🚩', desc: 'Vilket land har flaggan?', grades: [1, 6], status: 'soon' },
+      { id: 'kartrummet', name: 'Kartrummet', icon: '🗺️', desc: 'Väderstreck, kartsymboler och skala.', grades: [1, 6], status: 'open' },
+      { id: 'globen', name: 'Globen', icon: '🌍', desc: 'Världsdelar och hav. Var ligger landet?', grades: [1, 6], status: 'open' },
+      { id: 'sverigeresan', name: 'Sverigeresan', icon: '🦢', desc: 'Flyg över Sverige: städer, sjöar och landskap.', grades: [1, 6], status: 'open' },
+      { id: 'ballongresan', name: 'Ballongresan', icon: '🎈', desc: 'Peka ut länderna på kartan.', grades: [3, 6], status: 'open' },
+      { id: 'huvudstadsexpressen', name: 'Huvudstadsexpressen', icon: '🚂', desc: 'Vad heter landets huvudstad?', grades: [3, 6], status: 'open' },
+      { id: 'flaggmasten', name: 'Flaggmasten', icon: '🚩', desc: 'Vilket land har flaggan?', grades: [1, 6], status: 'open' },
     ],
   },
 ];

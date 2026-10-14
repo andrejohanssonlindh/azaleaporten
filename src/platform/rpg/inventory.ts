@@ -298,6 +298,7 @@ const PET_STAT: Record<string, Stat> = {
   'harmar-sista': 'klurighet', 'missar-inte': 'visdom', 'ett-steg': 'snabbhet', 'vanster-hoger': 'skydd',
   'loop-antal': 'kraft', 'bara-forsta': 'tur', 'sista-blocket': 'klurighet', citat: 'visdom', 'range-noll': 'snabbhet',
   femgrupp: 'klurighet', 'rutor-inte-varde': 'visdom', 'nyckel-glomd': 'tur',
+  'ost-vast': 'snabbhet', 'fel-varldsdel': 'skydd', granne: 'kraft', 'liknande-namn': 'klurighet', 'storsta-staden': 'tur', 'liknande-flagga': 'visdom',
 };
 
 /** Ger husdjursföremålet för en tämjd boss (om det inte redan finns). */

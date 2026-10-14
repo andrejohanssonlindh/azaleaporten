@@ -107,6 +107,17 @@ const STAT: Record<string, string> = {
   stapel: 'stapeldiagram', 'stapel-skala': 'skalan i stapeldiagram', 'stapel-jamfor': 'att jämföra staplar', 'stapel-rita': 'att bygga stapeldiagram',
   bild: 'bilddiagram', 'bild-halv': 'halva bilder i bilddiagram',
 };
+const GEOGRAFI: Record<string, string> = {
+  'karta.vaderstreck': 'väderstrecken', 'karta.riktning': 'vad som ligger åt vilket håll', 'karta.symboler': 'kartsymboler',
+  'karta.skala': 'skalan på kartan', 'karta.vriden': 'kartor där norr inte är uppåt',
+  'varldsdel.namn': 'världsdelarna', 'varldsdel.hav': 'haven', 'varldsdel.land': 'vilken världsdel länderna ligger i',
+  'sverige.stader': 'Sveriges städer', 'sverige.natur': 'Sveriges sjöar, öar och berg', 'sverige.norden': 'Norden',
+  'sverige.landsdelar': 'Sveriges landsdelar', 'sverige.landskap': 'Sveriges landskap',
+};
+const VARLDSDEL: Record<string, string> = {
+  europa: 'Europa', asien: 'Asien', afrika: 'Afrika', nordamerika: 'Nordamerika', sydamerika: 'Sydamerika', oceanien: 'Australien och Oceanien',
+};
+const GEO_SAK: Record<string, string> = { land: 'länderna', huvudstad: 'huvudstäderna', flagga: 'flaggorna' };
 const TAL = ['nollans', 'ettans', 'tvåans', 'treans', 'fyrans', 'femmans', 'sexans', 'sjuans', 'åttans', 'nians', 'tians', 'elvans', 'tolvans'];
 
 export function skillLabel(skill: string): string {
@@ -124,6 +135,10 @@ export function skillLabel(skill: string): string {
   if (enTopic === 'tid' && ENTID[enRest]) return ENTID[enRest];
   if (enTopic === 'stav' && ENSTAV[enRest]) return ENSTAV[enRest];
   if (enTopic === 'gram' && GRAM[enRest]) return GRAM[enRest];
+  const [, geoRest] = /^geo\.(.+)$/.exec(skill) ?? [];
+  if (geoRest && GEOGRAFI[geoRest]) return GEOGRAFI[geoRest];
+  const [, geoTopic, del] = /^geo\.(land|huvudstad|flagga)\.(.+)$/.exec(skill) ?? [];
+  if (geoTopic && VARLDSDEL[del]) return `${GEO_SAK[geoTopic]} i ${VARLDSDEL[del]}`;
   const [, progRest] = /^prog\.(.+)$/.exec(skill) ?? [];
   if (progRest && PROG[progRest]) return PROG[progRest];
   const [, topic, rest] = /^ma\.([a-z]+)\.(.+)$/.exec(skill) ?? [];

@@ -9,3 +9,6 @@ test-results/
 # Privat innehåll hör hemma i ../privat, aldrig här
 privat/
 familjepaket/
+# Rå kartdata (stor). tools/karta.ts gör om den till vy-*.json och lander.json, som checkas in.
+src/games/geografi/kartdata/countries-*.json
+src/games/geografi/kartdata/svenska-landskap-klippt.geo.json

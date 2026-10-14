@@ -34,6 +34,8 @@ import { BUGGJAKTEN, KODSTIGEN, LOOPVERKSTADEN } from '../games/robot/content';
 import { PYTHONHAMNEN } from '../games/python/content';
 import { ROBOTFABRIKEN } from '../games/roboton';
 import { FAGELTORNET, SKORDEMARKNADEN } from '../games/diagram/content';
+import { BALLONGRESAN, FLAGGMASTEN, GLOBEN, HUVUDSTADSEXPRESSEN, KARTRUMMET, SVERIGERESAN } from '../games/geografi/content';
+import { OBSERVATORIET } from '../games/kompasson';
 
 // Spelbara områden: områdets innehåll (litet, laddas direkt) + spelet som levererar frågorna.
 // Spelkoden laddas först när någon spelar i området, så att startsidan förblir liten.
@@ -70,6 +72,12 @@ const AREAS: Record<string, Playable> = {
   pythonhamnen: { def: PYTHONHAMNEN, load: () => import('../games/python').then((m) => m.python) },
   fageltornet: { def: FAGELTORNET, load: () => import('../games/diagram').then((m) => m.fageltornet) },
   skordemarknaden: { def: SKORDEMARKNADEN, load: () => import('../games/diagram').then((m) => m.skordemarknaden) },
+  kartrummet: { def: KARTRUMMET, load: () => import('../games/geografi').then((m) => m.kartrummet) },
+  globen: { def: GLOBEN, load: () => import('../games/geografi').then((m) => m.globen) },
+  sverigeresan: { def: SVERIGERESAN, load: () => import('../games/geografi').then((m) => m.sverigeresan) },
+  ballongresan: { def: BALLONGRESAN, load: () => import('../games/geografi').then((m) => m.ballongresan) },
+  huvudstadsexpressen: { def: HUVUDSTADSEXPRESSEN, load: () => import('../games/geografi').then((m) => m.huvudstadsexpressen) },
+  flaggmasten: { def: FLAGGMASTEN, load: () => import('../games/geografi').then((m) => m.flaggmasten) },
 };
 
 // Regionbossar: en blandning av regionens spel.
@@ -85,6 +93,7 @@ export const PLAYABLE: Record<string, Playable> = {
   ordskogen: { def: ORDSKOGENS_HJARTA, load: async () => regionGame('ordskogen', await gamesOf('ordskogen')) },
   vasteron: { def: VASTERONS_FYR, load: async () => regionGame('vasteron', await gamesOf('vasteron')) },
   roboton: { def: ROBOTFABRIKEN, load: async () => regionGame('roboton', await gamesOf('roboton')) },
+  kompasson: { def: OBSERVATORIET, load: async () => regionGame('kompasson', await gamesOf('kompasson')) },
 };
 
 const loading = new Map<string, Promise<GameModule>>();

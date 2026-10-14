@@ -133,6 +133,30 @@ export function VasteronGrowth(p: GrowthProps) {
   );
 }
 
+export function KompassonGrowth(p: GrowthProps) {
+  return (
+    <>
+      <Lager n={1} {...p}>
+        <circle cx="38" cy="165" r="5" fill="#fff" stroke="#8d6e4a" stroke-width="1" />
+        <path d="M38 161 l1.6 4 h-3.2 z" fill="#e03131" /><path d="M38 169 l1.6 -4 h-3.2 z" fill="#495057" />
+      </Lager>
+      <Lager n={2} {...p}>
+        <circle cx="22" cy="112" r="7" fill="#4dabf7" />
+        <path d="M22 105 q-3.5 7 0 14 q3.5 -7 0 -14" fill="#fff" />
+        <path d="M16.5 116 L20 123 M27.5 116 L24 123" stroke="#8d6e4a" stroke-width=".7" />
+        <rect x="19.5" y="122.5" width="5" height="3.5" rx=".8" fill="#8d6e4a" />
+      </Lager>
+      <Lager n={3} {...p}>
+        <Lampor at={[[56, 124, 0], [61, 119, 0], [47, 117, 3], [66, 112, 0]]} r={1.5} />
+      </Lager>
+      <Lager n={4} {...p}>
+        <circle cx="70" cy="142" r="11.5" fill="none" stroke="#fcc419" stroke-width="2.2" />
+        {star(70, 126, 4.5)}
+      </Lager>
+    </>
+  );
+}
+
 export function RobotonGrowth(p: GrowthProps) {
   return (
     <>

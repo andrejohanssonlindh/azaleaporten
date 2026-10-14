@@ -9,6 +9,8 @@
   --fm: #1c7ed6; --fm-bg: #e7f5ff; --em: #b35c00; --em-bg: #fff4e6;
   --geo-fill: #ffe8cc; --geo-stroke: #e8590c; --geo-fill2: #ffd8a8; --geo-hit: #b2f2bb; --geo-blue: #1c7ed6; --geo-grid: #e9ecef; --geo-water: #a5d8ff;
   --dia-bar: #f08c00; --dia-bar2: #1c7ed6; --dia-grid: #e3d6c0; --dia-axis: #7a6a58; --dia-hit: #2b8a3e; --dia-hit-bg: #d3f9d8;
+  --kar-hav: #a5d8ff; --kar-land: #f4e3b5; --kar-bakland: #e9e2d0; --kar-kant: #a08a6a; --kar-sjo: #74c0fc; --kar-papper: #fffdf8;
+  --kar-lyser: #ff922b; --kar-vald: #d6336c; --kar-skog: #69db7c; --kar-aker: #ffe066; --kar-hojd1: #8ce99a; --kar-hojd2: #e9c46a; --kar-hojd3: #9c6644;
   --font: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
   color-scheme: light dark;
 }
@@ -21,6 +23,8 @@
     --fm: #74c0fc; --fm-bg: #1a2a3a; --em: #ffc078; --em-bg: #3a2a1a;
     --geo-fill: #4a2f1c; --geo-stroke: #ff922b; --geo-fill2: #6b3f1e; --geo-hit: #2b5a34; --geo-blue: #74c0fc; --geo-grid: #3a3248; --geo-water: #1c4a6e;
     --dia-bar: #ffa94d; --dia-bar2: #74c0fc; --dia-grid: #3a3248; --dia-axis: #b3a796; --dia-hit: #69db7c; --dia-hit-bg: #1f3d26;
+    --kar-hav: #1c3a5a; --kar-land: #6b5a3e; --kar-bakland: #3d3548; --kar-kant: #b3a796; --kar-sjo: #2f6fa8; --kar-papper: #251f31;
+    --kar-lyser: #ffa94d; --kar-vald: #f06595; --kar-skog: #2f9e44; --kar-aker: #b08900; --kar-hojd1: #2b8a3e; --kar-hojd2: #a07c2c; --kar-hojd3: #6b4423;
     --shadow: 0 2px 0 rgba(0, 0, 0, .3), 0 10px 26px rgba(0, 0, 0, .25);
   }
 }
@@ -1211,3 +1215,68 @@ button.dia-bild-rad { cursor: pointer; }
 .dia-plock-ikon { font-size: 24px; }
 .dia-facit { border: 2px dashed var(--dia-hit); border-radius: 14px; padding: 6px 8px; margin: 6px 0; }
 .dia-rand { stroke: var(--card); stroke-width: 2.5; }
+
+/* ---------- kartor (Kompassön) ---------- */
+.kar-svg { width: 100%; max-width: 480px; max-height: 62vh; height: auto; display: block; margin: 4px auto 10px; border-radius: 14px; border: 2px solid var(--line); }
+.kar-havbg { fill: var(--kar-hav); }
+.kar-papper { fill: var(--kar-papper); }
+.kar-yta .kar-fyll { stroke: var(--kar-kant); stroke-width: .5; stroke-linejoin: round; }
+.kar-land .kar-fyll { fill: var(--kar-land); }
+.kar-bakland .kar-fyll { fill: var(--kar-bakland); }
+.kar-hav .kar-fyll { fill: var(--kar-hav); stroke: none; }
+.kar-sjo .kar-fyll { fill: var(--kar-sjo); }
+.kar-skog .kar-fyll { fill: var(--kar-skog); }
+.kar-aker .kar-fyll { fill: var(--kar-aker); }
+.kar-hojd-lag .kar-fyll { fill: var(--kar-hojd1); }
+.kar-hojd-mellan .kar-fyll { fill: var(--kar-hojd2); }
+.kar-hojd-hog .kar-fyll { fill: var(--kar-hojd3); }
+.kar-yta .kar-rand { fill: url(#kar-ranor); stroke: var(--kar-lyser); stroke-width: 2.2; pointer-events: none; }
+.kar-ranor-streck { fill: var(--kar-lyser); opacity: .55; }
+.kar-yta.vald .kar-rand { stroke: var(--kar-vald); stroke-width: 3; }
+.kar-yta.visa .kar-rand { stroke: var(--dia-hit); }
+.kar-yta.off .kar-fyll { opacity: .35; }
+.kar-hit { fill: transparent; stroke: transparent; stroke-width: 7; }
+.kar-tryck .tap { cursor: pointer; }
+.kar-tryck .tap:hover .kar-fyll { filter: brightness(1.06); }
+.kar-tryck .tap:focus-visible { outline: none; }
+.kar-tryck .tap:focus-visible .kar-fyll, .kar-tryck .tap:focus-visible .kar-punkt { stroke: var(--accent); stroke-width: 2.5; }
+.kar-streck { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.kar-alv .kar-streck { stroke: var(--kar-sjo); stroke-width: 2; }
+.kar-vag .kar-streck { stroke: #e03131; stroke-width: 5; }
+.kar-jarnvag .kar-streck { stroke: #212529; stroke-width: 5; stroke-dasharray: 10 6; }
+.kar-grans .kar-streck { stroke: var(--kar-kant); stroke-width: 1; stroke-dasharray: 3 2; }
+.kar-hit-linje { fill: none; stroke: transparent; stroke-width: 16; }
+.kar-linje.lyser .kar-streck, .kar-linje.vald .kar-streck { stroke: var(--kar-lyser); stroke-width: 4; }
+.kar-punkt { fill: var(--ink); stroke: var(--card); stroke-width: 1.5; }
+.kar-prick.lyser .kar-punkt, .kar-prick.vald .kar-punkt { fill: var(--kar-vald); }
+.kar-prick.off { opacity: .35; }
+.kar-ring { fill: none; stroke: var(--kar-lyser); stroke-width: 2.5; stroke-dasharray: 4 2.5; pointer-events: none; }
+.kar-prick.vald .kar-ring { stroke: var(--kar-vald); stroke-dasharray: none; }
+.kar-ikon { font-size: 22px; }
+.kar-namn { font: 800 11px var(--font); fill: var(--ink); paint-order: stroke; stroke: var(--card); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.kar-etikett { font: 700 11px var(--font); fill: var(--muted); pointer-events: none; }
+.kar-etikett.liten { font-size: 9px; }
+.kar-ekvator path { stroke: #e8590c; stroke-width: 1.2; stroke-dasharray: 5 4; }
+.kar-ekvator text { font: 700 9px var(--font); fill: #e8590c; }
+.kar-skala path { stroke: var(--ink); stroke-width: 2; }
+.kar-skala text { font: 700 10px var(--font); fill: var(--ink); }
+.kar-ros-bg { fill: var(--card); opacity: .85; stroke: var(--line); }
+.kar-ros-pil { fill: var(--muted); }
+.kar-ros-pil.liten { opacity: .7; }
+.kar-ros-pil.norr { fill: #e03131; }
+.kar-ros-pil.on { fill: var(--kar-vald); opacity: 1; }
+.kar-ros-text { font: 900 13px var(--font); fill: var(--ink); }
+.kar-ros-text.liten { font-size: 10px; }
+.kar-ros-mitt { fill: var(--ink); }
+.kar-pic { font-size: 64px; text-align: center; line-height: 1.1; }
+.flagga { display: block; width: 100%; height: auto; border-radius: 3px; }
+.flagga.stor { width: min(220px, 60vw); margin: 4px auto 10px; box-shadow: var(--shadow); }
+.kar-flaggbild { display: flex; justify-content: center; }
+.kar-flaggval { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 360px; margin: 8px auto; }
+.kar-flaggknapp { padding: 8px; min-height: 0; }
+.kar-flaggknapp.wrong { opacity: .35; }
+.kar-namnruta { min-width: 12ch; text-align: left; }
+.kar-stavas { text-align: center; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) {
+  .kar-yta .kar-fyll, .kar-punkt { transition: opacity .2s; }
+}

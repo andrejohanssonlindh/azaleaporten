@@ -69,6 +69,9 @@ export const ARENDEN: Arende[] = [
   { id: 'fagelvakten', who: 'Fågelvakten Ugglis', icon: '🦉', areaId: 'fageltornet', n: 3,
     story: 'Hoho! Flyttfåglarna kommer till dalen, så många att jag inte hinner räkna dem. Hjälper du mig med strecken i Fågeltornet?',
     thanks: 'Hoho! Varenda fågel räknad och inskriven i fågelboken. Tack, räknemästare!' },
+  { id: 'borttappat-brev', who: 'Postmästaren Frimärka', icon: '📮', areaId: 'huvudstadsexpressen', n: 3,
+    story: 'Åh nej! Det har kommit en hel säck brev till världens huvudstäder, men regnet har suddat ut adresserna. Bara ländernas namn syns. Kan du åka med Huvudstadsexpressen och hjälpa mig?',
+    thanks: 'Varenda brev kom fram till rätt huvudstad! Du är den bästa brevbäraren i världen.' },
 ];
 
 export const arende = (id: string | null | undefined) => ARENDEN.find((a) => a.id === id);
