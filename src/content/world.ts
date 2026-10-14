@@ -89,13 +89,13 @@ export const REGIONS: Region[] = [
     ],
   },
   {
-    // Planerad (PLAN.md §14f): läsa och tolka diagram, lägesmått, och till sist diagram som lurar.
+    // Läsa och tolka diagram, lägesmått, och till sist diagram som lurar (PLAN.md §14f). Byggs ett område i taget.
     id: 'diagramdalen', name: 'Diagramdalen', subject: 'Statistik', icon: '📊',
     tagline: 'En dal där alla räknar allt: fåglarna vid tornet, skörden på marknaden, vädret och rösterna på torget. Längst in står tivolits spegelsal, där diagrammen sträcker och krymper sig – och tidningen som alltid har en rubrik som låter för bra för att vara sann.',
     sky: ['#f59f00', '#fff3bf', '#5c940d'],
     areas: [
-      { id: 'fageltornet', name: 'Fågeltornet', icon: '🐦', desc: 'Räkna fåglar med streck och tabeller.', grades: [1, 3], status: 'soon' },
-      { id: 'skordemarknaden', name: 'Skördemarknaden', icon: '🌾', desc: 'Stapeldiagram och bilddiagram.', grades: [1, 4], status: 'soon' },
+      { id: 'fageltornet', name: 'Fågeltornet', icon: '🐦', desc: 'Räkna fåglar med streck och tabeller.', grades: [1, 3], status: 'open' },
+      { id: 'skordemarknaden', name: 'Skördemarknaden', icon: '🌾', desc: 'Stapeldiagram och bilddiagram.', grades: [1, 4], status: 'open' },
       { id: 'vaderstationen', name: 'Väderstationen', icon: '🌦️', desc: 'Linjediagram: hur ändras vädret?', grades: [3, 6], status: 'soon' },
       { id: 'omrostningstorget', name: 'Omröstningstorget', icon: '🗳️', desc: 'Cirkeldiagram: vem fick flest röster?', grades: [3, 6], status: 'soon' },
       { id: 'vagmastarens-bod', name: 'Vågmästarens bod', icon: '⚖️', desc: 'Medelvärde, median och typvärde.', grades: [4, 6], status: 'soon' },

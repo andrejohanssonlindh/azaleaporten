@@ -102,6 +102,11 @@ const PROG: Record<string, string> = {
   'py.print': 'print i Python', 'py.variabel': 'variabler i Python', 'py.text': 'text och tal i Python', 'py.if': 'if och else i Python',
   'py.for': 'for-loopar i Python', 'py.fel': 'fel i Python-kod',
 };
+const STAT: Record<string, string> = {
+  streck: 'streckdiagram', 'streck-rita': 'att rita streck', tabell: 'tabeller', 'tabell-jamfor': 'att jämföra i tabeller',
+  stapel: 'stapeldiagram', 'stapel-skala': 'skalan i stapeldiagram', 'stapel-jamfor': 'att jämföra staplar', 'stapel-rita': 'att bygga stapeldiagram',
+  bild: 'bilddiagram', 'bild-halv': 'halva bilder i bilddiagram',
+};
 const TAL = ['nollans', 'ettans', 'tvåans', 'treans', 'fyrans', 'femmans', 'sexans', 'sjuans', 'åttans', 'nians', 'tians', 'elvans', 'tolvans'];
 
 export function skillLabel(skill: string): string {
@@ -128,6 +133,7 @@ export function skillLabel(skill: string): string {
   if (topic === 'pengar' && PENGAR[rest]) return PENGAR[rest];
   if (topic === 'brak' && BRAK[rest]) return BRAK[rest];
   if (topic === 'geo' && GEO[rest]) return GEO[rest];
+  if (topic === 'stat' && STAT[rest]) return STAT[rest];
   if (LINJE[`${topic}.${rest}`]) return LINJE[`${topic}.${rest}`];
   if (topic === 'mult' && TAL[Number(rest)]) return `${TAL[Number(rest)]} tabell`;
   if (topic === 'div' && /^\d+$/.test(rest)) return `delat med ${rest}`;

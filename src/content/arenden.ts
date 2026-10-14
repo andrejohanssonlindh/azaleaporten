@@ -66,6 +66,9 @@ export const ARENDEN: Arende[] = [
   { id: 'bokbussen', who: 'Bokbussen Berit', icon: '🚌', areaId: 'berattelsebiblioteket', n: 3,
     story: 'Jag ska köra ut böcker till hela ön, men jag vet inte vilka som är spännande! Kan du läsa några åt mig i Berättelsebiblioteket?',
     thanks: 'Nu vet jag precis vilka böcker alla vill ha. Tut tut, tack!' },
+  { id: 'fagelvakten', who: 'Fågelvakten Ugglis', icon: '🦉', areaId: 'fageltornet', n: 3,
+    story: 'Hoho! Flyttfåglarna kommer till dalen, så många att jag inte hinner räkna dem. Hjälper du mig med strecken i Fågeltornet?',
+    thanks: 'Hoho! Varenda fågel räknad och inskriven i fågelboken. Tack, räknemästare!' },
 ];
 
 export const arende = (id: string | null | undefined) => ARENDEN.find((a) => a.id === id);

@@ -50,7 +50,7 @@ describe('lektionerna', () => {
   const withLessons = Object.entries(PLAYABLE).filter(([, p]) => p.def.lessons?.length);
 
   it('finns i alla matteområden i Talbergen och Betongbukten', () => {
-    for (const id of ['tidstornet', 'tiokompisbron', 'tabellgruvan', 'myntmarknaden', 'tallinjebron', 'brakbageriet', 'fluffy', 'svampen', 'oxie', 'sibbarp', 'bryggeriet', 'kroksback', 'stapelbaddsparken', 'kodstigen', 'loopverkstaden', 'buggjakten']) {
+    for (const id of ['tidstornet', 'tiokompisbron', 'tabellgruvan', 'myntmarknaden', 'tallinjebron', 'brakbageriet', 'fluffy', 'svampen', 'oxie', 'sibbarp', 'bryggeriet', 'kroksback', 'stapelbaddsparken', 'kodstigen', 'loopverkstaden', 'buggjakten', 'fageltornet', 'skordemarknaden']) {
       expect(PLAYABLE[id].def.lessons?.length, id).toBeGreaterThan(0);
     }
   });

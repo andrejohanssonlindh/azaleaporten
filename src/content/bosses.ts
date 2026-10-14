@@ -40,6 +40,8 @@ export const BOSS_SLOTS: { id: string; where: string }[] = [
   { id: 'loopverkstaden.mastare', where: 'Loopverkstaden – slutboss' },
   { id: 'buggjakten.mastare', where: 'Buggjakten – slutboss' },
   { id: 'pythonhamnen.mastare', where: 'Pythonhamnen – slutboss' },
+  { id: 'fageltornet.mastare', where: 'Fågeltornet – slutboss' },
+  { id: 'skordemarknaden.mastare', where: 'Skördemarknaden – slutboss' },
 ];
 
 export const GENERIC_PERSONAS: Persona[] = [
@@ -372,6 +374,26 @@ export const GENERIC_PERSONAS: Persona[] = [
     onBossHit: ['Koden kör!', 'Snyggt läst!'],
     defeat: 'Fantastiskt! Du läser Python som ett proffs. Ta mitt tangentbord – det skriver aldrig ett enda fel.',
     signatureItem: { name: 'Professor Syntax tangentbord', slot: 'vapen', flavor: 'Varje tangent ger rätt tecken.' },
+  },
+  {
+    boss: 'fageltornet.mastare', name: 'Fågelvakten Ugglis', title: 'Fågeltornets Mästare', portrait: '🦉', color: '#5c940d',
+    entrance: 'Hoho! Från mitt torn ser jag varenda fågel i dalen, och jag har räknat dem alla. Kan du läsa mina strecklistor och tabeller lika snabbt som jag?',
+    phase2: 'Hoho! Nu kommer flyttfåglarna – långa listor och stora tal!',
+    phase3: 'Det sista provet: räkna, jämför och rita, allt på en gång!',
+    onHeroMiss: ['Hoho, räkna igen!', 'En fågel flög förbi dig!'],
+    onBossHit: ['Hoho! Precis rätt!', 'Skarpa ögon!'],
+    defeat: 'Hoho! Du räknar som en riktig fågelvakt. Ta min kikare – med den missar du aldrig en enda fågel.',
+    signatureItem: { name: 'Ugglis kikare', slot: 'skold', flavor: 'Räknar fåglar på en kilometers avstånd.' },
+  },
+  {
+    boss: 'skordemarknaden.mastare', name: 'Marknadsfogden Stapel', title: 'Skördemarknadens Mästare', portrait: '🧑‍🌾', color: '#e67700',
+    entrance: 'Välkommen till marknaden! Jag är Marknadsfogden Stapel, och jag har ett diagram över allt som säljs. Kan du läsa dem – skalor, nycklar och allt?',
+    phase2: 'Nu går skalan i tior och varje bild är värd fem. Håll ögonen på axeln!',
+    phase3: 'Det stora marknadsprovet: staplar, bilder och skillnader!',
+    onHeroMiss: ['Kolla skalan!', 'Glömde du nyckeln?'],
+    onBossHit: ['Rätt avläst!', 'Som en riktig fogde!'],
+    defeat: 'Utmärkt! Du läser diagram bättre än hela marknaden. Ta min våg – den visar alltid precis rätt.',
+    signatureItem: { name: 'Fogdens våg', slot: 'vapen', flavor: 'Väger rätt, varje gång.' },
   },
 ];
 

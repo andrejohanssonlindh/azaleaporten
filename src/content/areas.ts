@@ -33,6 +33,7 @@ import { LOGIKSLINGAN } from '../games/logik/content';
 import { BUGGJAKTEN, KODSTIGEN, LOOPVERKSTADEN } from '../games/robot/content';
 import { PYTHONHAMNEN } from '../games/python/content';
 import { ROBOTFABRIKEN } from '../games/roboton';
+import { FAGELTORNET, SKORDEMARKNADEN } from '../games/diagram/content';
 
 // Spelbara områden: områdets innehåll (litet, laddas direkt) + spelet som levererar frågorna.
 // Spelkoden laddas först när någon spelar i området, så att startsidan förblir liten.
@@ -67,6 +68,8 @@ const AREAS: Record<string, Playable> = {
   loopverkstaden: { def: LOOPVERKSTADEN, load: () => import('../games/robot').then((m) => m.loopverkstaden) },
   buggjakten: { def: BUGGJAKTEN, load: () => import('../games/robot').then((m) => m.buggjakten) },
   pythonhamnen: { def: PYTHONHAMNEN, load: () => import('../games/python').then((m) => m.python) },
+  fageltornet: { def: FAGELTORNET, load: () => import('../games/diagram').then((m) => m.fageltornet) },
+  skordemarknaden: { def: SKORDEMARKNADEN, load: () => import('../games/diagram').then((m) => m.skordemarknaden) },
 };
 
 // Regionbossar: en blandning av regionens spel.

@@ -8,6 +8,7 @@
   --face: #ffffff; --rim: #cbbfa8; --tick: #a39684; --hand: #2b2118; --minhand: #1c7ed6;
   --fm: #1c7ed6; --fm-bg: #e7f5ff; --em: #b35c00; --em-bg: #fff4e6;
   --geo-fill: #ffe8cc; --geo-stroke: #e8590c; --geo-fill2: #ffd8a8; --geo-hit: #b2f2bb; --geo-blue: #1c7ed6; --geo-grid: #e9ecef; --geo-water: #a5d8ff;
+  --dia-bar: #f08c00; --dia-bar2: #1c7ed6; --dia-grid: #e3d6c0; --dia-axis: #7a6a58; --dia-hit: #2b8a3e; --dia-hit-bg: #d3f9d8;
   --font: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
   color-scheme: light dark;
 }
@@ -19,6 +20,7 @@
     --face: #1f1b28; --rim: #4a4058; --tick: #8a7f99; --hand: #f3ede4; --minhand: #74c0fc;
     --fm: #74c0fc; --fm-bg: #1a2a3a; --em: #ffc078; --em-bg: #3a2a1a;
     --geo-fill: #4a2f1c; --geo-stroke: #ff922b; --geo-fill2: #6b3f1e; --geo-hit: #2b5a34; --geo-blue: #74c0fc; --geo-grid: #3a3248; --geo-water: #1c4a6e;
+    --dia-bar: #ffa94d; --dia-bar2: #74c0fc; --dia-grid: #3a3248; --dia-axis: #b3a796; --dia-hit: #69db7c; --dia-hit-bg: #1f3d26;
     --shadow: 0 2px 0 rgba(0, 0, 0, .3), 0 10px 26px rgba(0, 0, 0, .25);
   }
 }
@@ -1151,3 +1153,61 @@ span.rb-hole { padding: 0 6px; border-radius: 8px; border: 2px dashed var(--acce
 .lb-big { font-size: 26px; font-weight: 900; }
 .lb-hop-head { fill: var(--accent); }
 .lb-hop-head.b { fill: var(--minhand); }
+
+/* ---------- diagram (Diagramdalen) ---------- */
+.dia { margin: 4px auto 10px; max-width: 420px; }
+.dia-titel { font-weight: 800; font-size: 15px; margin-bottom: 6px; }
+.dia-legend { display: flex; gap: 14px; justify-content: center; font-size: 13px; margin-bottom: 4px; }
+.dia-legend span { display: inline-flex; gap: 5px; align-items: center; }
+.dia-svg { width: 100%; height: auto; display: block; }
+.dia-svg.dia-edit { touch-action: none; }
+.dia-grid { stroke: var(--dia-grid); stroke-width: 1; }
+.dia-axis { stroke: var(--dia-axis); stroke-width: 2; }
+.dia-tick { fill: var(--muted); font-size: 12px; font-weight: 700; }
+.dia-axelnamn { fill: var(--muted); font-size: 11px; font-weight: 700; }
+.dia-katnamn { fill: var(--ink); font-size: 11.5px; font-weight: 700; }
+.dia-kat-emoji { font-size: 18px; }
+.dia-bar.s0 { fill: var(--dia-bar); }
+.dia-bar.s1 { fill: var(--dia-bar2); }
+.dia-hatch { fill: url(#dia-ranor); pointer-events: none; }
+.dia-varde-txt { fill: var(--ink); font-size: 12px; font-weight: 900; }
+.dia-tap { fill: transparent; cursor: pointer; }
+.dia-tap:focus-visible { outline: none; stroke: var(--accent); stroke-width: 3; }
+.dia-svg .hit .dia-bar { stroke: var(--dia-hit); stroke-width: 3; }
+.dia-svg .hit .dia-katnamn { fill: var(--dia-hit); }
+.dia-svg .off .dia-bar { opacity: .35; }
+.dia-edit .dia-tap { cursor: ns-resize; }
+.dia-byggknappar { display: grid; margin-top: 2px; }
+.dia-knappar { display: inline-flex; gap: 4px; justify-content: center; }
+.dia-knappar .btn.small { min-width: 40px; min-height: 40px; padding: 4px 8px; }
+
+.dia-tab { display: flex; flex-direction: column; border: 2px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--card); text-align: left; }
+.dia-rad { display: grid; grid-template-columns: minmax(7em, 1fr) 1.2fr; align-items: center; gap: 8px; padding: 6px 12px; border: none; border-top: 1px solid var(--line); background: none; font: inherit; color: inherit; text-align: left; min-height: 44px; }
+.dia-rad.head { border-top: none; background: var(--bg2); font-size: 13px; font-weight: 800; color: var(--muted); min-height: 0; }
+.dia-tab:not(.streck) .dia-rad { grid-template-columns: 1fr auto; }
+.dia-rad.bygg { grid-template-columns: minmax(6.5em, 1fr) 1.2fr auto; }
+button.dia-rad { cursor: pointer; }
+button.dia-rad:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.dia-rad.hit { background: var(--dia-hit-bg); }
+.dia-rad.off { opacity: .4; text-decoration: line-through; }
+.dia-varde { font-weight: 900; font-size: 19px; font-variant-numeric: tabular-nums; }
+.dia-kat { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.dia-kat-ikon { font-size: 20px; }
+.dia-tally { stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; display: block; }
+
+.dia-bild { display: flex; flex-direction: column; border: 2px solid var(--line); border-radius: 14px; background: var(--card); text-align: left; overflow: hidden; }
+.dia-bild-rad { display: grid; grid-template-columns: 7.5em 1fr; align-items: center; gap: 8px; padding: 6px 10px; border: none; border-bottom: 1px solid var(--line); background: none; font: inherit; color: inherit; text-align: left; min-height: 44px; }
+button.dia-bild-rad { cursor: pointer; }
+.dia-bild-rad.hit { background: var(--dia-hit-bg); }
+.dia-bild-rad.off { opacity: .4; }
+.dia-bilder { display: flex; flex-wrap: wrap; gap: 2px; }
+.dia-pikto { font-size: 22px; line-height: 1; display: inline-block; }
+.dia-pikto.halv { width: .62em; overflow: hidden; }
+.dia-pikto.halv > span { display: inline-block; width: 1.25em; }
+.dia-nyckel { padding: 8px 12px; background: var(--bg2); font-size: 15px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+.dia-plock { width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto 8px; }
+.dia-plock-bg { fill: color-mix(in srgb, var(--geo-water) 35%, var(--card)); stroke: var(--line); stroke-width: 2; }
+.dia-plock-ikon { font-size: 24px; }
+.dia-facit { border: 2px dashed var(--dia-hit); border-radius: 14px; padding: 6px 8px; margin: 6px 0; }
+.dia-rand { stroke: var(--card); stroke-width: 2.5; }
