@@ -345,13 +345,13 @@ function Cirkel(p: ChartProps) {
 function ByggKnappar({ chart: c, vals, edit }: ChartProps) {
   const v = vals!;
   const { min, max, steg } = c.axel;
-  const vad = c.typ === 'linje' ? 'punkt' : 'stapel';
+  const vad = c.typ === 'linje' ? ' punkt' : '';
   return (
     <div class="dia-byggknappar" style={{ paddingLeft: `${(42 / W) * 100}%`, paddingRight: `${(10 / W) * 100}%`, gridTemplateColumns: `repeat(${c.kat.length}, 1fr)` }}>
       {c.kat.map((k, i) => (
         <span key={k} class="dia-knappar">
-          <button type="button" class="btn small" aria-label={`Lägre ${vad}: ${k}`} disabled={v[i] <= min} onClick={() => edit!(i, Math.max(min, v[i] - steg))}>▼</button>
-          <button type="button" class="btn small" aria-label={`Högre ${vad}: ${k}`} disabled={v[i] >= max} onClick={() => edit!(i, Math.min(max, v[i] + steg))}>▲</button>
+          <button type="button" class="btn small" aria-label={`Lägre${vad}: ${k}`} disabled={v[i] <= min} onClick={() => edit!(i, Math.max(min, v[i] - steg))}>▼</button>
+          <button type="button" class="btn small" aria-label={`Högre${vad}: ${k}`} disabled={v[i] >= max} onClick={() => edit!(i, Math.min(max, v[i] + steg))}>▲</button>
         </span>
       ))}
     </div>

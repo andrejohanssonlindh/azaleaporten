@@ -1,9 +1,12 @@
 import type { Lesson } from '../../platform/rpg/types';
+import { honest } from '../../engines/diagram/chart';
 import { ChartView } from '../../engines/diagram/ChartView';
+import { EXEMPEL_MEDEL, EXEMPEL_MEDIAN } from './lage';
 import { EXEMPEL_CIRKEL, EXEMPEL_PROCENT } from './rost';
+import { EXEMPEL_AXEL, EXEMPEL_YTA } from './spegel';
 import { EXEMPEL_LINJE, EXEMPEL_TVA } from './vader';
 
-// Diagramdalens klassrum, del två: Väderstationen och Omröstningstorget.
+// Diagramdalens klassrum, del två: Väderstationen, Omröstningstorget, Vågmästarens bod, Spegelsalen och Skvallerpressen.
 // Lektionernas id:n är permanenta (se lessons i content.ts).
 
 export const VADERSTATIONEN: Record<string, Lesson> = {
@@ -95,6 +98,182 @@ export const OMROSTNINGSTORGET: Record<string, Lesson> = {
       text: 'Om du vet hur många, kan du räkna ut procenten. Ta reda på hur mycket en procent är, och se hur många sådana som får plats.',
       steps: ['60 av 200 röstade på hund.', '1 % av 200 är 2.', '60 / 2 = 30. Det är 30 %.'],
       prova: { mode: 'procent', level: 2 },
+    },
+  ] },
+};
+
+export const VAGMASTARENS_BOD: Record<string, Lesson> = {
+  'medelvarde-dela-lika': { pages: [
+    {
+      title: 'Dela lika',
+      text: 'Ekorren har 2 kastanjer, haren 7 och igelkotten 3. Om de delar lika – hur många får var och en? Det är medelvärdet.',
+      pic: <ChartView chart={EXEMPEL_MEDEL} />,
+      steps: ['Lägg ihop: 2 + 7 + 3 = 12.', 'De är 3 djur. Dela: 12 / 3 = 4.', 'Medelvärdet är 4. Om alla delar lika får var och en 4.'],
+      prova: { mode: 'medel', level: 0 },
+    },
+    {
+      title: 'Delaglömmarens fälla',
+      text: 'Delaglömmaren lägger ihop alla talen – och glömmer sedan att dela. Men 12 är summan, inte medelvärdet! Dela alltid med hur många tal det är.',
+      tips: 'En nolla räknas också. Har någon plockat noll kastanjer är den ändå med när du delar.',
+      prova: { mode: 'medel', level: 1 },
+    },
+    {
+      title: 'Medelvärde ur ett diagram',
+      text: 'Läs av varje stapel först och skriv upp talen. Sedan gör du som vanligt: lägg ihop och dela med hur många staplar det är.',
+      prova: { mode: 'medel', level: 2 },
+    },
+  ] },
+
+  'median-sortera-forst': { pages: [
+    {
+      title: 'Talet i mitten',
+      text: 'Medianen är talet i mitten – men först måste talen stå i ordning, från minst till störst.',
+      pic: <ChartView chart={EXEMPEL_MEDIAN} />,
+      steps: ['Talen: 3, 1, 4, 0, 2.', 'I ordning: 0, 1, 2, 3, 4.', 'I mitten står 2. Medianen är 2.'],
+      prova: { mode: 'median', level: 0 },
+    },
+    {
+      title: 'Mittenmusens fälla',
+      text: 'Mittenmusen springer rakt till mitten av raden och tar 4. Men talen stod inte i ordning! Sortera alltid först.',
+      prova: { mode: 'median', level: 1 },
+    },
+    {
+      title: 'Två i mitten',
+      text: 'Om det är ett jämnt antal tal står två tal i mitten. Då är medianen mitt emellan dem.',
+      steps: ['Talen i ordning: 2, 4, 6, 8.', 'I mitten står 4 och 6.', 'Mitt emellan 4 och 6 är 5. Medianen är 5.'],
+      prova: { mode: 'median', level: 2 },
+    },
+  ] },
+
+  'typvarde-och-bredd': { pages: [
+    {
+      title: 'Det vanligaste',
+      text: 'Typvärdet är det tal som finns flest gånger.',
+      steps: ['Talen: 2, 5, 2, 7, 2, 3.', 'Tvåan finns tre gånger. Inget annat tal finns så många gånger.', 'Typvärdet är 2 – inte 7, som bara är störst.'],
+      prova: { mode: 'typ', level: 0 },
+    },
+    {
+      title: 'Störst minus minst',
+      text: 'Variationsbredden visar hur utspridda talen är: det största talet minus det minsta.',
+      steps: ['Talen: 4, 9, 2, 6.', 'Störst är 9, minst är 2.', '9 − 2 = 7. Variationsbredden är 7.'],
+      prova: { mode: 'bredd', level: 0 },
+    },
+    {
+      title: 'Jätten i klassen',
+      text: 'En jätte börjar i klassen. Han är mycket längre än alla andra. Då blir summan av allas längder mycket större – och medelvärdet växer. Medianen, talet i mitten, flyttar sig nästan inte.',
+      prova: { mode: 'valj', level: 1 },
+    },
+  ] },
+};
+
+export const SPEGELSALEN: Record<string, Lesson> = {
+  'kolla-axeln': { pages: [
+    {
+      title: 'Var börjar axeln?',
+      text: 'Jordgubbsstapeln ser ut att vara många gånger högre än chokladstapeln. Men titta på axeln: den börjar på 40! Talen är 48 och 42 – nästan lika.',
+      pic: <ChartView chart={EXEMPEL_AXEL} />,
+      prova: { mode: 'axel', level: 0 },
+    },
+    {
+      title: 'Laga axeln',
+      text: 'Ett ärligt stapeldiagram har en axel som börjar på noll. Då syns det hur stora skillnaderna är på riktigt.',
+      pic: <ChartView chart={honest(EXEMPEL_AXEL)} showVals />,
+      prova: { mode: 'axel', level: 2 },
+    },
+    {
+      title: 'Ojämna steg',
+      text: 'Titta på talen vid axeln: 0, 10, 20, 50, 100. Strecken står lika tätt, men stegen är olika stora! Då går det inte att jämföra höjderna. Läs talen i stället.',
+      prova: { mode: 'skala', level: 0 },
+    },
+  ] },
+
+  'ytan-lurar': { pages: [
+    {
+      title: 'Bilder som växer',
+      text: 'Det finns 20 bananer och 10 äpplen – dubbelt så många. Men bananbilden är dubbelt så hög och dubbelt så bred. Då ser den fyra gånger så stor ut!',
+      pic: <ChartView chart={EXEMPEL_YTA} />,
+      prova: { mode: 'yta', level: 0 },
+    },
+    {
+      title: 'Breda staplar',
+      text: 'Det är höjden på en stapel som visar talet. En bredare stapel ser större ut, men den är inte värd mer.',
+      prova: { mode: 'bredd', level: 0 },
+    },
+    {
+      title: 'Lita på talen',
+      text: 'Hur många gånger fler är det egentligen? Läs talen och räkna: 20 är 2 gånger 10 – hur stort det än ser ut.',
+      prova: { mode: 'yta', level: 1 },
+    },
+  ] },
+
+  'tva-diagram': { pages: [
+    {
+      title: 'Två skalor',
+      text: 'Två diagram bredvid varandra kan ha olika tal på axlarna. En stapel som når högt i ett diagram som går till 10 kan vara mindre än en låg stapel i ett diagram som går till 50. Läs axeln i båda!',
+      prova: { mode: 'olika', level: 1 },
+    },
+    {
+      title: 'Inga tal?',
+      text: 'Ett diagram utan tal på axeln säger inte hur stora sakerna är. Det kan bara visa vilken som ser störst ut.',
+      prova: { mode: 'enhet', level: 0 },
+    },
+    {
+      title: 'Alla diagram lurar inte',
+      text: 'Ibland är ett diagram precis som det ska. Kolla: börjar axeln på noll? Är stegen lika stora? Är staplarna lika breda? Finns talen med? Då är det ärligt.',
+      prova: { mode: 'skala', level: 2 },
+    },
+  ] },
+};
+
+export const SKVALLERPRESSEN: Record<string, Lesson> = {
+  'stammer-rubriken': { pages: [
+    {
+      title: 'Läs själv',
+      text: 'En rubrik vill att du ska bli förvånad. Läs av diagrammet själv och jämför med rubriken. Är den sann, falsk – eller går det inte att veta?',
+      prova: { mode: 'rubrik', level: 0 },
+    },
+    {
+      title: 'Russinplockaren',
+      text: 'Russinplockaren visar bara de månader när det ökar. Titta på hela året innan du tror på rubriken: vad hände före och efter?',
+      prova: { mode: 'utsnitt', level: 0 },
+    },
+    {
+      title: 'Hur många svarade?',
+      text: 'Om tidningen bara frågade fyra personer kan den inte veta vad hela byn tycker. Då går det inte att veta – hur säker rubriken än låter.',
+      prova: { mode: 'urval', level: 0 },
+    },
+  ] },
+
+  raknetricks: { pages: [
+    {
+      title: 'Totalen',
+      text: 'Ett diagram över hur många det blivit totalt går alltid uppåt. Det som såldes en viss månad är skillnaden mot månaden innan.',
+      steps: ['Totalt efter januari: 40.', 'Totalt efter februari: 70.', 'I februari såldes 70 − 40 = 30.'],
+      prova: { mode: 'summerad', level: 0 },
+    },
+    {
+      title: 'Mer än hela',
+      text: 'Hela cirkeln är 100 %. Om procenten vid bitarna blir mer än 100 tillsammans kan diagrammet inte stämma.',
+      prova: { mode: 'hundra', level: 0 },
+    },
+    {
+      title: 'Per person',
+      text: 'I en stor by blir det mycket av allt. Vill man veta hur mycket varje person äter delar man med hur många som bor där.',
+      steps: ['Storby: 2000 glassar och 1000 invånare. Det är 2 per person.', 'Lillby: 250 glassar och 50 invånare. Det är 5 per person.', 'I Lillby äter varje person mest!'],
+      prova: { mode: 'perperson', level: 0 },
+    },
+  ] },
+
+  'samband-ar-inte-orsak': { pages: [
+    {
+      title: 'Glass och solbränna',
+      text: 'På sommaren säljs mycket glass, och många blir solbrända. Båda linjerna går upp samtidigt. Men glassen ger inte solbränna – det är solen som får båda att öka!',
+      prova: { mode: 'samband', level: 0 },
+    },
+    {
+      title: 'Leta efter det tredje',
+      text: 'När två saker ökar samtidigt: fråga dig om något tredje kan styra båda. Vädret, årstiden eller hur många som bor någonstans är vanliga svar.',
+      prova: { mode: 'samband', level: 1 },
     },
   ] },
 };

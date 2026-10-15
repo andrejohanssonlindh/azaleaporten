@@ -89,7 +89,7 @@ export const REGIONS: Region[] = [
     ],
   },
   {
-    // Läsa och tolka diagram, lägesmått, och till sist diagram som lurar (PLAN.md §14f). Byggs ett område i taget.
+    // Läsa och tolka diagram, lägesmått, och till sist diagram som lurar (PLAN.md §14f).
     id: 'diagramdalen', name: 'Diagramdalen', subject: 'Statistik', icon: '📊',
     tagline: 'En dal där alla räknar allt: fåglarna vid tornet, skörden på marknaden, vädret och rösterna på torget. Längst in står tivolits spegelsal, där diagrammen sträcker och krymper sig – och tidningen som alltid har en rubrik som låter för bra för att vara sann.',
     sky: ['#f59f00', '#fff3bf', '#5c940d'],
@@ -98,9 +98,9 @@ export const REGIONS: Region[] = [
       { id: 'skordemarknaden', name: 'Skördemarknaden', icon: '🌾', desc: 'Stapeldiagram och bilddiagram.', grades: [1, 4], status: 'open' },
       { id: 'vaderstationen', name: 'Väderstationen', icon: '🌦️', desc: 'Linjediagram: hur ändras vädret?', grades: [3, 6], status: 'open' },
       { id: 'omrostningstorget', name: 'Omröstningstorget', icon: '🗳️', desc: 'Cirkeldiagram: vem fick flest röster?', grades: [3, 6], status: 'open' },
-      { id: 'vagmastarens-bod', name: 'Vågmästarens bod', icon: '⚖️', desc: 'Medelvärde, median och typvärde.', grades: [4, 6], status: 'soon' },
-      { id: 'spegelsalen', name: 'Spegelsalen', icon: '🪞', desc: 'Diagram som lurar ögat. Hitta knepet!', grades: [4, 6], status: 'soon' },
-      { id: 'skvallerpressen', name: 'Skvallerpressen', icon: '📰', desc: 'Rubriker som lurar. Stämmer det verkligen?', grades: [4, 6], status: 'soon' },
+      { id: 'vagmastarens-bod', name: 'Vågmästarens bod', icon: '⚖️', desc: 'Medelvärde, median och typvärde.', grades: [4, 6], status: 'open' },
+      { id: 'spegelsalen', name: 'Spegelsalen', icon: '🪞', desc: 'Diagram som lurar ögat. Hitta knepet!', grades: [4, 6], status: 'open' },
+      { id: 'skvallerpressen', name: 'Skvallerpressen', icon: '📰', desc: 'Rubriker som lurar. Stämmer det verkligen?', grades: [4, 6], status: 'open' },
     ],
   },
   {

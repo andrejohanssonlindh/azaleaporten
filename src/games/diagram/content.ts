@@ -261,3 +261,266 @@ export const OMROSTNINGSTORGET: AreaDef = {
       ] },
   ],
 };
+
+// ---------- Vågmästarens bod ----------
+
+const DELAGLOMMAREN: BossDef = {
+  type: 'boss', id: 'delaglommaren', kind: 'monster', name: 'Delaglömmaren', icon: '🐹', title: 'Lägger ihop men glömmer att dela',
+  hp: 8, trap: 'medel-glomt-dela', pool: [{ mode: 'medel', level: 0 }],
+  lines: {
+    entrance: 'Mums! Jag är Delaglömmaren. Jag lägger ihop alla nötterna i en stor hög – och sedan äter jag upp allihop. Dela lika? Vad är det?',
+    phase2: 'Nu blir högarna större! Och det finns nollor också – mums!',
+    onHeroMiss: ['Hela högen är min!', 'Dela? Glömde det!', 'Mums mums!'],
+    onBossHit: ['Du delade lika!', 'Aj, min hög!', 'Var och en får lika?!'],
+    defeat: 'Om alla delar lika får alla lika mycket … Det var ju rättvist! Får jag följa med? Jag delar med mig av mina nötter.',
+  },
+  pet: { name: 'Lilla Delaglömmaren', icon: '🐹' }, titleReward: 'Rättvisedelaren',
+};
+
+const MITTENMUSEN: BossDef = {
+  type: 'boss', id: 'mittenmusen', kind: 'monster', name: 'Mittenmusen', icon: '🐭', title: 'Tar mitten utan att sortera',
+  hp: 8, trap: 'median-osorterad', pool: [{ mode: 'median', level: 0 }],
+  lines: {
+    entrance: 'Pip! Jag är Mittenmusen, och jag springer alltid rakt till mitten av raden. Sortera först? Det tar ju så lång tid!',
+    phase2: 'Pip pip! Längre rader – och jag springer ännu fortare!',
+    onHeroMiss: ['Mitten, pip!', 'Ingen sortering!', 'Snabbt till mitten!'],
+    onBossHit: ['Du sorterade!', 'Pip … aj!', 'I ordning först?!'],
+    defeat: 'Först i ordning, sedan mitten. Pip! Får jag följa med? Jag håller ordning i din ryggsäck.',
+  },
+  pet: { name: 'Lilla Mittenmusen', icon: '🐭' }, titleReward: 'Mittenfinnaren',
+};
+
+export const VAGMASTARENS_BOD: AreaDef = {
+  areaId: 'vagmastarens-bod',
+  gameId: 'vagmastarens-bod',
+  title: 'Vågmästarens bod',
+  kunskap: { name: 'Lägesmått', icon: '⚖️', titles: ['Medelvärdesmästaren', 'Bodens vågmästare'] },
+  texts: { cleared: 'Vågen står i balans!', notYet: 'Nio rätt av tio behövs för att vågen ska stå still – försök igen!', back: 'Till boden' },
+  story: 'I Vågmästarens bod väger och mäter man allt som dalen samlat in. Men hur mycket är det "ungefär"? Vågmästarinnan använder tre knep: medelvärde, median och typvärde. Lär dig dem – och se upp för jätten!',
+  lessons: [
+    { id: 'medelvarde-dela-lika', title: 'Medelvärde = dela lika', icon: '🟰', desc: 'Lägg ihop, och dela med hur många', nodes: ['dela-lika', 'nollan-raknas', 'delaglommaren', 'medel-ur-diagram'], skills: ['ma.stat.medel', 'ma.stat.medel-diagram'] },
+    { id: 'median-sortera-forst', title: 'Median: sortera först', icon: '🔢', desc: 'Talet i mitten – när de står i ordning', nodes: ['sortera-forst', 'langa-rader', 'mittenmusen', 'tva-i-mitten'], skills: ['ma.stat.median'] },
+    { id: 'typvarde-och-bredd', title: 'Typvärde och variationsbredd', icon: '📏', desc: 'Det vanligaste, och största minus minsta', nodes: ['vanligast', 'storst-minus-minst', 'vilket-matt', 'jatten'], skills: ['ma.stat.typvarde', 'ma.stat.variationsbredd', 'ma.stat.lagesmatt'] },
+  ],
+  eras: [
+    { id: 'dela-lika', name: 'Dela lika', icon: '🟰', fact: 'Medelvärdet är vad var och en får om alla delar lika. Lägg ihop alla talen och dela med hur många de är.',
+      nodes: [
+        stage('dela-lika', 'Dela lika', '🟰', 'Medelvärdet', 'medel', 0, 16000),
+        stage('nollan-raknas', 'Nollan räknas', '0️⃣', 'Medelvärde med större tal', 'medel', 1, 20000),
+        DELAGLOMMAREN,
+      ] },
+    { id: 'mitten', name: 'Mitten', icon: '🔢', fact: 'Medianen är talet i mitten – när talen står i ordning från minst till störst.',
+      nodes: [
+        stage('sortera-forst', 'Sortera först', '🔢', 'Medianen', 'median', 0, 16000),
+        stage('langa-rader', 'Långa rader', '📜', 'Medianen av sju tal', 'median', 1, 20000),
+        MITTENMUSEN,
+      ] },
+    { id: 'vanligast', name: 'Vanligast', icon: '🏆', fact: 'Typvärdet är det tal som finns flest gånger. Variationsbredden är hur långt det är mellan det minsta och det största.',
+      nodes: [
+        stage('vanligast', 'Vanligast', '🏆', 'Typvärdet', 'typ', 0, 14000),
+        stage('storst-minus-minst', 'Störst minus minst', '📏', 'Variationsbredden', 'bredd', 0, 14000),
+        stage('tva-i-mitten', 'Två i mitten', '👯', 'Median av ett jämnt antal', 'median', 2, 22000),
+      ] },
+    { id: 'vagskalen', name: 'Vågskålen', icon: '⚖️', fact: 'Ett jättestort tal drar iväg medelvärdet, men medianen står nästan still.',
+      nodes: [
+        stage('medel-ur-diagram', 'Medel ur diagram', '📊', 'Medelvärde från staplar', 'medel', 2, 22000),
+        stage('vilket-matt', 'Vilket mått?', '🤔', 'Medelvärde, median eller typvärde?', 'valj', 0, 22000),
+        stage('jatten', 'Jätten', '🧌', 'Ett jättetal i klassen', 'valj', 1, 15000),
+      ] },
+    { id: 'boden', name: 'Boden', icon: '🏪', fact: 'Nu kan du alla lägesmåtten. Klarar du Vågmästarens Mästare?',
+      nodes: [
+        stage('hela-boden', 'Hela boden', '⚖️', 'Allt blandat', 'blandat', 1, 22000),
+        mastare('vagmastaren', 'Vågmästaren', '⚖️', 'Vågmästarens Mästare', 'Lägesmåttsmästaren'),
+      ] },
+  ],
+};
+
+// ---------- Spegelsalen ----------
+
+const AXELKLIPPAREN: BossDef = {
+  type: 'boss', id: 'axelklipparen', kind: 'monster', name: 'Axelklipparen', icon: '✂️', title: 'Klipper bort början av axeln',
+  hp: 8, trap: 'axel-inte-noll', pool: [{ mode: 'axel', level: 0 }],
+  lines: {
+    entrance: 'Klipp klipp! Jag är Axelklipparen. Jag klipper bort början av axeln, så blir små skillnader JÄTTESTORA. Ser du det?',
+    phase2: 'Klipp klipp klipp! Nu klipper jag ännu mer!',
+    onHeroMiss: ['Klipp!', 'Jättestor skillnad!', 'Snipp snapp!'],
+    onBossHit: ['Du såg att axeln var klippt!', 'Inte min sax!', 'Noll?! Aj!'],
+    defeat: 'Axeln ska börja på noll … Okej, okej. Får jag följa med? Jag klipper ut bilder ur tidningen åt dig.',
+  },
+  pet: { name: 'Lilla Axelklipparen', icon: '✂️' }, titleReward: 'Axelvakten',
+};
+
+const BALLONGBLASAREN: BossDef = {
+  type: 'boss', id: 'ballongblasaren', kind: 'monster', name: 'Ballongblåsaren', icon: '🎈', title: 'Blåser upp bilderna åt alla håll',
+  hp: 8, trap: 'yta-lurar', pool: [{ mode: 'yta', level: 0 }],
+  lines: {
+    entrance: 'Fffff! Jag är Ballongblåsaren. Dubbelt så mycket? Då blåser jag upp bilden dubbelt så hög OCH dubbelt så bred. Den ser ut som fyra gånger!',
+    phase2: 'Fffffff! Ännu större ballonger!',
+    onHeroMiss: ['Fyra gånger!', 'Fffff!', 'Titta så stor!'],
+    onBossHit: ['Pang! Ballongen sprack!', 'Du läste talen!', 'Fsss …'],
+    defeat: 'Det är talen som räknas, inte hur stor ballongen är … Får jag följa med? Jag blåser ballonger till ditt kalas.',
+  },
+  pet: { name: 'Lilla Ballongblåsaren', icon: '🎈' }, titleReward: 'Ballongsticket',
+};
+
+const SKALBYTAREN: BossDef = {
+  type: 'boss', id: 'skalbytaren', kind: 'monster', name: 'Skalbytaren', icon: '🦎', title: 'Byter skala mellan två diagram',
+  hp: 8, trap: 'olika-skalor', pool: [{ mode: 'olika', level: 0 }],
+  lines: {
+    entrance: 'Hssss. Jag är Skalbytaren. Två diagram bredvid varandra – men jag byter skalan på det ena när ingen tittar. Vem har mest nu?',
+    phase2: 'Hsss! Nu byter jag ännu fortare!',
+    onHeroMiss: ['Hsss, högst stapel vinner!', 'Byt, byt!', 'Lurad!'],
+    onBossHit: ['Du läste båda axlarna!', 'Hsss … aj!', 'Mina skalor!'],
+    defeat: 'Man måste läsa axeln i varje diagram … Hsss. Får jag följa med? Jag byter färg så att ingen ser mig.',
+  },
+  pet: { name: 'Lilla Skalbytaren', icon: '🦎' }, titleReward: 'Skalgranskaren',
+};
+
+export const SPEGELSALEN: AreaDef = {
+  areaId: 'spegelsalen',
+  gameId: 'spegelsalen',
+  title: 'Spegelsalen',
+  kunskap: { name: 'Diagram som lurar', icon: '🪞', titles: ['Spegelgenomskådaren', 'Diagramdetektiven'] },
+  texts: { cleared: 'Inga speglar lurar dig!', notYet: 'Nio rätt av tio behövs för att se igenom speglarna – försök igen!', back: 'Till spegelsalen' },
+  story: 'Längst in på tivolit ligger Spegelsalen. Här sträcker speglarna ut diagrammen: små skillnader ser jättestora ut, och stora ser små ut. Lär dig se igenom knepen – men kom ihåg att alla diagram inte lurar!',
+  lessons: [
+    { id: 'kolla-axeln', title: 'Kolla axeln!', icon: '📏', desc: 'Börjar axeln på noll? Är stegen lika?', nodes: ['var-borjar-axeln', 'lite-eller-mycket', 'axelklipparen', 'ojamna-steg', 'gangerna', 'laga-axeln', 'alla-knep'], skills: ['ma.stat.lura.axel', 'ma.stat.lura.skala'] },
+    { id: 'ytan-lurar', title: 'Ytan lurar ögat', icon: '🎈', desc: 'Breda staplar och växande bilder', nodes: ['breda-staplar', 'hur-mycket-storre', 'vaxande-bilder', 'ytan-lurar', 'ballongblasaren', 'laga-bredden'], skills: ['ma.stat.lura.bredd', 'ma.stat.lura.yta'] },
+    { id: 'tva-diagram', title: 'Två diagram, två skalor', icon: '🪞', desc: 'Läs axeln i varje diagram', nodes: ['tva-diagram', 'talby-och-ekby', 'skalbytaren', 'utan-tal'], skills: ['ma.stat.lura.olika', 'ma.stat.lura.enhet'] },
+  ],
+  eras: [
+    { id: 'axeln', name: 'Axeln', icon: '📏', fact: 'Om axeln inte börjar på noll ser små skillnader jättestora ut. Kolla alltid var axeln börjar!',
+      nodes: [
+        stage('var-borjar-axeln', 'Var börjar axeln?', '📏', 'Hitta knepet', 'axel', 0, 15000),
+        stage('lite-eller-mycket', 'Lite eller mycket?', '🔍', 'Vad visar diagrammet egentligen?', 'axel', 1, 16000),
+        AXELKLIPPAREN,
+      ] },
+    { id: 'stegen', name: 'Stegen', icon: '🪜', fact: 'På en ärlig axel ökar talen lika mycket för varje streck. Om stegen är olika stora går det inte att jämföra höjderna.',
+      nodes: [
+        stage('ojamna-steg', 'Ojämna steg', '🪜', 'Hitta knepet', 'skala', 0, 15000),
+        stage('gangerna', 'Hur många gånger?', '✖️', 'Hur stor är skillnaden på riktigt?', 'skala', 1, 18000),
+      ] },
+    { id: 'bredden', name: 'Bredden', icon: '↔️', fact: 'Det är höjden på en stapel som visar talet. En bred stapel ser större ut än den är.',
+      nodes: [
+        stage('breda-staplar', 'Breda staplar', '↔️', 'Hitta knepet', 'bredd', 0, 15000),
+        stage('hur-mycket-storre', 'Hur mycket större?', '🔎', 'Bredden lurar', 'bredd', 1, 18000),
+      ] },
+    { id: 'ballongerna', name: 'Ballongerna', icon: '🎈', fact: 'En bild som är dubbelt så hög och dubbelt så bred ser fyra gånger så stor ut. Läs talen!',
+      nodes: [
+        stage('vaxande-bilder', 'Växande bilder', '🎈', 'Hitta knepet', 'yta', 0, 15000),
+        stage('ytan-lurar', 'Ytan lurar', '🫧', 'Hur många gånger på riktigt?', 'yta', 1, 18000),
+        BALLONGBLASAREN,
+      ] },
+    { id: 'tva-speglar', name: 'Två speglar', icon: '🪞', fact: 'Två diagram bredvid varandra kan ha olika skalor. Läs axeln i båda innan du jämför.',
+      nodes: [
+        stage('tva-diagram', 'Två diagram', '🪞', 'Hitta knepet', 'olika', 0, 15000),
+        stage('talby-och-ekby', 'Talby och Ekby', '🏘️', 'Var såldes mest?', 'olika', 1, 18000),
+        SKALBYTAREN,
+        stage('utan-tal', 'Utan tal', '❓', 'Diagram utan tal', 'enhet', 0, 12000),
+      ] },
+    { id: 'verkstaden', name: 'Verkstaden', icon: '🔧', fact: 'Ett ärligt diagram har en axel som börjar på noll, lika stora steg och lika breda staplar.',
+      nodes: [
+        stage('laga-axeln', 'Laga axeln', '🔧', 'Flytta axeln till noll', 'axel', 2, 25000),
+        stage('laga-bredden', 'Laga bredden', '🛠️', 'Gör staplarna lika breda', 'bredd', 2, 25000),
+        stage('alla-knep', 'Alla knep', '🃏', 'Knep eller ärligt?', 'skala', 2, 18000),
+      ] },
+    { id: 'spegelsalens-mitt', name: 'Spegelsalens mitt', icon: '✨', fact: 'Nu ser du igenom alla knepen. Klarar du Spegelsalens Mästare?',
+      nodes: [
+        stage('hela-salen', 'Hela salen', '🪞', 'Allt blandat', 'blandat', 1, 20000),
+        mastare('spegelmastaren', 'Spegelmästaren', '🪞', 'Spegelsalens Mästare', 'Spegelsprängaren'),
+      ] },
+  ],
+};
+
+// ---------- Skvallerpressen ----------
+
+const RUSSINPLOCKAREN: BossDef = {
+  type: 'boss', id: 'russinplockaren', kind: 'monster', name: 'Russinplockaren', icon: '🍇', title: 'Visar bara den bit som passar',
+  hp: 8, trap: 'utsnitt', pool: [{ mode: 'utsnitt', level: 0 }],
+  lines: {
+    entrance: 'Mmm, russin! Jag är Russinplockaren. Jag plockar bara de godaste bitarna ur diagrammet – de där det ökar. Resten? Det slänger jag!',
+    phase2: 'Nu plockar jag ännu smartare bitar!',
+    onHeroMiss: ['Bara de goda bitarna!', 'Det ökar ju!', 'Mmm, russin!'],
+    onBossHit: ['Du såg hela året!', 'Mina russin!', 'Aj, resten av kakan!'],
+    defeat: 'Man måste titta på hela kakan, inte bara russinen … Får jag följa med? Jag delar mina russin med dig.',
+  },
+  pet: { name: 'Lilla Russinplockaren', icon: '🍇' }, titleReward: 'Helhetsseraren',
+};
+
+const FAFRAGAREN: BossDef = {
+  type: 'boss', id: 'fafragaren', kind: 'monster', name: 'Fåfrågaren', icon: '🦜', title: 'Frågar bara några få',
+  hp: 8, trap: 'fa-svar', pool: [{ mode: 'urval', level: 0 }],
+  lines: {
+    entrance: 'Kraa! Jag är Fåfrågaren. Jag frågade fyra av mina kompisar, och tre sa ja. Alltså tycker HELA BYN likadant! Kraa!',
+    phase2: 'Kraa kraa! Nu frågar jag ännu färre!',
+    onHeroMiss: ['Tre av fyra, kraa!', 'Hela byn tycker så!', 'Kraa!'],
+    onBossHit: ['För få svar?!', 'Kraa … aj!', 'Du räknade alla!'],
+    defeat: 'Man måste fråga fler än sina kompisar … Kraa. Får jag följa med? Jag pratar med alla i byn åt dig.',
+  },
+  pet: { name: 'Lilla Fåfrågaren', icon: '🦜' }, titleReward: 'Undersökaren',
+};
+
+const GLASSMONSTRET: BossDef = {
+  type: 'boss', id: 'glassmonstret', kind: 'monster', name: 'Glassmonstret', icon: '🍦', title: 'Tror att glass ger solbränna',
+  hp: 8, trap: 'samband-orsak', pool: [{ mode: 'samband', level: 0 }],
+  lines: {
+    entrance: 'Slurp! Jag är Glassmonstret. När folk äter glass blir de solbrända – det syns i diagrammen! Alltså ger glass solbränna. Slurp!',
+    phase2: 'Slurp slurp! Nu har jag ännu fler bevis!',
+    onHeroMiss: ['Glass ger solbränna!', 'Slurp!', 'Det syns ju!'],
+    onBossHit: ['Det var solen?!', 'Min glass smälter!', 'Slurp … aj!'],
+    defeat: 'Det är solen som får folk att både äta glass och bli solbrända … Får jag följa med? Jag bjuder på glass – med solkräm.',
+  },
+  pet: { name: 'Lilla Glassmonstret', icon: '🍦' }, titleReward: 'Orsaksjägaren',
+};
+
+export const SKVALLERPRESSEN: AreaDef = {
+  areaId: 'skvallerpressen',
+  gameId: 'skvallerpressen',
+  title: 'Skvallerpressen',
+  kunskap: { name: 'Rubriker och diagram', icon: '📰', titles: ['Rubrikgranskaren', 'Dalens faktakollare'] },
+  texts: { cleared: 'Varje rubrik är granskad!', notYet: 'Nio rätt av tio behövs för att tidningen ska bli sann – försök igen!', back: 'Till tryckeriet' },
+  story: 'Skvallerpressen är dalens tidning. Den har alltid en rubrik som låter för bra för att vara sann – och ett diagram som ska bevisa den. Stämmer rubriken? Ibland gör den det. Ibland inte. Och ibland går det inte att veta!',
+  lessons: [
+    { id: 'stammer-rubriken', title: 'Stämmer rubriken?', icon: '📰', desc: 'Sant, falskt eller går inte att veta', nodes: ['stammer-rubriken', 'tredubblat', 'bara-en-bit', 'hela-aret', 'russinplockaren', 'fa-fragade', 'fafragaren'], skills: ['ma.stat.lura.rubrik', 'ma.stat.lura.utsnitt', 'ma.stat.lura.urval'] },
+    { id: 'raknetricks', title: 'Totalt, per person och 100 %', icon: '🧮', desc: 'Tricks med siffrorna', nodes: ['totalt-sedan-januari', 'okar-varje-manad', 'mer-an-hundra', 'rakna-procenten', 'per-person', 'glass-per-person'], skills: ['ma.stat.lura.summerad', 'ma.stat.lura.hundra', 'ma.stat.lura.perperson'] },
+    { id: 'samband-ar-inte-orsak', title: 'Samband är inte orsak', icon: '🍦', desc: 'Två saker som ökar samtidigt', nodes: ['glass-och-solbranna', 'glassmonstret', 'forskarna-sager'], skills: ['ma.stat.lura.samband'] },
+  ],
+  eras: [
+    { id: 'forsta-sidan', name: 'Första sidan', icon: '📰', fact: 'En rubrik ska få dig att vilja läsa. Men stämmer den med diagrammet? Läs alltid av diagrammet själv.',
+      nodes: [
+        stage('stammer-rubriken', 'Stämmer rubriken?', '📰', 'Sant eller falskt?', 'rubrik', 0, 15000),
+        stage('tredubblat', 'Tredubblat!', '📈', 'Har det verkligen ökat så mycket?', 'rubrik', 1, 18000),
+      ] },
+    { id: 'russinen', name: 'Russinen', icon: '🍇', fact: 'Den som bara visar en bit av tiden kan få det att se ut som vad som helst. Fråga: vad hände före och efter?',
+      nodes: [
+        stage('bara-en-bit', 'Bara en bit', '✂️', 'Stämmer det för hela året?', 'utsnitt', 0, 16000),
+        stage('hela-aret', 'Hela året', '📅', 'Varför ser det ut så?', 'utsnitt', 1, 16000),
+        RUSSINPLOCKAREN,
+      ] },
+    { id: 'siffrorna', name: 'Siffrorna', icon: '🧮', fact: 'Ett diagram över totalen går alltid uppåt. Det som kommer till varje månad är skillnaden mot månaden innan.',
+      nodes: [
+        stage('totalt-sedan-januari', 'Totalt sedan januari', '➕', 'Hur många bara den månaden?', 'summerad', 0, 18000),
+        stage('okar-varje-manad', 'Ökar varje månad?', '📈', 'Totalen som lurar', 'summerad', 1, 18000),
+        stage('mer-an-hundra', 'Mer än hundra', '🥧', 'Cirklar som inte stämmer', 'hundra', 0, 14000),
+        stage('rakna-procenten', 'Räkna procenten', '💯', 'Hur många procent tillsammans?', 'hundra', 1, 16000),
+      ] },
+    { id: 'enkaten', name: 'Enkäten', icon: '📋', fact: 'Om bara några få har svarat vet man inte vad alla tycker. Och i en stor by blir det mycket av allt – kolla per person!',
+      nodes: [
+        stage('fa-fragade', 'Få fick frågan', '🗣️', 'Hur många svarade?', 'urval', 0, 15000),
+        FAFRAGAREN,
+        stage('per-person', 'Per person', '🧍', 'Totalt eller per person?', 'perperson', 0, 18000),
+        stage('glass-per-person', 'Glass per person', '🍨', 'Räkna per person', 'perperson', 1, 20000),
+      ] },
+    { id: 'sambanden', name: 'Sambanden', icon: '🔗', fact: 'Två saker kan öka samtidigt utan att den ena orsakar den andra. Ofta är det något tredje – som vädret – som styr båda.',
+      nodes: [
+        stage('glass-och-solbranna', 'Glass och solbränna', '☀️', 'Varför ökar båda?', 'samband', 0, 15000),
+        GLASSMONSTRET,
+        stage('forskarna-sager', 'Forskarna säger …', '🔬', 'Stämmer det?', 'samband', 1, 15000),
+      ] },
+    { id: 'tryckeriet', name: 'Tryckeriet', icon: '🗞️', fact: 'Nu granskar du rubriker som en riktig reporter. Klarar du Skvallerpressens Mästare?',
+      nodes: [
+        stage('hela-tidningen', 'Hela tidningen', '📰', 'Allt blandat', 'blandat', 1, 20000),
+        mastare('chefredaktoren', 'Chefredaktören', '📰', 'Skvallerpressens Mästare', 'Faktakollaren'),
+      ] },
+  ],
+};

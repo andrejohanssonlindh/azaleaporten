@@ -157,6 +157,37 @@ export function KompassonGrowth(p: GrowthProps) {
   );
 }
 
+export function DiagramdalenGrowth(p: GrowthProps) {
+  return (
+    <>
+      <Lager n={1} {...p}>
+        {/* vimplar med små diagram */}
+        <path d="M127 427 Q135 433 143 425" stroke="#495057" stroke-width=".6" fill="none" />
+        <path d="M129 428.6 l1.6 4 l1.6 -3.4 z" fill="#4dabf7" /><path d="M133.5 430.2 l1.6 4 l1.6 -3.8 z" fill="#ff922b" />
+        <path d="M138 429.4 l1.6 4 l1.6 -4.2 z" fill="#ffd43b" />
+      </Lager>
+      <Lager n={2} {...p}>
+        {/* fågeltornet */}
+        <path d="M132 446 l2 -20 h4 l2 20 z" fill="#a0785a" stroke="#6b4423" stroke-width=".6" />
+        <path d="M131 426 h10 l-5 -6 z" fill="#c92a2a" />
+        <path d="M141 418 q2 -2 4 0 q2 -2 4 0" stroke="#495057" stroke-width=".8" fill="none" />
+      </Lager>
+      <Lager n={3} {...p}>
+        {/* vindflöjel och regnmätare */}
+        <path d="M178 438 v-16" stroke="#495057" stroke-width="1" />
+        <path d="M172 422 h12 l-3 -2 M184 422 l-3 2" stroke="#495057" stroke-width="1" fill="none" />
+        <rect x="174.5" y="430" width="3" height="8" rx=".6" fill="#d0ebff" stroke="#1971c2" stroke-width=".5" />
+        <rect x="175" y="434" width="2" height="3.6" fill="#4dabf7" />
+      </Lager>
+      <Lager n={4} {...p}>
+        {/* spegeltältet lyser */}
+        <Lampor at={[[184, 444, 0], [189, 435, 1], [199, 435, 2], [204, 444, 3], [194, 430, 0]]} r={1.4} />
+        {star(194, 413, 4.5)}
+      </Lager>
+    </>
+  );
+}
+
 export function RobotonGrowth(p: GrowthProps) {
   return (
     <>

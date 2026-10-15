@@ -2,7 +2,7 @@ import type { ComponentChildren } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { dataRev, go, heroId, toast } from '../state';
 import { allSteg, grownSince, markSeen, type Steg } from '../platform/rpg/vaxt';
-import { BetongbuktenGrowth, KompassonGrowth, OrdskogenGrowth, RobotonGrowth, TalbergenGrowth, VasteronGrowth } from './IslandGrowth';
+import { BetongbuktenGrowth, DiagramdalenGrowth, KompassonGrowth, OrdskogenGrowth, RobotonGrowth, TalbergenGrowth, VasteronGrowth } from './IslandGrowth';
 import { getHeroState, getProfile } from '../platform/profiles';
 import { mistByArea } from '../platform/learning/skills';
 import { getArea, getPlay, nextOpenNode } from '../platform/rpg/progress';
@@ -184,6 +184,7 @@ function Island({ heroEmoji, mist, keys, steg, seen }: IslandProps) {
         <path d="M188 446 L194 426 L200 446" fill="#e03131" />
         <path d="M194 426 V420" stroke="#495057" stroke-width="1" />
         <path d="M194 420 l6 2 l-6 2 z" fill="#e64980" />
+        <DiagramdalenGrowth {...g('diagramdalen')} />
       </Spot>
 
       {/* Övningsängen */}

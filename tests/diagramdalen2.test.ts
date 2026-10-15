@@ -102,7 +102,23 @@ function checkTraps(def: AreaDef, g: DiagramGame<DQ>) {
 const AREAS: [string, AreaDef, DiagramGame<DQ>, string[]][] = [
   ['Väderstationen', content.VADERSTATIONEN, dal.vaderGame, ['fel-punkt', 'x-y-bytt', 'topp-inte-okning', 'okning-minskning', 'fel-serie', 'fel-diagramtyp', 'mellan-linjer', 'svarade-varde', 'fel-hojd']],
   ['Omröstningstorget', content.OMROSTNINGSTORGET, dal.rostGame, ['andel-antal', 'fel-andel', 'mest-minst', 'summa-skillnad']],
+  ['Vågmästarens bod', content.VAGMASTARENS_BOD, dal.lageGame, ['medel-glomt-dela', 'medel-fel-antal', 'median-osorterad', 'median-jamnt', 'typvarde-storst', 'antal-ganger', 'fel-matt', 'jatten']],
+  ['Spegelsalen', content.SPEGELSALEN, dal.spegelGame, ['axel-inte-noll', 'ojamn-skala', 'bredd-lurar', 'yta-lurar', 'olika-skalor', 'utan-enhet', 'ser-fusk-overallt', 'fel-knep', 'fel-del']],
+  ['Skvallerpressen', content.SKVALLERPRESSEN, dal.pressGame, ['trodde-rubriken', 'kan-veta', 'vet-inte-falskt', 'fa-svar', 'utsnitt', 'summerad-lurar', 'ej-hundra', 'totalt-per-person', 'samband-orsak', 'ser-fusk-overallt']],
 ];
+
+describe('Spegelsalen: ärliga diagram finns med', () => {
+  it('ungefär var fjärde "hitta knepet"-fråga är ärlig, och då förvränger diagrammet inte', () => {
+    let arliga = 0, alla = 0;
+    for (let seed = 0; seed < 200; seed++) {
+      const q = dal.spegelGame.make({ mode: 'axel', level: 0 }, rngFrom(seed));
+      alla++;
+      if (!q.chart.lur) { arliga++; expect(q.answer).toBe('Diagrammet är ärligt'); }
+    }
+    expect(arliga / alla).toBeGreaterThan(0.1);
+    expect(arliga / alla).toBeLessThan(0.4);
+  });
+});
 
 for (const [name, def, g, expected] of AREAS) {
   describe(name, () => {

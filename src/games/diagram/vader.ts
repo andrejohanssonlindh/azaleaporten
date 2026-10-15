@@ -49,7 +49,7 @@ export const vaderExtra: Extra = {
 };
 
 /** n olika värden som bildar en kurva: ökar hela tiden (vaxt) eller upp till en topp och ner igen (dag). */
-function kurva(form: Linje['form'], n: number, lo: number, hi: number, step: number, rng: Rng): number[] {
+export function kurva(form: Linje['form'], n: number, lo: number, hi: number, step: number, rng: Rng): number[] {
   const pool: number[] = [];
   for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) pool.push(Math.round(v * 100) / 100);
   const s = rng.shuffle(pool).slice(0, n).sort((a, b) => a - b);

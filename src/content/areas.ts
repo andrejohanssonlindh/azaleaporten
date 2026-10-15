@@ -33,7 +33,8 @@ import { LOGIKSLINGAN } from '../games/logik/content';
 import { BUGGJAKTEN, KODSTIGEN, LOOPVERKSTADEN } from '../games/robot/content';
 import { PYTHONHAMNEN } from '../games/python/content';
 import { ROBOTFABRIKEN } from '../games/roboton';
-import { FAGELTORNET, OMROSTNINGSTORGET, SKORDEMARKNADEN, VADERSTATIONEN } from '../games/diagram/content';
+import { FAGELTORNET, OMROSTNINGSTORGET, SKORDEMARKNADEN, SKVALLERPRESSEN, SPEGELSALEN, VADERSTATIONEN, VAGMASTARENS_BOD } from '../games/diagram/content';
+import { UTSIKTSTORNET } from '../games/diagramdalen';
 import { BALLONGRESAN, FLAGGMASTEN, GLOBEN, HUVUDSTADSEXPRESSEN, KARTRUMMET, SVERIGERESAN } from '../games/geografi/content';
 import { OBSERVATORIET } from '../games/kompasson';
 
@@ -74,6 +75,9 @@ const AREAS: Record<string, Playable> = {
   skordemarknaden: { def: SKORDEMARKNADEN, load: () => import('../games/diagram').then((m) => m.skordemarknaden) },
   vaderstationen: { def: VADERSTATIONEN, load: () => import('../games/diagram').then((m) => m.vaderstationen) },
   omrostningstorget: { def: OMROSTNINGSTORGET, load: () => import('../games/diagram').then((m) => m.omrostningstorget) },
+  'vagmastarens-bod': { def: VAGMASTARENS_BOD, load: () => import('../games/diagram').then((m) => m.vagmastarensBod) },
+  spegelsalen: { def: SPEGELSALEN, load: () => import('../games/diagram').then((m) => m.spegelsalen) },
+  skvallerpressen: { def: SKVALLERPRESSEN, load: () => import('../games/diagram').then((m) => m.skvallerpressen) },
   kartrummet: { def: KARTRUMMET, load: () => import('../games/geografi').then((m) => m.kartrummet) },
   globen: { def: GLOBEN, load: () => import('../games/geografi').then((m) => m.globen) },
   sverigeresan: { def: SVERIGERESAN, load: () => import('../games/geografi').then((m) => m.sverigeresan) },
@@ -95,6 +99,7 @@ export const PLAYABLE: Record<string, Playable> = {
   ordskogen: { def: ORDSKOGENS_HJARTA, load: async () => regionGame('ordskogen', await gamesOf('ordskogen')) },
   vasteron: { def: VASTERONS_FYR, load: async () => regionGame('vasteron', await gamesOf('vasteron')) },
   roboton: { def: ROBOTFABRIKEN, load: async () => regionGame('roboton', await gamesOf('roboton')) },
+  diagramdalen: { def: UTSIKTSTORNET, load: async () => regionGame('diagramdalen', await gamesOf('diagramdalen')) },
   kompasson: { def: OBSERVATORIET, load: async () => regionGame('kompasson', await gamesOf('kompasson')) },
 };
 
