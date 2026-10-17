@@ -3,8 +3,9 @@ import { BITAR, LOST, PLATSER, dragAxel, dragVarv, invDrag, parse, platsVid, vis
 
 // Kuben i 3D med CSS-transformer (inga bibliotek). 26 små kuber; ett drag animeras genom att lagrets
 // kuber vrids, och när vridningen är klar byts färgerna och vridningen nollas.
-// Kameran visar U, F och R (vy 'ner' visar D, F och R). Dra i kuben för att titta runt – den fjädrar
-// tillbaka när du släpper, så att F alltid är sidan som tittar på dig.
+// Kameran visar U, F och R (vy 'ner' visar D, F och R). Dra i kuben för att titta runt och trycka på bitar
+// på baksidan; kuben stannar där tills barnet trycker "Rätt vy". Dragen räknas alltid från kuben (F = grön
+// mittbit i början), inte från kameran.
 
 export interface Anim { drag: Drag; ms: number; id: number }
 
@@ -46,6 +47,8 @@ export interface Kub3DProps {
 export function Kub3D({ kub, anim, onAnimEnd, vy = 'upp', s = 46, onTryck, markera, fel, etiketter, tona, label }: Kub3DProps) {
   const [go, setGo] = useState(false);
   const [orbit, setOrbit] = useState({ x: 0, y: 0, fjader: false });
+  const orbitRef = useRef(orbit);
+  orbitRef.current = orbit;
   const slut = useRef(onAnimEnd);
   slut.current = onAnimEnd;
   const drog = useRef(false);
@@ -61,18 +64,19 @@ export function Kub3D({ kub, anim, onAnimEnd, vy = 'upp', s = 46, onTryck, marke
 
   function down(e: PointerEvent) {
     const x0 = e.clientX, y0 = e.clientY;
+    const o0 = orbitRef.current;
     drog.current = false;
     const move = (ev: PointerEvent) => {
       const dx = ev.clientX - x0, dy = ev.clientY - y0;
       if (!drog.current && Math.hypot(dx, dy) < 6) return;
       drog.current = true;
-      setOrbit({ x: Math.max(-170, Math.min(170, dx * 0.7)), y: Math.max(-70, Math.min(70, -dy * 0.7)), fjader: false });
+      // Runt hela varvet åt sidan, och upp eller ner så att toppen och botten syns.
+      setOrbit({ x: o0.x + dx * 0.7, y: Math.max(-115, Math.min(115, o0.y - dy * 0.7)), fjader: false });
     };
     const up = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointercancel', up);
-      if (drog.current) setOrbit({ x: 0, y: 0, fjader: true });
       // Klicket som kommer efter en dragning ska inte räknas som ett tryck på en bit.
       window.setTimeout(() => { drog.current = false; }, 0);
     };
@@ -85,8 +89,15 @@ export function Kub3D({ kub, anim, onAnimEnd, vy = 'upp', s = 46, onTryck, marke
   const ry = -38 + orbit.x;
   const mark = new Set(markera ?? []);
   const fela = new Set(fel ?? []);
+  const vriden = orbit.x !== 0 || orbit.y !== 0;
+  // Närmaste "hela varv" tillbaka, så att kuben inte snurrar flera varv på vägen hem.
+  const hem = () => {
+    setOrbit({ x: ((orbit.x % 360) + 540) % 360 - 180, y: orbit.y, fjader: false });
+    requestAnimationFrame(() => requestAnimationFrame(() => setOrbit({ x: 0, y: 0, fjader: true })));
+  };
 
   return (
+    <div class="kub3d-ram">
     <div class={`kub3d${onTryck ? ' tryckbar' : ''}`} style={{ '--s': `${s}px`, width: `${s * 4.2}px`, height: `${s * 4.2}px` }}
       role="img" aria-label={label} onPointerDown={down}>
       <div class="kub3d-kub" style={{ transform: `rotateX(${rx}deg) rotateY(${ry}deg)`, transition: orbit.fjader ? 'transform 450ms ease-out' : 'none' }}>
@@ -101,7 +112,7 @@ export function Kub3D({ kub, anim, onAnimEnd, vy = 'upp', s = 46, onTryck, marke
                 return (
                   <div key={r} class="kub3d-yta" style={{ transform: `${r} translateZ(${s / 2}px)` }}>
                     {p >= 0 && (
-                      <div class={`kub3d-dekal f-${kub[p]}${mark.has(p) ? ' lyser' : tona ? ' tona' : ''}${fela.has(p) ? ' fel' : ''}`}
+                      <div data-p={p} class={`kub3d-dekal f-${kub[p]}${mark.has(p) ? ' lyser' : tona ? ' tona' : ''}${fela.has(p) ? ' fel' : ''}`}
                         onClick={onTryck ? () => { if (!drog.current) onTryck(p); } : undefined}>
                         {etiketter && p % 9 === 4 && <span class="kub3d-bokstav">{SIDBOKSTAV[Math.floor(p / 9)]}</span>}
                       </div>
@@ -113,6 +124,8 @@ export function Kub3D({ kub, anim, onAnimEnd, vy = 'upp', s = 46, onTryck, marke
           );
         })}
       </div>
+    </div>
+    {vriden && <button type="button" class="btn small kub3d-hem" onClick={hem}>↺ Rätt vy</button>}
     </div>
   );
 }

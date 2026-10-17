@@ -243,19 +243,20 @@ export const STEGNAMN: Record<StegId, string> = {
 
 function bitar(rng: Rng, level: number, base: { mode: string; level: number; skill: string }): KubQ {
   const start = vrid(LOST, blanda(rng, 20));
-  const synliga = PLATSER.map((_, i) => i).filter(synlig);
+  // Barnet kan vrida kuben och trycka på baksidan, så alla klistermärken räknas. Bitarna som frågas om syns ändå från början.
+  const alla = PLATSER.map((_, i) => i);
   const typAv = (p: number) => BITAR.find((b) => b.platser.includes(p))!.typ;
   if (level === 0) {
     const typ = rng.pick(['mitt', 'kant', 'horn'] as const);
-    const ratt = synliga.filter((p) => typAv(p) === typ);
-    const fel = Object.fromEntries(synliga.filter((p) => typAv(p) !== typ).map((p) => [p, typ === 'mitt' || typAv(p) === 'mitt' ? 'mittbit' : 'kant-horn']));
+    const ratt = alla.filter((p) => typAv(p) === typ);
+    const fel = Object.fromEntries(alla.filter((p) => typAv(p) !== typ).map((p) => [p, typ === 'mitt' || typAv(p) === 'mitt' ? 'mittbit' : 'kant-horn']));
     return { ...base, kind: 'bit', prompt: `Tryck på en ${typ === 'mitt' ? 'mittbit' : typ === 'kant' ? 'kantbit' : 'hörnbit'}.`, start, ratt, fel };
   }
   if (level === 1) {
     const b = rng.pick(BITAR.filter((x) => x.typ !== 'mitt' && x.platser.some(synlig)));
     const f = farger(start, b);
-    const ratt = b.platser.filter(synlig);
-    const fel = Object.fromEntries(synliga.filter((p) => !ratt.includes(p)).map((p) => {
+    const ratt = b.platser;
+    const fel = Object.fromEntries(alla.filter((p) => !ratt.includes(p)).map((p) => {
       const o = BITAR.find((x) => x.platser.includes(p))!;
       const of = farger(start, o);
       return [p, o.typ === 'mitt' ? 'mittbit' : o.typ !== b.typ && f.every((c) => of.includes(c)) ? 'kant-horn' : 'fel-farger'];
@@ -268,9 +269,9 @@ function bitar(rng: Rng, level: number, base: { mode: string; level: number; ski
     const b = rng.pick(BITAR.filter((x) => x.typ !== 'mitt' && x.platser.some(synlig) && !paPlats(k, x)));
     if (!b) continue;
     const h = hem(k, farger(k, b));
-    const ratt = h.platser.filter(synlig);
-    if (!ratt.length) continue;
-    const fel = Object.fromEntries(synliga.filter((p) => !ratt.includes(p)).map((p) => [p, 'fel-plats']));
+    if (!h.platser.some(synlig)) continue;
+    const ratt = h.platser;
+    const fel = Object.fromEntries(alla.filter((p) => !ratt.includes(p)).map((p) => [p, 'fel-plats']));
     return { ...base, kind: 'bit', prompt: 'Var hör biten som lyser hemma? Tryck på platsen där den ska sitta.', start: k, ratt, fel, markera: b.platser, fargprick: farger(k, b) };
   }
   throw new Error('Ingen bit att flytta');

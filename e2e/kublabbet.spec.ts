@@ -11,6 +11,14 @@ const shot = async (page: Page, name: string) => {
 const NAMN: Record<string, string> = { U: 'Upp', D: 'Ner', R: 'Höger', L: 'Vänster', F: 'Fram', B: 'Bak' };
 const knapp = (page: Page, d: string) =>
   page.getByRole('group', { name: 'Vrid kuben' }).getByRole('button', { name: `${d.replace("'", '′')}: ${NAMN[d[0]]}${d.endsWith("'") ? ', åt andra hållet' : ''}`, exact: true });
+/** Mittpunkterna för klistermärkena på sidorna (i stora kuben). */
+const mitten = (page: Page, sidor: string) => page.evaluate((sidor) => [...document.querySelectorAll<HTMLElement>('.kub-scen > .kub3d-ram .kub3d-dekal')]
+  .filter((el) => sidor.includes('URFDLB'[Math.floor(Number(el.dataset.p) / 9)]))
+  .map((el) => { const b = el.getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2] as [number, number]; }), sidor);
+/** Hur många av sidornas klistermärken som träffas av ett tryck mitt på dem. */
+const traffbara = (page: Page, sidor: string) => page.evaluate((sidor) => [...document.querySelectorAll<HTMLElement>('.kub-scen > .kub3d-ram .kub3d-dekal')]
+  .filter((el) => sidor.includes('URFDLB'[Math.floor(Number(el.dataset.p) / 9)]))
+  .filter((el) => { const b = el.getBoundingClientRect(); const h = document.elementFromPoint(b.x + b.width / 2, b.y + b.height / 2); return h === el || h?.parentElement === el; }).length, sidor);
 const ova = (page: Page, namn: RegExp) => page.getByRole('group', { name: 'Vad vill du öva på?' }).getByRole('button', { name: namn }).click();
 
 test('Kublabbet: drag, höger-tricket, bitar och en lektion', async ({ page }) => {
@@ -51,10 +59,25 @@ test('Kublabbet: drag, höger-tricket, bitar och en lektion', async ({ page }) =
   await expect(page.locator('.feedback.ok')).toBeVisible();
   await shot(page, '4-horn-klart');
 
-  // Tryck på en bit: prova tills det blir rätt.
+  // Tryck på en bit: varje synligt klistermärke går att träffa med ett riktigt tryck (inget osynligt ligger framför).
   await ova(page, /Mitt, kant och hörn/);
-  const dekaler = page.locator('.kub-scen > .kub3d .kub3d-dekal');
-  for (let i = 0; i < 54 && !(await page.locator('.feedback.ok').isVisible()); i++) await dekaler.nth(i).dispatchEvent('click');
+  await page.locator('.kub-scen').scrollIntoViewIfNeeded();
+  expect(await traffbara(page, 'URF')).toBe(27);
+  // Vrid kuben ett halvt varv: då går baksidan att trycka på, och "Rätt vy" vrider tillbaka.
+  const box = (await page.locator('.kub-scen .kub3d').first().boundingBox())!;
+  await page.mouse.move(box.x + 10, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 270, box.y + box.height / 2, { steps: 8 });
+  await page.mouse.up();
+  expect(await traffbara(page, 'B')).toBe(9);
+  await page.getByRole('button', { name: '↺ Rätt vy' }).click();
+  await expect(page.getByRole('button', { name: '↺ Rätt vy' })).toHaveCount(0);
+  await page.waitForTimeout(600);
+  // Tryck tills det blir rätt, med riktiga tryck på skärmen.
+  for (const [x, y] of await mitten(page, 'URF')) {
+    if (await page.locator('.feedback.ok').isVisible()) break;
+    await page.mouse.click(x, y);
+  }
   await expect(page.locator('.feedback.ok')).toBeVisible();
   await shot(page, '5-bit');
 

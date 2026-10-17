@@ -36,7 +36,7 @@ export const KUBLABBET: Record<string, Lesson> = {
         <Bild markera={typ('kant')} text="Kantbitar: två färger" />
         <Bild markera={typ('horn')} text="Hörnbitar: tre färger" />
       </Rad>,
-      tips: 'Dra i kuben med fingret för att titta runt. När du släpper hoppar den tillbaka.',
+      tips: 'Dra i kuben med fingret för att titta runt – då kan du trycka på bitarna på baksidan också. Tryck ↺ Rätt vy för att vrida tillbaka.',
       prova: { mode: 'bitar', level: 0 },
     },
     {

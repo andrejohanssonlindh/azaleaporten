@@ -1311,7 +1311,13 @@ button.dia-bild-rad { cursor: pointer; }
 /* ---------- Kublabbet: Rubiks kub i 3D ---------- */
 .kub3d, .kub-toppbild, .kub-farger { --kw: #f8f9fa; --ky: #ffd43b; --kg: #2b9348; --kb: #1971c2; --ko: #f76707; --kr: #e03131; --kropp: #1b1b1f; }
 .kub3d { position: relative; perspective: calc(var(--s) * 14); touch-action: none; user-select: none; -webkit-user-select: none; margin: 0 auto; flex: none; }
-.kub3d-kub { position: absolute; inset: 0; transform-style: preserve-3d; }
+.kub3d-ram { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.kub3d-hem { min-height: 36px; padding: 4px 12px; }
+/* Bara ytorna och klistermärkena tar emot tryck. Lådorna runt de små kuberna och lagren är platta och
+   osynliga, men de skulle annars ligga framför klistermärkena och ta trycken. */
+.kub3d-kub { position: absolute; inset: 0; transform-style: preserve-3d; pointer-events: none; }
+.kub3d-bit { pointer-events: none; }
+.kub3d-yta { pointer-events: auto; }
 .kub3d-bit { position: absolute; left: 50%; top: 50%; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); transform-style: preserve-3d; }
 .kub3d-yta { position: absolute; inset: 0; background: var(--kropp); border-radius: calc(var(--s) * .12); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .kub3d-dekal { position: absolute; inset: 7%; border-radius: calc(var(--s) * .14); display: grid; place-items: center; transition: opacity .2s, box-shadow .2s; }

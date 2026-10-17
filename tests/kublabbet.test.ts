@@ -111,7 +111,9 @@ describe('frågorna', () => {
       }
       case 'bit': {
         expect(q.ratt!.length).toBeGreaterThan(0);
-        for (const p of q.ratt!) { expect(['U', 'F', 'R']).toContain(PLATSER[p].sida); expect(q.fel![p]).toBeUndefined(); }
+        // Biten syns från början, och varje klistermärke är antingen rätt eller har en felkod (kuben kan vridas).
+        expect(q.ratt!.some((p) => ['U', 'F', 'R'].includes(PLATSER[p].sida))).toBe(true);
+        for (let p = 0; p < 54; p++) expect(q.ratt!.includes(p) !== (q.fel![p] !== undefined), `${q.mode} ${p}`).toBe(true);
         break;
       }
       case 'vilket': case 'valj': {
