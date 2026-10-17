@@ -33,6 +33,7 @@ import { LOGIKSLINGAN } from '../games/logik/content';
 import { BUGGJAKTEN, KODSTIGEN, LOOPVERKSTADEN } from '../games/robot/content';
 import { PYTHONHAMNEN } from '../games/python/content';
 import { ROBOTFABRIKEN } from '../games/roboton';
+import { KUBLABBET } from '../games/kub/content';
 import { FAGELTORNET, OMROSTNINGSTORGET, SKORDEMARKNADEN, SKVALLERPRESSEN, SPEGELSALEN, VADERSTATIONEN, VAGMASTARENS_BOD } from '../games/diagram/content';
 import { UTSIKTSTORNET } from '../games/diagramdalen';
 import { BALLONGRESAN, FLAGGMASTEN, GLOBEN, HUVUDSTADSEXPRESSEN, KARTRUMMET, SVERIGERESAN } from '../games/geografi/content';
@@ -71,6 +72,7 @@ const AREAS: Record<string, Playable> = {
   loopverkstaden: { def: LOOPVERKSTADEN, load: () => import('../games/robot').then((m) => m.loopverkstaden) },
   buggjakten: { def: BUGGJAKTEN, load: () => import('../games/robot').then((m) => m.buggjakten) },
   pythonhamnen: { def: PYTHONHAMNEN, load: () => import('../games/python').then((m) => m.python) },
+  kublabbet: { def: KUBLABBET, load: () => import('../games/kub').then((m) => m.kub) },
   fageltornet: { def: FAGELTORNET, load: () => import('../games/diagram').then((m) => m.fageltornet) },
   skordemarknaden: { def: SKORDEMARKNADEN, load: () => import('../games/diagram').then((m) => m.skordemarknaden) },
   vaderstationen: { def: VADERSTATIONEN, load: () => import('../games/diagram').then((m) => m.vaderstationen) },

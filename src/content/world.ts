@@ -78,7 +78,7 @@ export const REGIONS: Region[] = [
   },
   {
     id: 'roboton', name: 'Robotön', subject: 'Programmering', icon: '🤖',
-    tagline: 'En ö full av robotar som bara gör exakt det man säger. Längs Logikslingan lär man sig tänka som en robot, på Kodstigen styr man dem, i Loopverkstaden snurrar maskinerna, i Buggjakten kryper felen omkring – och i Pythonhamnen pratar robotarna riktig kod.',
+    tagline: 'En ö full av robotar som bara gör exakt det man säger. Längs Logikslingan lär man sig tänka som en robot, på Kodstigen styr man dem, i Loopverkstaden snurrar maskinerna, i Buggjakten kryper felen omkring, i Pythonhamnen pratar robotarna riktig kod – och i Kublabbet löser man Rubiks kub med små kubprogram.',
     sky: ['#364fc7', '#a5d8ff', '#868e96'],
     areas: [
       { id: 'logikslingan', name: 'Logikslingan', icon: '🧩', desc: 'Logiska pussel: vad hör ihop och vad kommer sedan?', grades: [1, 4], status: 'open' },
@@ -86,6 +86,7 @@ export const REGIONS: Region[] = [
       { id: 'loopverkstaden', name: 'Loopverkstaden', icon: '🔁', desc: 'Gör samma sak många gånger: loopar.', grades: [2, 5], status: 'open' },
       { id: 'buggjakten', name: 'Buggjakten', icon: '🐞', desc: 'Hitta felet i robotens instruktioner.', grades: [2, 6], status: 'open' },
       { id: 'pythonhamnen', name: 'Pythonhamnen', icon: '🐍', desc: 'Läs dina första rader Python.', grades: [4, 6], status: 'open' },
+      { id: 'kublabbet', name: 'Kublabbet', icon: '🎲', desc: 'Lös Rubiks kub, ett drag i taget.', grades: [2, 6], status: 'open' },
     ],
   },
   {

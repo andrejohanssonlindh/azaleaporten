@@ -101,6 +101,11 @@ const PROG: Record<string, string> = {
   'bugg.pilar': 'buggar med pilar', 'bugg.svang': 'buggar med svängar', 'bugg.loop': 'buggar i loopar', 'bugg.laga': 'att laga program',
   'py.print': 'print i Python', 'py.variabel': 'variabler i Python', 'py.text': 'text och tal i Python', 'py.if': 'if och else i Python',
   'py.for': 'for-loopar i Python', 'py.fel': 'fel i Python-kod',
+  'kub.bitar': 'kubens bitar', 'kub.drag': 'kubens drag', 'kub.prim': 'prim och halva varv', 'kub.vilket': 'att känna igen kubens drag',
+  'kub.program': 'kubprogram', 'kub.baklanges': 'kubprogram baklänges', 'kub.blomma': 'blomman på kuben', 'kub.kors': 'det vita korset',
+  'kub.horn': 'de vita hörnen', 'kub.mitten': 'kubens mittenlager', 'kub.gulkors': 'det gula korset', 'kub.gulkant': 'de gula kanterna',
+  'kub.gulhorn': 'de gula hörnen', 'kub.vridhorn': 'att vrida de gula hörnen', 'kub.steg': 'stegen i kublösningen',
+  'kub.utantill': 'kubprogram utantill', 'kub.hela': 'att lösa hela kuben',
 };
 const STAT: Record<string, string> = {
   streck: 'streckdiagram', 'streck-rita': 'att rita streck', tabell: 'tabeller', 'tabell-jamfor': 'att jämföra i tabeller',

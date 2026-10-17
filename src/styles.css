@@ -1307,3 +1307,56 @@ button.dia-bild-rad { cursor: pointer; }
 @media (prefers-reduced-motion: no-preference) {
   .kar-yta .kar-fyll, .kar-punkt { transition: opacity .2s; }
 }
+
+/* ---------- Kublabbet: Rubiks kub i 3D ---------- */
+.kub3d, .kub-toppbild, .kub-farger { --kw: #f8f9fa; --ky: #ffd43b; --kg: #2b9348; --kb: #1971c2; --ko: #f76707; --kr: #e03131; --kropp: #1b1b1f; }
+.kub3d { position: relative; perspective: calc(var(--s) * 14); touch-action: none; user-select: none; -webkit-user-select: none; margin: 0 auto; flex: none; }
+.kub3d-kub { position: absolute; inset: 0; transform-style: preserve-3d; }
+.kub3d-bit { position: absolute; left: 50%; top: 50%; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); transform-style: preserve-3d; }
+.kub3d-yta { position: absolute; inset: 0; background: var(--kropp); border-radius: calc(var(--s) * .12); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.kub3d-dekal { position: absolute; inset: 7%; border-radius: calc(var(--s) * .14); display: grid; place-items: center; transition: opacity .2s, box-shadow .2s; }
+.kub3d.tryckbar .kub3d-dekal { cursor: pointer; }
+.f-w { background: var(--kw); fill: var(--kw); } .f-y { background: var(--ky); fill: var(--ky); } .f-g { background: var(--kg); fill: var(--kg); }
+.f-b { background: var(--kb); fill: var(--kb); } .f-o { background: var(--ko); fill: var(--ko); } .f-r { background: var(--kr); fill: var(--kr); }
+.kub3d-dekal.lyser { box-shadow: inset 0 0 0 calc(var(--s) * .07) #ff4fa3, inset 0 0 0 calc(var(--s) * .13) #fff; }
+.kub3d-dekal.tona { opacity: .28; }
+.kub3d-dekal.fel { box-shadow: inset 0 0 0 calc(var(--s) * .1) #c92a2a; }
+.kub3d-dekal.fel::after { content: '✕'; color: #c92a2a; font-weight: 900; font-size: calc(var(--s) * .5); }
+.kub3d-bokstav { font: 900 calc(var(--s) * .5) var(--font); color: #1b1b1f; }
+
+.kq.kub .drill-prompt { margin-bottom: 6px; }
+.kub-scen { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 4px 0; }
+.kub-sido { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.kub-sido figure, .kub-figur { margin: 0; display: flex; flex-direction: column; align-items: center; }
+.kub-sido figcaption { font-size: 13px; color: var(--muted); font-weight: 700; }
+.kub-figur .lb-caption { max-width: 150px; text-align: center; }
+
+.kub-knappar { display: flex; flex-direction: column; gap: 6px; align-items: center; margin: 8px 0; }
+.kub-knapprad { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; width: min(100%, 440px); }
+.kub-knapprad.hela { grid-template-columns: 1fr 1fr; }
+.kub-knapp { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52px; padding: 4px 2px; border-radius: 12px;
+  border: 2px solid var(--line); background: var(--card); box-shadow: 0 2px 0 var(--line); line-height: 1.05; }
+.kub-knapp b { font-size: 21px; font-weight: 900; }
+.kub-knapp small { font-size: 11px; color: var(--muted); font-weight: 700; }
+.kub-knapp.prim { background: color-mix(in srgb, var(--fm) 10%, var(--card)); }
+.kub-knapp.hela { flex-direction: row; gap: 6px; font-size: 20px; font-weight: 900; }
+.kub-knapp:active { transform: translateY(1px); box-shadow: none; }
+.kub-knapp:disabled { opacity: .45; cursor: not-allowed; }
+
+.kub-prog { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin: 6px 0; }
+.kub-bricka { min-width: 38px; padding: 5px 8px; border-radius: 10px; border: 2px solid var(--line); background: var(--card); font: 900 18px var(--font); text-align: center; }
+.kub-bricka.klar { opacity: .4; }
+.kub-bricka.nu { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.kub-bricka.ny-grupp { margin-left: 10px; }
+.kub-farger { display: flex; justify-content: center; gap: 6px; margin: 0 0 4px; }
+.kub-prick { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--kropp); }
+.kub-steg { text-align: center; margin: 2px 0; }
+.kub-tips { text-align: center; font-weight: 800; color: var(--fm); }
+.kub-rakna { text-align: center; }
+.kub-kontroll { gap: 8px; }
+.kub-val .drill-choice { min-width: 76px; }
+.kub-film { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.kub-film .lb-caption { max-width: 240px; text-align: center; }
+.kub-toppbild { margin: 0; display: flex; flex-direction: column; align-items: center; }
+.kub-topp-kropp { fill: var(--kropp); }
+.kub-topp { stroke: var(--kropp); stroke-width: 1; }
