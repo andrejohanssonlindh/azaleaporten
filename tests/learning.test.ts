@@ -119,7 +119,8 @@ describe('dimman och repetitionen', () => {
         expect(skillLabel(s), s).not.toBe('något du har övat på');
       }
     }
-  });
+    // Alla spel × alla banor × 60 frågor; Kublabbets frågor löser en kub var, så det tar några sekunder på CI.
+  }, 30_000);
 
   it('hjältar från före schemat får det byggt ur händelseloggen', () => {
     const hid = hero();
