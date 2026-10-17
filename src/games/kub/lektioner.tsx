@@ -15,7 +15,9 @@ const bak = (alg: string) => inv(parse(alg)).join(' ');
 const PRICK: Kub = 'obyoygbrgyyrrrrrrryyobbbbbbwwwwwwwwwyyroooooogybgggggg';
 
 const typ = (t: 'mitt' | 'kant' | 'horn') => BITAR.filter((b) => b.typ === t && (b.pos[1] === 1 || b.pos[0] === 1 || b.pos[2] === 1)).flatMap((b) => b.platser);
-const BLOMMA = vrid(LOST, 'F2 R2 B2 L2');
+export const BLOMMA = vrid(LOST, 'F2 R2 B2 L2');
+/** Blommans fyra fall i lektionen (testas: tre kronblad före, fyra efter). */
+export const BLOMFALL = ['U F2', 'U R', "F U' R", "F' U' R"];
 const kronbladen = BITAR.filter((b) => b.typ === 'kant' && b.pos[1] === 1).flatMap((b) => b.platser).filter((p) => BLOMMA[p] === 'w');
 const korset = BITAR.filter((b) => b.typ === 'kant' && b.pos[1] === -1).flatMap((b) => b.platser);
 
@@ -125,21 +127,36 @@ export const KUBLABBET: Record<string, Lesson> = {
   blomman: { pages: [
     {
       title: 'En blomma runt den gula mitten',
-      text: 'Första målet: fyra vita kanter med vitt uppåt, runt den gula mitten. Det ser ut som en gul blomma med vita kronblad!\n\nLeta upp de vita kanterna och flytta upp dem, en i taget.',
+      text: 'Första målet: fyra vita kanter med vitt uppåt, runt den gula mitten. Det ser ut som en gul blomma med vita kronblad!\n\nDu flyttar upp en vit kant i taget. Hur du gör beror på var kanten sitter och åt vilket håll det vita pekar. Det finns fyra fall – nästa sidor visar dem ett i taget.',
       pic: <Bild kub={BLOMMA} markera={kronbladen} text="Blomman: fyra vita kronblad." />,
+      tips: 'Den gyllene regeln: innan du lyfter upp en kant, vrid toppen (U) så att platsen ovanför kanten är tom. Annars knuffar du ner ett kronblad du redan har!',
     },
     {
-      title: 'Flytta upp ett kronblad',
-      text: 'Kanterna kan sitta på olika ställen. Börja med de lätta!',
-      pic: <KubFilm setup="F2 R2 B2" alg="L2" text="Den vit-röda kanten satt nere med vitt nedåt. L2 – och den blev ett kronblad!" />,
-      steps: [
-        'Hitta en vit kant. Titta också underifrån!',
-        'Sitter den nere med vitt nedåt? Vrid den sidan två gånger.',
-        'Sitter den i mittenlagret? Vrid sidan bredvid ett kvarts varv, så åker den upp med vitt uppåt.',
-        'Pekar det vita åt sidan? Vrid den sidan en gång, så hamnar kanten i mittenlagret. Fortsätt sedan som ovan.',
-        'Är platsen ovanför redan upptagen av ett kronblad? Vrid toppen (U) först, så att platsen blir ledig.',
-      ],
-      tips: 'Kronbladen får flytta runt på toppen. Det viktiga är att de stannar uppe!',
+      title: 'Fall 1: nere, vitt nedåt',
+      text: 'Kanten sitter i nedersta raden och det vita pekar rakt ner. Den är lättast!\n\nVrid U tills platsen rakt ovanför kanten är tom. Vrid sedan den sidan två gånger – kanten åker hela vägen upp, med vitt uppåt.',
+      pic: <KubFilm fran={BLOMMA} setup={bak('U F2')} alg="U F2" vy="ner" text="Kuben underifrån. U: platsen ovanför blir tom. F2: kanten åker upp till toppen." />,
+      steps: ['Titta underifrån: var sitter den vita kanten?', 'Vrid U tills platsen rakt ovanför är tom.', 'Vrid sidan där kanten sitter två gånger.'],
+      tips: 'Tryck ⏭ Ett drag för att se ett drag i taget.',
+    },
+    {
+      title: 'Fall 2: i mitten',
+      text: 'Kanten sitter i mittenraden, mellan två sidor. Det vita pekar åt en av sidorna.\n\nVrid sidan som INTE har det vita, så att kanten åker uppåt. Då hamnar det vita uppe! Men först: vrid U så att platsen där kanten kommer upp är tom.',
+      pic: <KubFilm fran={BLOMMA} setup={bak('U R')} alg="U R" text="Det vita pekar mot dig. U gör platsen tom, och R lyfter kanten uppåt." />,
+      steps: ['Vilken sida pekar det vita åt? Den sidan ska du inte vrida.', 'Vrid U så att platsen ovanför den andra sidan är tom.', 'Vrid den andra sidan så att kanten åker uppåt.'],
+      tips: 'Åker kanten nedåt i stället? Ångra, och vrid åt andra hållet (med ′).',
+    },
+    {
+      title: 'Fall 3: uppe, vitt åt sidan',
+      text: 'Kanten sitter redan uppe, men det vita pekar åt sidan i stället för uppåt. Den måste ner en bit och vända sig.\n\nVrid sidan som det vita pekar åt ett kvarts varv. Då hamnar kanten i mittenraden – och då är det fall 2!',
+      pic: <KubFilm fran={BLOMMA} setup={bak("F U' R")} alg="F U' R" text="F: kanten ner i mitten. U′: platsen blir tom. R: upp med vitt uppåt." />,
+      steps: ['Vrid sidan som det vita pekar åt ett kvarts varv (här F).', 'Nu sitter kanten i mitten – gör som i fall 2.', 'Vrid U så att platsen är tom, och lyft upp kanten.'],
+    },
+    {
+      title: 'Fall 4: nere, vitt åt sidan',
+      text: 'Kanten sitter nere, men det vita pekar åt sidan. Gör som i fall 3: vrid sidan som det vita pekar åt ett kvarts varv, så hamnar kanten i mittenraden. Sedan är det fall 2 igen!',
+      pic: <KubFilm fran={BLOMMA} setup={bak("F' U' R")} alg="F' U' R" text="F′: kanten upp i mitten. U′: platsen blir tom. R: upp med vitt uppåt." />,
+      steps: ['Vrid sidan som det vita pekar åt ett kvarts varv.', 'Nu sitter kanten i mitten – gör som i fall 2.'],
+      tips: 'Alla fall slutar med fall 1 eller fall 2. Lär dig dem först!',
       prova: { mode: 'blomma', level: 0 },
     },
   ] },

@@ -102,3 +102,20 @@ test('Kublabbet: drag, höger-tricket, bitar och en lektion', async ({ page }) =
   await shot(page, '7-lektion');
   await expect(page.locator('.kub-bricka.klar')).toHaveCount(1, { timeout: 3000 });
 });
+
+test('en oläst lektion öppnas när banan börjar, går att hoppa över och kommer inte tillbaka direkt', async ({ page }) => {
+  await newHero(page);
+  await page.removeLocatorHandler(page.getByRole('button', { name: 'Hoppa över', exact: true }));
+  await page.goto('./#/omrade/kublabbet');
+  await page.getByRole('button', { name: /Spela: Mitt, kant och hörn/ }).click();
+  await expect(page.getByRole('dialog', { name: /Klassrummet: Kubens delar/ })).toBeVisible();
+  await shot(page, '8-intro');
+  await page.getByRole('button', { name: 'Hoppa över', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.locator('.kub3d').first()).toBeVisible();
+  // Samma bana igen i samma besök: ingen lektion som tjatar.
+  await page.goto('./#/omrade/kublabbet');
+  await page.getByRole('button', { name: /Spela: Mitt, kant och hörn/ }).click();
+  await expect(page.locator('.kub3d').first()).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+});

@@ -15,6 +15,7 @@ async function newHero(page: Page) {
   }
   await page.getByRole('button', { name: 'Kliv in i riket!' }).click();
   await expect(page.getByRole('group', { name: 'Karta över ön' })).toBeVisible();
+  await page.addLocatorHandler(page.getByRole('button', { name: 'Hoppa över', exact: true }), (b) => b.click());
 }
 
 /** Svarar på en flervalsfråga: provar alternativ tills den är klar (fel måste rättas). */

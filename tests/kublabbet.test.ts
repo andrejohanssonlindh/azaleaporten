@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BITAR, LOST, PLATSER, arLost, bitMedFarger, dragBas, inv, invDrag, pa, parse, sitter, vrid, type Drag, type Farg } from '../src/engines/kub/kub';
-import { ALG, delDrag, gulForm, gulFormFri, los, type Del } from '../src/engines/kub/losning';
+import { ALG, delDrag, gulForm, gulFormFri, kronblad, los, type Del } from '../src/engines/kub/losning';
 import { KUB_ERR, blanda, diagnosDrag, diagnosLosa, explainKub, klart, makeKub, specsForSkill, type KubQ } from '../src/games/kub/logic';
 import { KUBLABBET } from '../src/games/kub/content';
 import { allNodes } from '../src/platform/rpg/types';
@@ -77,6 +77,19 @@ describe('nybörjarlösaren', () => {
     expect(gulForm(bak(ALG.gulkors.drag))).toBe('linje');
     expect(gulForm(bak([...ALG.gulkors.drag, ...ALG.gulkors.drag]))).toBe('L');
     expect(gulFormFri('obyoygbrgyyrrrrrrryyobbbbbbwwwwwwwwwyyroooooogybgggggg')).toBe('prick');
+  });
+});
+
+describe('lektionerna', () => {
+  it('blommans fall: tre kronblad före, och först sista draget ger det fjärde', async () => {
+    const { BLOMMA, BLOMFALL } = await import('../src/games/kub/lektioner');
+    for (const alg of BLOMFALL) {
+      const d = parse(alg);
+      const start = vrid(BLOMMA, inv(d));
+      expect(kronblad(start), alg).toBe(3);
+      expect(kronblad(vrid(start, d.slice(0, -1))), alg).toBe(3);
+      expect(vrid(start, d), alg).toBe(BLOMMA);
+    }
   });
 });
 

@@ -25,7 +25,10 @@ import { stigmonster } from '../content/monsters';
 import { HeroFigure } from './HeroFigure';
 import { Loading, useGame } from './useGame';
 import { findLesson, LessonLayer, NudgeAsk, NudgeBar, type LessonAt } from './Klassrum';
-import { lessonDone, nudgeFor } from '../platform/learning/lektioner';
+import { lessonDone, lessonForNode, nudgeFor } from '../platform/learning/lektioner';
+
+/** Lektioner som redan har öppnats av sig själva före en bana i det här besöket (så att Hoppa över inte tjatar). */
+const visadeForeBanan = new Set<string>();
 
 // Spelskärmen: en runda (10 frågor), en repetition (5 frågor) eller en bossstrid.
 
@@ -88,6 +91,15 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
   const [bossLine, setBossLine] = useState<string>('');
   const [confirmQuit, setConfirmQuit] = useState(false);
   /** Klassrummets lektion som ligger över rundan, och om Mästare Kastanj redan har frågat (stark) i den här rundan. */
+  // En oläst lektion till banan öppnas av sig själv när en runda börjar (en gång per besök); den går att hoppa över.
+  const [intro, setIntro] = useState<LessonAt | null>(() => {
+    if (!p || !node || !pl || !run || run.index > 0 || run.results.length || (run.kind !== 'stage' && run.kind !== 'boss')) return null;
+    const meta = lessonForNode(pl.def, node.id);
+    const key = `${p.id}/${areaId}/${meta?.id}`;
+    if (!meta || lessonDone(p.id, areaId, meta.id) || visadeForeBanan.has(key)) return null;
+    visadeForeBanan.add(key);
+    return { areaId, meta };
+  });
   const [lessonOpen, setLessonOpen] = useState<LessonAt | null>(null);
   const [asked, setAsked] = useState(false);
   const q = useMemo(() => (run && node && pl ? currentQuestion(run, node, game) : null), [run?.seed, run?.index]);
@@ -236,6 +248,7 @@ function PlayRun({ areaId, nodeId, practice = false, review = false, veckans = f
   return (
     <Screen class="play">
       {lessonOpen && <LessonLayer at={lessonOpen} onClose={() => setLessonOpen(null)} />}
+      {intro && !lessonOpen && <LessonLayer at={intro} intro closeLabel="Börja banan" onClose={() => setIntro(null)} />}
       <header class="play-head">
         <div class="play-title">
           <small>{review ? `🌫️ ${area.title}` : veckans ? `📝 ${area.title}` : practice ? '🎯 Övningsängen' : `${era!.icon} ${era!.name}`}</small>

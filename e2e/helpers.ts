@@ -13,6 +13,8 @@ export async function newHero(page: Page) {
   }
   await page.getByRole('button', { name: 'Kliv in i riket!' }).click();
   await expect(page.getByRole('group', { name: 'Karta över ön' })).toBeVisible();
+  // En oläst lektion öppnas av sig själv när en bana börjar. Testerna som inte handlar om den hoppar över den.
+  await page.addLocatorHandler(page.getByRole('button', { name: 'Hoppa över', exact: true }), (b) => b.click());
 }
 
 /** Räknar ut svaret ur uppställningen på skärmen (rutan är input-fältet). */

@@ -75,7 +75,7 @@ function PageView({ page, game, shown, onShow }: { page: LessonPage; game: GameM
 }
 
 /** En lektion. onClose = tillbaka till rundan eller sidan man kom från. */
-export function LessonView({ at, onClose, closeLabel }: { at: LessonAt; onClose: () => void; closeLabel: string }) {
+export function LessonView({ at, onClose, closeLabel, intro }: { at: LessonAt; onClose: () => void; closeLabel: string; intro?: boolean }) {
   dataRev.value;
   const game = useGame(at.areaId);
   const [page, setPage] = useState(0);
@@ -121,6 +121,12 @@ export function LessonView({ at, onClose, closeLabel }: { at: LessonAt; onClose:
   return (
     <div class="lesson">
       {head}
+      {intro && page === 0 && (
+        <div class="lesson-intro">
+          <span>Innan banan: en kort lektion som visar hur man gör.</span>
+          <button class="btn small" onClick={onClose}>Hoppa över</button>
+        </div>
+      )}
       <div class="run-dots lesson-dots" aria-label={`Sida ${page + 1} av ${pages.length}`}>
         {pages.map((_, i) => <span key={i} class={`dot${i < page ? ' ok' : i === page ? ' now' : ''}`} />)}
       </div>
@@ -149,10 +155,10 @@ export function KlassrumPage({ areaId, lessonId }: { areaId: string; lessonId: s
 }
 
 /** Lektionen som ett lager över en runda eller fri övning: det som ligger under rörs inte. */
-export function LessonLayer({ at, onClose, closeLabel = 'Tillbaka till frågan' }: { at: LessonAt; onClose: () => void; closeLabel?: string }) {
+export function LessonLayer({ at, onClose, closeLabel = 'Tillbaka till frågan', intro }: { at: LessonAt; onClose: () => void; closeLabel?: string; intro?: boolean }) {
   return (
     <div class="lesson-layer" role="dialog" aria-modal="true" aria-label={`Klassrummet: ${at.meta.title}`}>
-      <LessonView at={at} onClose={onClose} closeLabel={closeLabel} />
+      <LessonView at={at} onClose={onClose} closeLabel={closeLabel} intro={intro} />
     </div>
   );
 }
