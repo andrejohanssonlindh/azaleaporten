@@ -127,7 +127,7 @@ export const KUBLABBET: AreaDef = {
       ] },
     { id: 'kubmastarens-rum', name: 'Kubmästarens rum', icon: '🏆', fact: 'Nu kan du alla åtta stegen. Med dem kan du lösa vilken Rubiks kub som helst!',
       nodes: [
-        stage('hela-gula-sidan', 'Hela gula sidan', '🌕', 'Ett helt steg själv', 'gul', 1, 70000),
+        stage('hela-gula-sidan', 'Gula sidan själv', '🌕', 'Välj rätt kubprogram och gör det', 'gul', 1, 45000),
         stage('utantill', 'Utantill', '🧠', 'Kubprogrammen utan lapp', 'trick', 0, 20000),
         KUBMASTAREN,
       ] },

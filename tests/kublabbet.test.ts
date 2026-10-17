@@ -93,6 +93,41 @@ describe('lektionerna', () => {
   });
 });
 
+describe('lektionernas strategier', () => {
+  it('varje film hittar ett riktigt läge, och filmen gör det den säger', async () => {
+    const { FILM, hitta } = await import('../src/games/kub/lektioner');
+    for (const [id, f] of Object.entries(FILM)) {
+      const { del, i, delar } = hitta(f.ok);
+      const drag = (f.drag ?? ((d: Del) => delDrag(d)))(del, i, delar);
+      expect(drag.length, id).toBeGreaterThan(0);
+      if (id === 'horn-hoger') expect(del.ganger).toBe(1);
+      if (id === 'horn-upp') expect(del.ganger).toBe(3);
+      if (id === 'horn-fram') expect(del.ganger).toBe(5);
+      if (id.startsWith('horn') || id.startsWith('mitten')) expect(sitter(vrid(del.fore, drag), bitMedFarger(vrid(del.fore, drag), del.bit!)), id).toBe(true);
+    }
+  });
+
+  it('gula kanterna: med gult kors passar alltid minst två kanter när U vrids rätt', () => {
+    for (let s = 1; s <= 300; s++) {
+      const d = los(slump(s)).find((x) => x.steg === 'gulkant');
+      if (!d) continue;
+      const kanter = BITAR.filter((b) => b.typ === 'kant' && b.pos[1] === 1);
+      const bast = Math.max(...[0, 1, 2, 3].map((u) => { const k = vrid(d.fore, Array(u).fill('U')); return kanter.filter((b) => sitter(k, b)).length; }));
+      expect(bast).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('mittenlagret: toppfärgen visar hållet', () => {
+    for (let s = 1; s <= 200; s++) {
+      for (const d of los(slump(s)).filter((x) => x.steg === 'mitten' && !x.lossnar)) {
+        const k = vrid(d.fore, d.forbered);
+        const uf = BITAR.find((b) => b.pos.join() === '0,1,1')!;
+        expect(k[pa(uf, 'U')!] === k[13] ? 'mitten-h' : 'mitten-v').toBe(d.algId);
+      }
+    }
+  });
+});
+
 describe('frågorna', () => {
   const lagen: [string, number][] = [
     ['bitar', 0], ['bitar', 1], ['bitar', 2], ['drag', 0], ['drag', 1], ['vilket', 0], ['vilket', 1], ['sekvens', 0], ['sekvens', 1],

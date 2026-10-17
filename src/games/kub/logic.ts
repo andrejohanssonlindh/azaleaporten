@@ -209,14 +209,19 @@ function lage(rng: Rng, ok: (d: Del, i: number, delar: Del[]) => boolean): { del
 }
 
 /** Första delen i ett steg (läget när steget börjar) och alla stegets drag. */
-function helaSteget(rng: Rng, steg: StegId) {
-  const { del, i, delar } = lage(rng, (d, j, ds) => d.steg === steg && (j === 0 || ds[j - 1].steg !== steg) && ds.filter((x) => x.steg === steg).some((x) => x.alg.length));
+/** maxAlg = högst så många kubprogram i steget (så att en uppgift inte blir för lång att göra tio gånger). */
+function helaSteget(rng: Rng, steg: StegId, maxAlg = Infinity) {
+  const { del, i, delar } = lage(rng, (d, j, ds) => {
+    if (d.steg !== steg || (j > 0 && ds[j - 1].steg === steg)) return false;
+    const n = ds.filter((x) => x.steg === steg && x.alg.length).length;
+    return n > 0 && n <= maxAlg;
+  });
   const alla = delar.slice(i).filter((_, j, rest) => rest.slice(0, j + 1).every((x) => x.steg === steg));
   return { start: del.fore, losning: alla.flatMap(delDrag) };
 }
 
 /** Delarna från i tills biten sitter (en fastsittande bit behöver två delar). */
-function tillsDetSitter(delar: Del[], i: number): Drag[] {
+export function tillsDetSitter(delar: Del[], i: number): Drag[] {
   const f = delar[i].bit!;
   const ut: Drag[] = [];
   for (let j = i; j < delar.length; j++) {
@@ -312,7 +317,8 @@ export function makeKub(spec: QuestionSpec, rng: Rng): KubQ {
       : [['bitar', 1], ['bitar', 2], ['drag', 1], ['vilket', 1], ['sekvens', 1], ['kors', 1], ['trick', 0]];
     [mode, level] = rng.pick(val);
   }
-  if (mode === 'gul') [mode, level] = rng.pick<[string, number]>([['gulkors', 1], ['gulkant', 1], ['gulhorn', 1], ['vridhorn', 1]]);
+  // Gula sidan själv: ett (högst två) kubprogram per uppgift. Att vrida hörnen kräver alltid flera, så det övas med lappen (nivå 0).
+  if (mode === 'gul') [mode, level] = rng.pick<[string, number]>([['gulkors', 1], ['gulkant', 1], ['gulhorn', 1], ['vridhorn', 0]]);
   const skill = mode === 'drag' ? (level >= 1 ? 'prog.kub.prim' : 'prog.kub.drag') : SKILL[mode] ?? 'prog.kub.drag';
   const b = (max: number) => ({ mode, level: clamp(level, max), skill });
 
@@ -396,7 +402,8 @@ export function makeKub(spec: QuestionSpec, rng: Rng): KubQ {
           : `Gör ner-tricket ${del.ganger === 2 ? 'två' : 'fyra'} gånger, tills gult pekar uppåt på hörnet fram till höger.`;
         return gor(b(1), prompt, start, del.alg, { topp: steg !== 'vridhorn', grupp: id === 'ner' ? 4 : undefined, underifran: steg === 'vridhorn', markera: steg === 'vridhorn' ? bitMedFarger(start, del.bit!).platser : undefined });
       }
-      const { start, losning } = helaSteget(rng, steg);
+      // Gula korset får ta två kubprogram (L → linje → kors); de andra ett. Vrid hörnen kräver flera hörn och tar längre tid.
+      const { start, losning } = helaSteget(rng, steg, steg === 'gulkors' ? 2 : steg === 'vridhorn' ? Infinity : 1);
       const prompt = steg === 'gulkors' ? 'Gör ett gult kors på toppen!' : steg === 'gulkant' ? 'Få alla gula kanter att passa mittbitarna!'
         : steg === 'gulhorn' ? 'Flytta de gula hörnen till rätt platser! (De får vara vända fel.)' : 'Vrid de gula hörnen rätt och lös kuben!';
       return {

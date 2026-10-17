@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { BITAR, LOST, PLATSER, dragAxel, dragVarv, invDrag, parse, platsVid, visa, vrid, type Drag, type Kub, type Vec } from './kub';
+import { BITAR, LOST, PLATSER, bitMedFarger, dragAxel, dragVarv, invDrag, parse, platsVid, visa, vrid, type Drag, type Farg, type Kub, type Vec } from './kub';
 
 // Kuben i 3D med CSS-transformer (inga bibliotek). 26 små kuber; ett drag animeras genom att lagrets
 // kuber vrids, och när vridningen är klar byts färgerna och vridningen nollas.
@@ -242,7 +242,8 @@ export function DragRad({ alg, klara = -1, dold, grupp, label = 'Kubprogrammet' 
 // ---------- bilder till lektionerna ----------
 
 /** En kub som spelar upp ett kubprogram, ett drag i taget eller allt på en gång. */
-export function KubFilm({ alg, setup, fran = LOST, vy, etiketter, text, grupp }: { alg: string; setup?: string; fran?: Kub; vy?: 'upp' | 'ner'; etiketter?: boolean; text?: string; grupp?: number }) {
+/** bit = färgerna på biten som filmen handlar om; den lyser hela vägen, var den än hamnar. */
+export function KubFilm({ alg, setup, fran = LOST, vy, etiketter, text, grupp, bit }: { alg: string; setup?: string; fran?: Kub; vy?: 'upp' | 'ner'; etiketter?: boolean; text?: string; grupp?: number; bit?: Farg[] }) {
   const drag = parse(alg);
   const start = setup ? vrid(fran, parse(setup)) : fran;
   const sp = useSpelare(start, 520);
@@ -257,7 +258,8 @@ export function KubFilm({ alg, setup, fran = LOST, vy, etiketter, text, grupp }:
   };
   return (
     <div class="kub-film">
-      <Kub3D kub={sp.visad} anim={sp.anim} onAnimEnd={sp.slut} vy={vy} etiketter={etiketter} s={40} label={text ?? `En kub som visar ${alg}`} />
+      <Kub3D kub={sp.visad} anim={sp.anim} onAnimEnd={sp.slut} vy={vy} etiketter={etiketter} s={40} label={text ?? `En kub som visar ${alg}`}
+        markera={bit ? bitMedFarger(sp.visad, bit).platser : undefined} />
       <DragRad alg={drag} klara={klara} grupp={grupp} />
       <div class="row center-row">
         <button type="button" class="btn small" onClick={allt}>▶ Spela</button>
