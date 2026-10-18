@@ -4,13 +4,13 @@ import { getHeroState, getProfile } from '../platform/profiles';
 import { randomSeed } from '../platform/rng';
 import { payToken } from '../platform/rpg/arena';
 import { giveSkattkistor, grantSpelTitlar, payKey } from '../platform/rpg/nycklar';
-import { finishKnut, KNUT_OFFHANDS, KNUT_WEAPONS, knutLoadout, knutResult, knutStarts, type KnutResult } from '../platform/rpg/trassel';
+import { finishKnut, KNUT_MODES, KNUT_OFFHANDS, KNUT_WEAPONS, knutBest, knutLoadout, knutResult, knutStarts, type KnutMode, type KnutResult } from '../platform/rpg/trassel';
 import { leaveToPicker } from '../session';
 import { HeroFigure } from './HeroFigure';
 import { Purse, TokenRow } from './Polletter';
 import { BackBar, Screen } from './ui';
 import { Loading, useLoaded } from './useGame';
-import type { Game } from '../minigames/trassel/sim';
+import type { Game } from '../minigames/trassel/strid';
 
 // Trasselvinden på Spelön: förberedelser, själva spelet (laddas först när det startar) och resultatet.
 // Lämnar barnet sidan mitt i en runda sparas det som samlats, som om barnet hade tryckt på Lämna.
@@ -20,17 +20,19 @@ const loadKnut = () => import('../minigames/trassel/View');
 export function Trasselvinden() {
   dataRev.value;
   const p = getProfile(heroId.value!);
-  const [run, setRun] = useState<{ seed: number; start: number; skatt: boolean } | null>(null);
-  const [result, setResult] = useState<(KnutResult & { record: boolean; titles: string[] }) | null>(null);
+  const [mode, setMode] = useState<KnutMode>('pinnar');
+  const [run, setRun] = useState<{ seed: number; start: number; skatt: boolean; mode: KnutMode } | null>(null);
+  const [result, setResult] = useState<(KnutResult & { record: boolean; titles: string[]; mode: KnutMode }) | null>(null);
   const [start, setStart] = useState<number | null>(null);
   const live = useRef<Game | null>(null);
+  const liveMode = useRef<KnutMode>('pinnar');
   const saved = useRef(true);
 
   useEffect(() => () => {
     const g = live.current;
     if (p && g && !saved.current) {
       const r = knutResult(g);
-      finishKnut(p.id, r);
+      finishKnut(p.id, r, liveMode.current);
       giveSkattkistor(p.id, r.skatter, 'Trasselvinden');
       grantSpelTitlar(p.id);
     }
@@ -38,7 +40,7 @@ export function Trasselvinden() {
 
   if (!p) { queueMicrotask(leaveToPicker); return null; }
   const s = getHeroState(p.id);
-  const starts = knutStarts(s.trassel.best);
+  const starts = knutStarts(knutBest(s, mode));
   const from = start !== null && starts.includes(start) ? start : starts.at(-1)!;
 
   function begin(withKey = false) {
@@ -46,18 +48,20 @@ export function Trasselvinden() {
     saved.current = false;
     live.current = null;
     setResult(null);
-    setRun({ seed: randomSeed(), start: from, skatt: withKey });
+    liveMode.current = mode;
+    setRun({ seed: randomSeed(), start: from, skatt: withKey, mode });
     touch();
   }
 
   function end(r: KnutResult) {
     if (saved.current) return;
     saved.current = true;
-    const record = r.best > getHeroState(p!.id).trassel.best;
-    finishKnut(p!.id, r);
+    const m = liveMode.current;
+    const record = r.best > knutBest(getHeroState(p!.id), m);
+    finishKnut(p!.id, r, m);
     giveSkattkistor(p!.id, r.skatter, 'Trasselvinden');
     const titles = grantSpelTitlar(p!.id);
-    setResult({ ...r, record, titles });
+    setResult({ ...r, record, titles, mode: m });
     setRun(null);
     touch();
   }
@@ -75,7 +79,7 @@ export function Trasselvinden() {
           <div class="big-emoji">{result.fell ? '💫' : '🏡'}</div>
           <h1>{result.solved ? `Du löste ${result.solved} knut${result.solved === 1 ? '' : 'ar'}!` : 'Knuten vann den här gången'}</h1>
           <p>+{result.blad} 🌸 azaleablad · {result.kills} monster</p>
-          {result.record && <p><b>Nytt rekord: knut {result.best}!</b></p>}
+          {result.record && <p><b>Nytt rekord i {KNUT_MODES[result.mode].name.toLowerCase()}: knut {result.best}!</b></p>}
           {result.skatter > 0 && <p>🎁 {result.skatter} skattkist{result.skatter === 1 ? 'a' : 'or'} – öppna i Azaleagården!</p>}
           {result.titles.map((t) => <p key={t}>🏷️ Ny titel: {t}</p>)}
           {result.fell && <p class="muted small">Tips: slå bort monstren när de kommer, och använd en klurig knuff 💡 när du kör fast.</p>}
@@ -85,7 +89,17 @@ export function Trasselvinden() {
       <section class="card storm-start">
         <HeroFigure hid={p.id} size={84} />
         <div>
-          <p>Uppe på vinden har alla rep trasslat ihop sig. <b>Dra pinnarna</b> tills inga rep korsar varandra. Varje knut är lite större än den förra. Men se upp: vindsmonstren gillar trassel!</p>
+          <p>Uppe på vinden har alla rep trasslat ihop sig. Varje knut är lite större än den förra. Men se upp: vindsmonstren gillar trassel!</p>
+          <div class="knut-modes" role="radiogroup" aria-label="Vilka knutar?">
+            {(Object.keys(KNUT_MODES) as KnutMode[]).map((k) => (
+              <button key={k} role="radio" aria-checked={k === mode} class={`knut-mode${k === mode ? ' on' : ''}`} onClick={() => { setMode(k); setStart(null); }}>
+                <span class="knut-mode-icon">{KNUT_MODES[k].icon}</span>
+                <b>{KNUT_MODES[k].name}</b>
+                <small>{KNUT_MODES[k].desc}</small>
+                {knutBest(s, k) > 0 && <small class="muted">Rekord: knut {knutBest(s, k)}</small>}
+              </button>
+            ))}
+          </div>
           {starts.length > 1 && (
             <div class="row center-row knut-starts" role="group" aria-label="Börja vid knut">
               <span class="small">Börja vid:</span>
@@ -98,7 +112,7 @@ export function Trasselvinden() {
           </div>
           {s.nycklar > 0 && <p class="small">🗝️ En skattrunda kostar en spelnyckel i stället för en pollett. Då gömmer sig skattkistor 🎁 i knutarna!</p>}
           <TokenRow hid={p.id} />
-          {s.trassel.runs > 0 && <p class="muted small">Högsta lösta knut: {s.trassel.best} · {s.trassel.runs} rundor</p>}
+          {s.trassel.runs > 0 && <p class="muted small">{s.trassel.runs} rundor på vinden</p>}
         </div>
       </section>
 
@@ -120,13 +134,13 @@ export function Trasselvinden() {
   );
 }
 
-function KnutRun({ hid, seed, start, skatt, live, onEnd }: { hid: string; seed: number; start: number; skatt: boolean; live: { current: Game | null }; onEnd: (r: KnutResult) => void }) {
+function KnutRun({ hid, seed, start, skatt, mode, live, onEnd }: { hid: string; seed: number; start: number; skatt: boolean; mode: KnutMode; live: { current: Game | null }; onEnd: (r: KnutResult) => void }) {
   const mod = useLoaded('trassel', loadKnut);
   if (mod === 'laddar' || mod === 'fel') return <Loading failed={mod === 'fel'} back="spelon" />;
   const Game = mod.default;
   return (
     <Screen class="place knut-place">
-      <Game hid={hid} seed={seed} start={start} skatt={skatt} live={live} onEnd={onEnd} />
+      <Game hid={hid} seed={seed} start={start} skatt={skatt} mode={mode} live={live} onEnd={onEnd} />
     </Screen>
   );
 }

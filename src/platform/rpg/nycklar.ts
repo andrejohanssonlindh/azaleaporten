@@ -43,7 +43,8 @@ export const SPEL_TITLAR: { title: string; ok: (s: ReturnType<typeof getHeroStat
   { title: 'Stormtämjaren', ok: (s) => s.storm.best >= 5, how: 'Klara steg 5 i Dimstormen' },
   { title: 'Djupdykaren', ok: (s) => s.grotta.best >= 10, how: 'Nå våning 10 i Grottdyket' },
   { title: 'Arenans hjälte', ok: (s) => s.arena.rank >= 6, how: 'Besegra sex motståndare i Arenan' },
-  { title: 'Knutmästaren', ok: (s) => s.trassel.best >= 10, how: 'Lös knut 10 på Trasselvinden' },
+  { title: 'Knutmästaren', ok: (s) => s.trassel.best >= 10, how: 'Lös pinnknut 10 på Trasselvinden' },
+  { title: 'Repmästaren', ok: (s) => s.trassel.rep >= 10, how: 'Lös repknut 10 på Trasselvinden' },
   { title: 'Skattjägaren', ok: (s) => s.skatter >= 10, how: 'Hitta tio skattkistor på Spelön' },
 ];
 

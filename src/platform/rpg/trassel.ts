@@ -3,8 +3,9 @@ import { getInv, effectiveStats, type Stats } from './inventory';
 import type { Item } from './items';
 import { offOf, weaponOf, type OffKind, type WeaponKind } from './dimstorm';
 
-// Trasselvinden: ett pusselspel på en vind full av trassliga rep. Barnet drar pinnarna tills inga rep
-// korsar varandra, och knutarna blir större för varje steg. Samtidigt kryper vindsmonster fram, och
+// Trasselvinden: ett pusselspel på en vind full av trassliga rep, i två lägen. Pinnknutar: dra pinnarna
+// tills inga rep korsar varandra. Repknutar: flytta repändar mellan hål, men bara ett rep som inget
+// ligger på kan lyftas. Knutarna blir större för varje steg. Samtidigt kryper vindsmonster fram, och
 // barnet trycker på dem för att slå. Utrustningen avgör hur slagen fungerar och egenskaperna sätter
 // siffrorna. Spelas med polletter och ger bara azaleablad. Själva spelet laddas först när det startar.
 
@@ -90,6 +91,16 @@ export const knutStarts = (best: number) => {
   return out;
 };
 
+export type KnutMode = 'pinnar' | 'rep';
+
+export const KNUT_MODES: Record<KnutMode, { icon: string; name: string; desc: string }> = {
+  pinnar: { icon: '📍', name: 'Pinnknutar', desc: 'Dra pinnarna tills inga rep korsar varandra.' },
+  rep: { icon: '🧶', name: 'Repknutar', desc: 'Flytta repändarna mellan hålen. Bara det översta repet går att lyfta!' },
+};
+
+/** Högsta lösta knuten i ett läge. */
+export const knutBest = (s: { trassel: { best: number; rep: number } }, mode: KnutMode) => (mode === 'rep' ? s.trassel.rep : s.trassel.best);
+
 export interface KnutResult { best: number; solved: number; blad: number; kills: number; skatter: number; fell: boolean }
 
 /** Rundans resultat ur spelets tillstånd. best = den högsta knuten som löstes (0 = ingen). */
@@ -98,8 +109,9 @@ export const knutResult = (g: { level: number; solved: number; phase: string; bl
 });
 
 /** Sparar en avslutad runda. best = den högsta knuten som löstes (0 = ingen). Allt man fått behålls. */
-export function finishKnut(hid: string, r: { best: number; blad: number }): number {
-  const s = getHeroState(hid);
-  saveHeroState(hid, { ...s, blad: s.blad + r.blad, trassel: { best: Math.max(s.trassel.best, r.best), runs: s.trassel.runs + 1 } });
+export function finishKnut(hid: string, r: { best: number; blad: number }, mode: KnutMode = 'pinnar'): number {
+  const s = getHeroState(hid), t = s.trassel;
+  const trassel = mode === 'rep' ? { ...t, rep: Math.max(t.rep, r.best), runs: t.runs + 1 } : { ...t, best: Math.max(t.best, r.best), runs: t.runs + 1 };
+  saveHeroState(hid, { ...s, blad: s.blad + r.blad, trassel });
   return r.blad;
 }

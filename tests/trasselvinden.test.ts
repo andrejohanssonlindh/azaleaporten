@@ -1,14 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createHero, getHeroState } from '../src/platform/profiles';
 import { STATS } from '../src/platform/rpg/items';
-import { finishKnut, knutLoadout, knutNumbers, knutResult, knutStarts, type KnutLoadout } from '../src/platform/rpg/trassel';
+import { finishKnut, knutBest, knutLoadout, knutNumbers, knutResult, knutStarts, type KnutLoadout } from '../src/platform/rpg/trassel';
 import { grantSpelTitlar } from '../src/platform/rpg/nycklar';
 import type { OffKind, WeaponKind } from '../src/platform/rpg/dimstorm';
 import { rngFrom } from '../src/platform/rng';
-import {
-  AREA, attack, bestNudge, BOSS_EVERY, crossings, gridFor, HERO, makeKnot, maxMons, MONS, moveDrag, grab, newGame, nextKnot, release,
-  segCross, spawnEvery, step, useHint, type Game, type Mon,
-} from '../src/minigames/trassel/sim';
+import { AREA, attack, BOSS_EVERY, HERO, maxMons, MONS, nextKnot, segCross, spawnEvery, step, useHint, type Game, type Mon } from '../src/minigames/trassel/strid';
+import { bestNudge, crossings, grab, gridFor, makeKnot, moveDrag, newGame, release, type PinnGame } from '../src/minigames/trassel/sim';
+import { lagg, lyft, makeRep, newRepGame, repFor, type RepKnut } from '../src/minigames/trassel/rep';
 import { freshStorage } from './helpers';
 
 beforeEach(() => { freshStorage(); });
@@ -18,11 +17,11 @@ const lo = (n: number, weapon: WeaponKind = 'svard', off: OffKind = null, pet: s
   ({ weapon, weaponIcon: '', off, offIcon: '', pet, ...knutNumbers(all(n), weapon, off, 'trollkarl') });
 
 /** Lägger alla pinnar på lösningen, som ett barn som drar en i taget. */
-function solve(g: Game) {
-  g.knot.goal.forEach((p, i) => { grab(g, i); moveDrag(g, p.x, p.y); release(g); });
+function solve(g: PinnGame) {
+  g.pz.goal.forEach((p, i) => { grab(g, i); moveDrag(g, p.x, p.y); release(g); });
 }
 const mon = (g: Game, x: number, y: number, hp = 50, kind: Mon['kind'] = 'ratta'): Mon => {
-  const m: Mon = { id: g.nextId++, kind, x, y, hp, maxHp: hp, dmg: 3, speed: MONS[kind].speed, peg: 0, stun: 0, bite: 0.4, wob: 0 };
+  const m: Mon = { id: g.nextId++, kind, x, y, hp, maxHp: hp, dmg: 3, speed: MONS[kind].speed, mal: 0, stun: 0, bite: 0.4, wob: 0 };
   g.mons.push(m);
   return m;
 };
@@ -74,14 +73,14 @@ describe('Trasselvinden: knutarna', () => {
     nextKnot(g);
     expect(g.phase).toBe('play');
     expect(g.level).toBe(2);
-    expect(g.knot.pegs.length).toBe(6);
+    expect(g.pz.pegs.length).toBe(6);
   });
 
   it('en knut löses inte medan barnet håller i en pinne', () => {
     const g = calm(lo(0));
-    g.knot.goal.forEach((p, i) => { g.knot.pegs[i] = { ...p }; });
+    g.pz.goal.forEach((p, i) => { g.pz.pegs[i] = { ...p }; });
     grab(g, 0);
-    moveDrag(g, g.knot.goal[0].x, g.knot.goal[0].y);
+    moveDrag(g, g.pz.goal[0].x, g.pz.goal[0].y);
     step(g, 0.1);
     expect(g.phase).toBe('play');
     release(g);
@@ -91,11 +90,11 @@ describe('Trasselvinden: knutarna', () => {
   it('en klurig knuff minskar trasslet och kostar en knuff', () => {
     for (let seed = 1; seed <= 10; seed++) {
       const g = newGame(lo(0), seed, 6);
-      const before = g.cross, hints = g.hints;
-      const b = bestNudge(g);
+      const before = g.pz.cross, hints = g.hints;
+      const b = bestNudge(g.pz);
       expect(b).not.toBeNull();
       expect(useHint(g)).toBe(true);
-      expect(g.cross).toBeLessThan(before);
+      expect(g.pz.cross).toBeLessThan(before);
       expect(g.hints).toBe(hints - 1);
     }
   });
@@ -121,20 +120,20 @@ describe('Trasselvinden: monstren', () => {
 
   it('spindeln rycker i en pinne, men inte i den barnet håller', () => {
     const g = calm(lo(0));
-    g.knot.goal.forEach((p, i) => { g.knot.pegs[i] = { ...p }; });
-    const s = mon(g, g.knot.pegs[0].x + 10, g.knot.pegs[0].y, 7, 'spindel');
+    g.pz.goal.forEach((p, i) => { g.pz.pegs[i] = { ...p }; });
+    const s = mon(g, g.pz.pegs[0].x + 10, g.pz.pegs[0].y, 7, 'spindel');
     grab(g, 0);
-    moveDrag(g, g.knot.goal[0].x, g.knot.goal[0].y);
+    moveDrag(g, g.pz.goal[0].x, g.pz.goal[0].y);
     step(g, 0.05);
     expect(g.mons).toContain(s);
     release(g);
     expect(g.phase).toBe('solved');
     const h = calm(lo(0), 3);
-    const at = { ...h.knot.pegs[0] };
+    const at = { ...h.pz.pegs[0] };
     mon(h, at.x + 10, at.y, 7, 'spindel');
     step(h, 0.05);
     expect(h.mons.length).toBe(0);
-    expect(h.knot.pegs[0]).not.toEqual(at);
+    expect(h.pz.pegs[0]).not.toEqual(at);
   });
 
   it('ett tryck slår, sedan måste slaget laddas', () => {
@@ -211,7 +210,7 @@ describe('Trasselvinden: framsteg', () => {
     finishKnut(id, r);
     finishKnut(id, { best: 2, blad: 1 });
     const s = getHeroState(id);
-    expect(s.trassel).toEqual({ best: 6, runs: 2 });
+    expect(s.trassel).toEqual({ best: 6, runs: 2, rep: 0 });
     expect(s.blad).toBe(r.blad + 1);
     expect(knutResult(calm(lo(0), 6)).best).toBe(0);
   });
@@ -227,5 +226,114 @@ describe('Trasselvinden: framsteg', () => {
     const id = hero();
     finishKnut(id, { best: 10, blad: 0 });
     expect(grantSpelTitlar(id)).toContain('Knutmästaren');
+  });
+});
+
+/** Repknutens läge som text: hålen och lagerordningen. */
+const snap = (pz: RepKnut) => JSON.stringify(pz.reps.map((r) => [r.a, r.b, r.z]));
+
+describe('Trasselvinden: repknutar', () => {
+  it('varje repknut börjar trasslig och går att lösa på par drag', () => {
+    for (let l = 1; l <= 16; l++) for (let seed = 1; seed <= 25; seed++) {
+      const pz = makeRep(l, rngFrom(seed * 77 + l));
+      const { reps, cols, rows } = repFor(l);
+      expect(pz.reps.length).toBe(reps);
+      expect(pz.holes.length).toBe(cols * rows);
+      expect(new Set(pz.reps.flatMap((r) => [r.a, r.b])).size).toBe(reps * 2);
+      expect(pz.cross, `knut ${l} seed ${seed}`).toBeGreaterThan(0);
+      expect(pz.par).toBe(pz.losning.length);
+      for (const d of pz.losning) expect(pz.flytta(d), `knut ${l} seed ${seed}`).toBe(true);
+      expect(pz.cross, `knut ${l} seed ${seed}`).toBe(0);
+      expect(pz.moves).toBe(pz.par);
+    }
+  });
+
+  it('det blir svårare: fler rep och fler trasselsteg', () => {
+    for (let l = 1; l < 20; l++) {
+      expect(repFor(l + 1).reps).toBeGreaterThanOrEqual(repFor(l).reps);
+      expect(repFor(l + 1).steg).toBeGreaterThanOrEqual(repFor(l).steg);
+    }
+    expect(repFor(1).reps).toBe(2);
+  });
+
+  it('ett rep med ett annat rep ovanpå går inte att lyfta; ett flyttat rep hamnar överst', () => {
+    for (let seed = 1; seed <= 10; seed++) {
+      const g = newRepGame(lo(0), seed, 6);
+      g.spawnT = 1e9;
+      const pz = g.pz;
+      const under = pz.reps.findIndex((_, i) => pz.covered(i));
+      expect(under).toBeGreaterThanOrEqual(0);
+      expect(lyft(g, under, 0)).toBe(false);
+      expect(pz.held).toBeNull();
+      expect(g.msg).toContain('ovanpå');
+      const top = pz.topp();
+      expect(pz.covered(top)).toBe(false);
+      expect(lyft(g, top, 1)).toBe(true);
+      expect(lagg(g, pz.freeHoles()[0])).toBe(true);
+      expect(pz.topp()).toBe(top);
+      expect(pz.moves).toBe(1);
+      // Ett upptaget hål eller ett släpp utanför flyttar ingenting.
+      lyft(g, top, 0);
+      expect(lagg(g, pz.reps.find((_, i) => i !== top)!.a)).toBe(false);
+      lyft(g, top, 0);
+      expect(lagg(g, null)).toBe(false);
+      expect(pz.moves).toBe(1);
+    }
+  });
+
+  it('spindelns trassel går alltid att ta tillbaka med ett drag', () => {
+    for (let seed = 1; seed <= 30; seed++) {
+      const pz = makeRep(1 + (seed % 12), rngFrom(seed));
+      const before = snap(pz);
+      const back = pz.bakat(rngFrom(seed + 999))!;
+      expect(back).not.toBeNull();
+      expect(pz.covered(back.rep)).toBe(false);
+      expect(pz.flytta(back)).toBe(true);
+      expect(snap(pz)).toBe(before);
+    }
+  });
+
+  it('spindeln väntar medan barnet håller i ett rep, och höjer par', () => {
+    const g = newRepGame(lo(0), 4, 3);
+    g.spawnT = 1e9;
+    const pz = g.pz, par = pz.par;
+    lyft(g, pz.topp(), 0);
+    expect(pz.trassla(0, rngFrom(1))).toBe(false);
+    pz.slapp();
+    expect(pz.trassla(0, rngFrom(1))).toBe(true);
+    expect(pz.par).toBe(par + 1);
+  });
+
+  it('den kluriga knuffen hjälper nästan alltid hela vägen', () => {
+    let ok = 0;
+    for (let seed = 1; seed <= 40; seed++) {
+      const pz = makeRep(2 + (seed % 12), rngFrom(seed * 13));
+      for (let k = 0; k < 40 && pz.cross > 0; k++) if (pz.knuff() === null) break;
+      if (pz.cross === 0) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(36);
+  });
+
+  it('få drag ger extra blad', () => {
+    const g = newRepGame(lo(0), 8, 6);
+    g.spawnT = 1e9; g.bossT = null;
+    for (const d of [...g.pz.losning]) { lyft(g, d.rep, d.end); lagg(g, d.to); }
+    expect(g.phase).toBe('solved');
+    expect(g.last!.bonus).toBeGreaterThan(0);
+    const h = newRepGame(lo(0), 8, 6);
+    h.spawnT = 1e9; h.bossT = null;
+    h.pz.par = 0;
+    for (const d of [...h.pz.losning]) { lyft(h, d.rep, d.end); lagg(h, d.to); }
+    expect(h.last!.bonus).toBe(0);
+  });
+
+  it('repknutarna har ett eget rekord och en egen titel', () => {
+    const id = hero();
+    finishKnut(id, { best: 10, blad: 3 }, 'rep');
+    const s = getHeroState(id);
+    expect(s.trassel).toEqual({ best: 0, runs: 1, rep: 10 });
+    expect(knutBest(s, 'rep')).toBe(10);
+    expect(knutBest(s, 'pinnar')).toBe(0);
+    expect(grantSpelTitlar(id)).toContain('Repmästaren');
   });
 });

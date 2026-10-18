@@ -911,6 +911,25 @@ button.stat.on { border-color: var(--accent); }
 .knut-hero svg { width: 100%; height: auto; display: block; }
 .knut-pet { position: absolute; right: -40%; bottom: 4%; font-size: min(6vw, 28px); }
 .knut-starts { flex-wrap: wrap; }
+.knut-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 8px 0; }
+.knut-mode { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 8px; border: 3px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); text-align: center; }
+.knut-mode.on { border-color: var(--accent); background: var(--bg2); }
+.knut-mode small { font-size: 13px; line-height: 1.25; color: var(--muted); }
+.knut-mode-icon { font-size: 30px; line-height: 1.1; }
+.knut-drag { align-self: center; font-size: 14px; }
+.rep-hal { fill: #2b1d10; stroke: #8a6a45; stroke-width: 4; }
+.rep-hal.mal { stroke: #ffd43b; stroke-width: 7; }
+.rep line { stroke-linecap: round; }
+.rep .skugga { stroke: rgba(0, 0, 0, .35); stroke-width: 24; }
+.rep .kant { stroke: rgba(0, 0, 0, .55); stroke-width: 26; }
+.rep .farg { stroke-width: 18; }
+.rep .glans { stroke: rgba(255, 255, 255, .35); stroke-width: 5; stroke-dasharray: 12 10; }
+.rep.lyft .skugga { stroke-width: 30; translate: 10px 14px; stroke: rgba(0, 0, 0, .25); }
+.rep.fri { filter: drop-shadow(0 0 8px rgba(255, 255, 255, .7)); }
+.rep.glow { filter: drop-shadow(0 0 14px #ffd43b); }
+.rep-pinne circle:first-child { stroke: rgba(0, 0, 0, .6); stroke-width: 6; }
+.rep-pinne .knopp { fill: rgba(255, 255, 255, .55); }
+.rep-pinne.vald circle:first-child { stroke: #ffd43b; stroke-width: 9; }
 
 /* ---------- Arenan: Bossduellen ---------- */
 .duel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
