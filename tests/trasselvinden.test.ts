@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createHero, getHeroState } from '../src/platform/profiles';
 import { STATS } from '../src/platform/rpg/items';
 import { finishKnut, knutBest, knutLoadout, knutNumbers, knutResult, knutStarts, type KnutLoadout } from '../src/platform/rpg/trassel';
-import { grantSpelTitlar } from '../src/platform/rpg/nycklar';
+import { giveSkattkistor, grantSpelTitlar } from '../src/platform/rpg/nycklar';
+import { KEYS } from '../src/platform/rpg/balance';
+import { getInv } from '../src/platform/rpg/inventory';
 import type { OffKind, WeaponKind } from '../src/platform/rpg/dimstorm';
 import { rngFrom } from '../src/platform/rng';
-import { AREA, attack, BOSS_EVERY, HERO, maxMons, MONS, nextKnot, segCross, spawnEvery, step, useHint, type Game, type Mon } from '../src/minigames/trassel/strid';
+import { AREA, attack, BOSS_EVERY, checkSolved, HERO, maxMons, MONS, nextKnot, segCross, spawnEvery, step, useHint, type Game, type Mon } from '../src/minigames/trassel/strid';
 import { bestNudge, crossings, grab, gridFor, makeKnot, moveDrag, newGame, release, type PinnGame } from '../src/minigames/trassel/sim';
 import { lagg, lyft, makeRep, newRepGame, repFor, type RepKnut } from '../src/minigames/trassel/rep';
 import { freshStorage } from './helpers';
@@ -215,11 +217,39 @@ describe('Trasselvinden: framsteg', () => {
     expect(knutResult(calm(lo(0), 6)).best).toBe(0);
   });
 
-  it('skattrundan ger kistor varannan knut, högst tre', () => {
-    const g = newGame(lo(0), 5, 1, true);
-    g.spawnT = 1e9;
-    for (let k = 0; k < 8; k++) { g.spawnT = 1e9; g.bossT = null; solve(g); nextKnot(g); }
-    expect(g.skatter).toBe(3);
+  it('skattrundan ger kistor varannan knut, högst KEYS.chestsPerRun, i båda lägena', () => {
+    const solveAny = (g: Game) => {
+      if ('reps' in g.pz) for (const d of [...(g.pz as RepKnut).losning]) (g.pz as RepKnut).flytta(d);
+      else solve(g as PinnGame);
+      checkSolved(g);
+    };
+    for (const make of [newGame, newRepGame]) {
+      const run = (skatt: boolean) => {
+        const g: Game = make(lo(0), 5, 1, skatt);
+        const got: number[] = [];
+        for (let k = 0; k < 8; k++) {
+          g.spawnT = 1e9; g.bossT = null;
+          solveAny(g);
+          expect(g.phase).toBe('solved');
+          if (g.last!.skatt) got.push(g.solved);
+          nextKnot(g);
+        }
+        return { g, got };
+      };
+      const t = run(true);
+      expect(t.g.skatter).toBe(KEYS.chestsPerRun);
+      expect(t.got).toEqual([2, 4, 6]);
+      expect(knutResult(t.g).skatter).toBe(KEYS.chestsPerRun);
+      expect(run(false).g.skatter).toBe(0);
+    }
+  });
+
+  it('kistorna från en skattrunda hamnar i hjältens förråd', () => {
+    const id = hero();
+    const before = getInv(id).chests.length;
+    giveSkattkistor(id, 2, 'Trasselvinden');
+    expect(getInv(id).chests.length).toBe(before + 2);
+    expect(getHeroState(id).skatter).toBe(2);
   });
 
   it('Knutmästaren efter knut 10', () => {

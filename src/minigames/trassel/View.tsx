@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { HeroFigure } from '../../shell/HeroFigure';
+import { KEYS } from '../../platform/rpg/balance';
 import { KNUT_MODES, knutLoadout, knutResult, type KnutMode, type KnutResult } from '../../platform/rpg/trassel';
 import { attack, BH, BOSS_EVERY, BW, HERO, MONS, monAt, nextKnot, step, useHint, type Game, type Pt } from './strid';
 import { grab, gridFor, moveDrag, newGame, PEG_R, release, type PinnGame } from './sim';
@@ -120,7 +121,7 @@ export default function TrasselGame({ hid, seed, start = 1, skatt = false, mode 
       <div class="knut-hud">
         <div class="cave-hp"><div class="hpbar"><div style={{ width: `${hpPart * 100}%`, background: hpPart > 0.3 ? 'linear-gradient(90deg,#2f9e44,#69db7c)' : undefined }} /></div><small>❤️ {g.hp}/{lo.maxHp}</small></div>
         <b>{info.icon} Knut {g.level}</b>
-        <span>🌸 {g.blad}</span>
+        <span>🌸 {g.blad}{g.skatt && <> · 🎁 {g.skatter}/{KEYS.chestsPerRun}</>}</span>
       </div>
 
       <div class={`knut-board${zap ? ' zap' : ''}`}>
@@ -158,6 +159,7 @@ export default function TrasselGame({ hid, seed, start = 1, skatt = false, mode 
               <p>Repen på vinden har trasslat ihop sig! <b>Dra pinnarna</b> så att inga rep korsar varandra. Röda rep är trassliga, och när alla är bruna är knuten löst.</p>
             )}
             <p>Vindsmonster kryper fram ibland. <b>Tryck på dem</b> för att slå. 🕷️ Spindlar trasslar till repen, så hinn före!</p>
+            {g.skatt && <p>🗝️ <b>Skattrunda!</b> Varannan knut du löser gömmer en skattkista 🎁 (högst {KEYS.chestsPerRun}).</p>}
             <p class="small">Den här knuten har {size(g.level)}.</p>
             <button class="btn primary big" onClick={() => setOverlay(null)}>Börja reda ut! {info.icon}</button>
           </div>

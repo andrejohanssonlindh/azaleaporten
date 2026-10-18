@@ -1,4 +1,5 @@
 import { rngFrom, type Rng } from '../../platform/rng';
+import { KEYS } from '../../platform/rpg/balance';
 import type { KnutLoadout } from '../../platform/rpg/trassel';
 
 // Trasselvindens gemensamma del: monstren, striden och knut efter knut. Själva pusslet är utbytbart
@@ -133,6 +134,7 @@ export interface Game<P extends Pussel = Pussel> {
   kills: number;
   /** Lösta knutar i rundan. */
   solved: number;
+  /** Skattrunda (startad med en spelnyckel): en skattkista varannan löst knut, högst KEYS.chestsPerRun. */
   skatt: boolean;
   skatter: number;
   /** Visas i rutan när knuten är löst. */
@@ -182,7 +184,7 @@ export function checkSolved(g: Game) {
   const heal = Math.min(g.lo.heal, g.lo.maxHp - g.hp);
   g.blad += blad + bonus;
   g.hp += heal;
-  const skatt = g.skatt && g.solved % 2 === 0 && g.skatter < 3;
+  const skatt = g.skatt && g.solved % 2 === 0 && g.skatter < KEYS.chestsPerRun;
   if (skatt) g.skatter++;
   for (const m of g.mons) ev(g, { kind: 'text', x: m.x, y: m.y, text: '💨' });
   g.mons = [];
