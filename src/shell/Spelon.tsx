@@ -10,6 +10,7 @@ import { Purse, TokenRow } from './Polletter';
 export const MINISPEL = [
   { id: 'dimstormen', icon: '🌪️', name: 'Dimstormen', desc: 'Stå emot monstren ur dimman' },
   { id: 'grottdyket', icon: '⛏️', name: 'Grottdyket', desc: 'Hur djupt vågar du gå?' },
+  { id: 'trasselvinden', icon: '🪢', name: 'Trasselvinden', desc: 'Reda ut knutarna, slå bort monstren' },
   { id: 'arenan', icon: '🏟️', name: 'Arenan', desc: 'Bossduellen: hoppa, blockera, slå' },
 ] as const;
 

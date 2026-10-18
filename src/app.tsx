@@ -23,6 +23,7 @@ import { Arenan } from './shell/Arenan';
 import { Spelon } from './shell/Spelon';
 import { Dimstormen } from './shell/Dimstormen';
 import { Grottdyket } from './shell/Grottdyket';
+import { Trasselvinden } from './shell/Trasselvinden';
 import { pausedByOtherTab, takeOverTab } from './platform/tabs';
 import { Mentor, Screen } from './shell/ui';
 
@@ -68,6 +69,7 @@ export function App() {
   else if (page === 'arenan') view = <Arenan />;
   else if (page === 'dimstormen') view = <Dimstormen />;
   else if (page === 'grottdyket') view = <Grottdyket />;
+  else if (page === 'trasselvinden') view = <Trasselvinden />;
   else if (page === 'region' && a) view = <RegionView id={a} />;
   else if (page === 'omrade' && a) view = <AreaView id={a} />;
   // key = sökvägen, så att en ny bana alltid får ett nytt spel-tillstånd

@@ -872,6 +872,46 @@ button.stat.on { border-color: var(--accent); }
 @keyframes cave-bump { 50% { translate: 0 -15%; scale: 1.15; } }
 @keyframes cave-zap { 20% { background: #fff3bf; } }
 
+/* ---------- Trasselvinden ---------- */
+.place-banner.knut-banner { background: linear-gradient(135deg, #5c3d1e, #a0703c 55%, #ffd8a8); }
+.knut { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.knut-hud, .knut-board, .knut .cave-actions { width: min(100%, calc((100dvh - 210px) * 1000 / 1150)); min-width: min(100%, 280px); }
+.knut-hud { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 700; }
+.knut-board {
+  position: relative; aspect-ratio: 1000 / 1150; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow);
+  background: repeating-linear-gradient(90deg, #6b4a2b 0 96px, #5e4026 96px 100px), #6b4a2b;
+  user-select: none; -webkit-user-select: none; touch-action: none;
+}
+.knut-board.zap { animation: cave-zap .35s; }
+.knut-board svg { display: block; width: 100%; height: 100%; }
+.knut-floor { fill: #3f2a17; }
+.knut-rep line { stroke-linecap: round; }
+.knut-rep .ytter { stroke: #4a3114; stroke-width: 18; }
+.knut-rep .inner { stroke: #d9b26f; stroke-width: 10; stroke-dasharray: 14 8; }
+.knut-rep.trassel .ytter { stroke: #8f1d1d; }
+.knut-rep.trassel .inner { stroke: #ff6b6b; }
+.knut-rep.fri .inner { stroke: #8ce99a; }
+.knut-pinne circle { fill: #f1d3a1; stroke: #4a3114; stroke-width: 6; }
+.knut-pinne .hal { fill: #4a3114; stroke: none; }
+.knut-pinne.rod circle:first-child { stroke: #c92a2a; }
+.knut-pinne.drar circle:first-child { fill: #ffe066; transform: scale(1.25); }
+.knut-pinne.glow circle:first-child { fill: #fff3bf; stroke: #fab005; stroke-width: 10; }
+.knut-mon text { font-size: 84px; pointer-events: none; }
+.knut-mon.boss text { font-size: 120px; }
+.knut-mon .stun { font-size: 32px; }
+.knut-mon .hp-bg { fill: rgba(0, 0, 0, .55); }
+.knut-mon .hp { fill: #ff6b6b; }
+.knut-fx { font-size: 40px; font-weight: 900; fill: #fff; paint-order: stroke; stroke: #000; stroke-width: 6; pointer-events: none; }
+.knut-fx.hurt { fill: #ff8787; }
+.knut-fx.crit { fill: #ffd43b; font-size: 52px; }
+.knut-fx.info { font-size: 34px; }
+@media (prefers-reduced-motion: no-preference) { .knut-fx { animation: knut-float .9s ease-out forwards; } }
+@keyframes knut-float { from { opacity: 1; translate: 0 0; } to { opacity: 0; translate: 0 -50px; } }
+.knut-hero { position: absolute; bottom: 0; width: 13%; transform: translateX(-50%); pointer-events: none; }
+.knut-hero svg { width: 100%; height: auto; display: block; }
+.knut-pet { position: absolute; right: -40%; bottom: 4%; font-size: min(6vw, 28px); }
+.knut-starts { flex-wrap: wrap; }
+
 /* ---------- Arenan: Bossduellen ---------- */
 .duel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .duel-hud, .duel-stage, .duel-controls, .duel-special { width: min(100%, calc((100dvh - 250px) * .8)); min-width: min(100%, 280px); }
