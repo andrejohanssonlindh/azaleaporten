@@ -4,7 +4,8 @@ import { AREA, checkSolved, ev, newStrid, segCross, segDist, type Game, type Pt,
 
 // Repknutar: färgade rep med ändarna instuckna i hål på en bräda. Repen ligger i lager, och barnet får
 // bara lyfta ett rep som inget annat rep ligger ovanpå. Ett rep man flyttar läggs alltid överst.
-// Knuten är löst när inga rep rör varandra (korsar, eller ligger över ett annat reps ände).
+// Knuten är löst när inga rep rör varandra (korsar, eller ligger över ett annat reps ände) och inget rep
+// ligger över en plugg. Pluggade hål går inte att använda, så det finns färre ställen att lägga repen på.
 //
 // Varje knut byggs baklänges från ett löst läge, med steg som är exakta motsatser till riktiga drag:
 // topprepet flyttar en ände och trycks ner så långt det går utan att något hamnar ovanpå det. Därför
@@ -28,11 +29,16 @@ export type End = 0 | 1;
 /** Ett drag: flytta repets ände till hålet `to`. */
 export interface Drag { rep: number; end: End; to: number }
 
-/** Antal rep, hålens rutnät och antal trasselsteg för knut l. */
-export function repFor(l: number): { reps: number; cols: number; rows: number; steg: number } {
+/** Hål som alltid lämnas öppna (utöver repens ändar). */
+export const MIN_FRIA_HAL = 3;
+
+/** Antal rep, hålens rutnät, antal trasselsteg och antal pluggar för knut l. */
+export function repFor(l: number): { reps: number; cols: number; rows: number; steg: number; pluggar: number } {
   const reps = Math.min(9, 2 + Math.floor(l / 2));
   const [cols, rows] = reps <= 3 ? [3, 4] : reps <= 5 ? [4, 5] : reps <= 7 ? [5, 6] : [5, 7];
-  return { reps, cols, rows, steg: reps + Math.ceil(l / 2) };
+  const fria = cols * rows - reps * 2;
+  const pluggar = Math.max(0, Math.min(fria - MIN_FRIA_HAL, Math.round(fria * Math.min(0.55, 0.15 + 0.04 * l))));
+  return { reps, cols, rows, steg: reps + l, pluggar };
 }
 
 export function holesFor(cols: number, rows: number): Pt[] {
@@ -43,12 +49,14 @@ export function holesFor(cols: number, rows: number): Pt[] {
 }
 
 export class RepKnut implements Pussel {
-  hjalp = 'Flytta repändarna tills inga rep ligger över varandra. Bara det översta repet går att lyfta!';
+  hjalp = 'Flytta repändarna tills inga rep ligger över varandra eller över en plugg. Bara det översta repet går att lyfta!';
   level: number;
   cols: number;
   rows: number;
   holes: Pt[];
   reps: Rep[];
+  /** Pluggade hål: går inte att använda, och inget rep får ligga över dem. */
+  plugs = new Set<number>();
   /** Repänden som barnet håller i. */
   held: { rep: number; end: End } | null = null;
   moves = 0;
@@ -73,7 +81,16 @@ export class RepKnut implements Pussel {
   hole(i: number, e: End) { return e ? this.reps[i].b : this.reps[i].a; }
   private setHole(i: number, e: End, h: number) { if (e) this.reps[i].b = h; else this.reps[i].a = h; }
   used(): Set<number> { return new Set(this.reps.flatMap((r) => [r.a, r.b])); }
-  freeHoles(): number[] { const u = this.used(); return [...this.holes.keys()].filter((h) => !u.has(h)); }
+  /** Ett hål som en repände kan läggas i: varken använt eller pluggat. */
+  isFree(h: number): boolean { return !this.plugs.has(h) && !this.used().has(h); }
+  freeHoles(): number[] { const u = this.used(); return [...this.holes.keys()].filter((h) => !u.has(h) && !this.plugs.has(h)); }
+
+  /** Ligger rep i över en plugg? */
+  overPlug(i: number): boolean {
+    const a = this.end(i, 0), b = this.end(i, 1);
+    for (const p of this.plugs) if (segDist(this.holes[p], a, b) < PIN_R) return true;
+    return false;
+  }
 
   /** Rör rep i och j varandra: korsar de, eller ligger det ena över det andras ände? */
   touch(i: number, j: number): boolean {
@@ -90,6 +107,7 @@ export class RepKnut implements Pussel {
     for (let i = 0; i < this.reps.length; i++) for (let j = i + 1; j < this.reps.length; j++) {
       if (this.touch(i, j)) { n++; fria.delete(i); fria.delete(j); }
     }
+    for (let i = 0; i < this.reps.length; i++) if (this.overPlug(i)) { n++; fria.delete(i); }
     this.cross = n;
     this.fria = fria;
   }
@@ -110,7 +128,7 @@ export class RepKnut implements Pussel {
 
   /** Ett riktigt drag: lyft repet (om inget ligger ovanpå), flytta änden och lägg repet överst. */
   flytta(d: Drag): boolean {
-    if (this.covered(d.rep) || this.used().has(d.to)) return false;
+    if (this.covered(d.rep) || !this.isFree(d.to)) return false;
     this.setHole(d.rep, d.end, d.to);
     this.reps[d.rep].z = this.reps.length;
     this.renumber();
@@ -130,7 +148,7 @@ export class RepKnut implements Pussel {
       for (const to of free) {
         if (to === avoid) continue;
         this.setHole(i, end, to);
-        cands.push({ end, to, t: this.touching(i).length });
+        cands.push({ end, to, t: this.touching(i).length + (this.overPlug(i) ? 1 : 0) });
         this.setHole(i, end, from);
       }
     }
@@ -251,10 +269,18 @@ function tidy(l: number, rng: Rng): RepKnut {
   }
 }
 
-/** Bygger repknut nummer l: ett löst läge som trasslas till baklänges. */
+/** Pluggar tomma hål som inget rep ligger över i det lösta läget (så att det fortfarande är löst). */
+function plugga(pz: RepKnut, n: number, rng: Rng) {
+  const ok = pz.freeHoles().filter((h) => pz.reps.every((_, i) => segDist(pz.holes[h], pz.end(i, 0), pz.end(i, 1)) >= PIN_R));
+  for (const h of rng.shuffle(ok).slice(0, n)) pz.plugs.add(h);
+  pz.measure();
+}
+
+/** Bygger repknut nummer l: ett löst läge som pluggas och sedan trasslas till baklänges. */
 export function makeRep(l: number, rng: Rng): RepKnut {
   const pz = tidy(l, rng);
-  const { steg } = repFor(l);
+  const { steg, pluggar } = repFor(l);
+  plugga(pz, pluggar, rng);
   let last: number | undefined;
   for (let k = 0; (k < steg || pz.cross === 0) && k < steg * 3; k++) {
     const d = pz.bakat(rng, undefined, last);
@@ -291,6 +317,7 @@ export function lagg(g: RepGame, hole: number | null): boolean {
   const pz = g.pz, h = pz.held;
   pz.held = null;
   if (!h || hole === null || g.phase !== 'play') return false;
+  if (pz.plugs.has(hole)) { g.msg = 'Det hålet är pluggat. Välj ett annat!'; return false; }
   const ok = pz.flytta({ rep: h.rep, end: h.end, to: hole });
   if (ok) g.msg = pz.cross ? `${pz.cross} kvar att reda ut.` : g.msg;
   checkSolved(g);

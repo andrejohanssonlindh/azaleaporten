@@ -919,6 +919,9 @@ button.stat.on { border-color: var(--accent); }
 .knut-drag { align-self: center; font-size: 14px; }
 .rep-hal { fill: #2b1d10; stroke: #8a6a45; stroke-width: 4; }
 .rep-hal.mal { stroke: #ffd43b; stroke-width: 7; }
+.rep-plugg circle { fill: #a47148; stroke: #3b2410; stroke-width: 6; }
+.rep-plugg .topp { fill: #c99a6b; stroke: none; }
+.rep-plugg.rod circle:first-child { stroke: #e03131; stroke-width: 9; }
 .rep line { stroke-linecap: round; }
 .rep .skugga { stroke: rgba(0, 0, 0, .35); stroke-width: 24; }
 .rep .kant { stroke: rgba(0, 0, 0, .55); stroke-width: 26; }

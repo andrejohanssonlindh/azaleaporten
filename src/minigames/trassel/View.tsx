@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { HeroFigure } from '../../shell/HeroFigure';
 import { KEYS } from '../../platform/rpg/balance';
 import { KNUT_MODES, knutLoadout, knutResult, type KnutMode, type KnutResult } from '../../platform/rpg/trassel';
-import { attack, BH, BOSS_EVERY, BW, HERO, MONS, monAt, nextKnot, step, useHint, type Game, type Pt } from './strid';
+import { attack, BH, BOSS_EVERY, BW, HERO, MONS, monAt, nextKnot, segDist, step, useHint, type Game, type Pt } from './strid';
 import { grab, gridFor, moveDrag, newGame, PEG_R, release, type PinnGame } from './sim';
 import { FARGER, lagg, lyft, newRepGame, PIN_R, repFor, type RepGame } from './rep';
 
@@ -62,7 +62,7 @@ export default function TrasselGame({ hid, seed, start = 1, skatt = false, mode 
       if (pz.held) {
         // En ände är redan vald: ett tryck på ett tomt hål lägger den där.
         const h = pz.holeAt(p.x, p.y);
-        if (h !== null && !pz.used().has(h)) { lagg(g, h); rerender(); return; }
+        if (h !== null && pz.isFree(h)) { lagg(g, h); rerender(); return; }
         pz.held = null;
       }
       const pin = pz.pinAt(p.x, p.y);
@@ -154,6 +154,7 @@ export default function TrasselGame({ hid, seed, start = 1, skatt = false, mode 
               <>
                 <p>Repen ligger huller om buller! <b>Dra en repände</b> till ett tomt hål, eller tryck på änden och sedan på hålet. Knuten är löst när inga rep ligger över varandra.</p>
                 <p>🔒 Ett rep som har ett annat rep ovanpå sig går inte att lyfta. Börja med det som ligger <b>överst</b>! Ett rep du flyttar hamnar alltid överst.</p>
+                {isRep(g) && g.pz.plugs.size > 0 && <p>🪵 Pluggade hål går inte att använda, och inget rep får ligga över en plugg.</p>}
               </>
             ) : (
               <p>Repen på vinden har trasslat ihop sig! <b>Dra pinnarna</b> så att inga rep korsar varandra. Röda rep är trassliga, och när alla är bruna är knuten löst.</p>
@@ -230,6 +231,8 @@ function PinnLayer({ g, glow }: { g: PinnGame; glow: Set<number> }) {
 function RepLayer({ g, glow, drag }: { g: RepGame; glow: Set<number>; drag: { at: Pt; moved: boolean } | null }) {
   const pz = g.pz, held = pz.held;
   const used = pz.used();
+  const overPlug = new Set<number>();
+  for (const p of pz.plugs) if (pz.reps.some((_, i) => held?.rep !== i && segDist(pz.holes[p], pz.end(i, 0), pz.end(i, 1)) < PIN_R)) overPlug.add(p);
   // Lägst först, så att det översta repet ritas sist. Repet barnet håller i lyfts över allt.
   const lager = (i: number) => (held?.rep === i ? 99 : pz.reps[i].z);
   const order = [...pz.reps.keys()].sort((a, b) => lager(a) - lager(b));
@@ -237,7 +240,7 @@ function RepLayer({ g, glow, drag }: { g: RepGame; glow: Set<number>; drag: { at
   return (
     <>
       {pz.holes.map((h, i) => (
-        <circle key={i} cx={h.x} cy={h.y} r={18} class={`rep-hal${held && !used.has(i) ? ' mal' : ''}`} />
+        <circle key={i} cx={h.x} cy={h.y} r={18} class={`rep-hal${held && !used.has(i) && !pz.plugs.has(i) ? ' mal' : ''}`} />
       ))}
       {order.map((i) => {
         const a = endAt(i, 0), b = endAt(i, 1), lift = held?.rep === i;
@@ -257,6 +260,13 @@ function RepLayer({ g, glow, drag }: { g: RepGame; glow: Set<number>; drag: { at
           </g>
         );
       })}
+      {/* Pluggarna sticker upp, så de ritas över repen: ett rep som ligger över en plugg syns fastna. */}
+      {[...pz.plugs].map((i) => (
+        <g key={`p${i}`} class={`rep-plugg${overPlug.has(i) ? ' rod' : ''}`} transform={`translate(${pz.holes[i].x} ${pz.holes[i].y})`}>
+          <circle r={26} />
+          <circle r={14} class="topp" />
+        </g>
+      ))}
     </>
   );
 }

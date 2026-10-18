@@ -9,7 +9,7 @@ import type { OffKind, WeaponKind } from '../src/platform/rpg/dimstorm';
 import { rngFrom } from '../src/platform/rng';
 import { AREA, attack, BOSS_EVERY, checkSolved, HERO, maxMons, MONS, nextKnot, segCross, spawnEvery, step, useHint, type Game, type Mon } from '../src/minigames/trassel/strid';
 import { bestNudge, crossings, grab, gridFor, makeKnot, moveDrag, newGame, release, type PinnGame } from '../src/minigames/trassel/sim';
-import { lagg, lyft, makeRep, newRepGame, repFor, type RepKnut } from '../src/minigames/trassel/rep';
+import { lagg, lyft, makeRep, MIN_FRIA_HAL, newRepGame, repFor, type RepKnut } from '../src/minigames/trassel/rep';
 import { freshStorage } from './helpers';
 
 beforeEach(() => { freshStorage(); });
@@ -276,6 +276,42 @@ describe('Trasselvinden: repknutar', () => {
       expect(pz.cross, `knut ${l} seed ${seed}`).toBe(0);
       expect(pz.moves).toBe(pz.par);
     }
+  });
+
+  it('pluggade hål: aldrig använda, alltid några hål kvar, och knuten går ändå att lösa', () => {
+    for (let l = 1; l <= 16; l++) for (let seed = 1; seed <= 25; seed++) {
+      const pz = makeRep(l, rngFrom(seed * 31 + l));
+      const { reps, pluggar } = repFor(l);
+      expect(pz.plugs.size).toBe(pluggar);
+      expect(pz.freeHoles().length).toBeGreaterThanOrEqual(MIN_FRIA_HAL);
+      for (const d of pz.losning) {
+        expect(pz.plugs.has(d.to)).toBe(false);
+        expect(pz.flytta(d)).toBe(true);
+        for (const r of pz.reps) { expect(pz.plugs.has(r.a)).toBe(false); expect(pz.plugs.has(r.b)).toBe(false); }
+      }
+      expect(pz.cross).toBe(0);
+      expect(pz.reps.some((_, i) => pz.overPlug(i))).toBe(false);
+      expect(reps).toBe(pz.reps.length);
+    }
+    expect(repFor(1).pluggar).toBeGreaterThan(0);
+    expect(repFor(12).pluggar).toBeGreaterThan(repFor(2).pluggar);
+  });
+
+  it('en ände går inte att lägga i en plugg, och ett rep över en plugg är trassligt', () => {
+    const g = newRepGame(lo(0), 3, 8);
+    g.spawnT = 1e9;
+    const pz = g.pz, top = pz.topp(), plug = [...pz.plugs][0];
+    expect(lyft(g, top, 0)).toBe(true);
+    expect(lagg(g, plug)).toBe(false);
+    expect(g.msg).toContain('pluggat');
+    expect(pz.moves).toBe(0);
+    // Ett ensamt rep rakt över en plugg räknas som en knut.
+    const solo = new (pz.constructor as typeof RepKnut)(1, 3, 1, [{ a: 0, b: 2, z: 0, farg: 0 }]);
+    expect(solo.cross).toBe(0);
+    solo.plugs.add(1);
+    solo.measure();
+    expect(solo.cross).toBe(1);
+    expect(solo.fria.size).toBe(0);
   });
 
   it('det blir svårare: fler rep och fler trasselsteg', () => {
